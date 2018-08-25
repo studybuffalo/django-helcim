@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 
 [dev-packages]
+# Code quality
+# ------------------------------------------------------------------------------
+pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
 
 [requires]
 python_version = "3.6"
