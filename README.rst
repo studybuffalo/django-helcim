@@ -46,7 +46,9 @@ To be completed.
 License
 -------
 
-To be completed.
+This project is licensed under the GPLv3. Please see the LICENSE_ file for details.
+
+.. _LICENSE: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
 
 Acknowledgements
 ----------------
