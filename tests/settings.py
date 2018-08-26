@@ -1,5 +1,5 @@
 from oscar import OSCAR_MAIN_TEMPLATE_DIR, get_core_apps
-from oscar.defaults import *
+from oscar.defaults import * # pylint: disable=unused-wildcard-import
 
 # To specify integration settings (which include passwords, hence why they
 # are not committed), create an integration.py module.
