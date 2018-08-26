@@ -43,3 +43,10 @@ License
 This project is licensed under the GPLv3. Please see the LICENSE_ file for details.
 
 .. _LICENSE: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
+
+Acknowledgements
+----------------
+
+Thanks to the `django-oscar-paypal`_ developers, from which this package is designed after.
+
+.. _django-oscar-paypal: https://github.com/django-oscar/django-oscar-paypal
