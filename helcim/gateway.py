@@ -1,10 +1,6 @@
 import requests
+import xmltodict
 
-
-def xml_to_dictionary(xml):
-    dictionary = {}
-
-    return dictionary
 
 def post(url, post_data):
     """
@@ -24,7 +20,7 @@ def post(url, post_data):
     # Error handling
 
     # Return the response
-    return xml_to_dictionary(response)
+    return xmltodict.parse(response)
 
 def purchase():
     """
