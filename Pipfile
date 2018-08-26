@@ -6,8 +6,14 @@ name = "pypi"
 [packages]
 
 [dev-packages]
+# Django (for testing)
+# ------------------------------------------------------------------------------
+django = ">=2.1"  # https://github.com/django/django
+django-oscar = ">=1.6"  # https://github.com/django-oscar/django-oscar
+
 # Code quality
 # ------------------------------------------------------------------------------
+coverage = ">=4.5" # https://github.com/nedbat/coveragepy
 pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
 
 [requires]
