@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from helcim import gateway
 
