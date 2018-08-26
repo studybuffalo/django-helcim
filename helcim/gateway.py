@@ -21,6 +21,8 @@ def post(url, post_data):
     # Make the POST request
     response = requests.post(url, post_data, headers=post_headers)
 
+    # Error handling
+
     # Return the response
     return xml_to_dictionary(response)
 
