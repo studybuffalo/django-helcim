@@ -14,7 +14,7 @@ This application integrates the Helcim Payment API with django-oscar.
 Getting Started
 ---------------
 
-Full instructions can be found on `Read The Docs`_
+Full instructions can be found on `Read The Docs`_.
 
 .. _Read The Docs: https://django-oscar-helcim.readthedocs.io/en/latest/
 
@@ -33,7 +33,7 @@ This package uses a MAJOR.MINOR.PATCH versioning, as outlined at `Semantic Versi
 Authors
 -------
 
-Joshua Robert Torrance \<StudyBuffalo_\>
+Joshua Robert Torrance (StudyBuffalo_)
 
 .. _StudyBuffalo: https://github.com/studybuffalo
 
