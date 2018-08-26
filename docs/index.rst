@@ -3,23 +3,22 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to django-oscar-helcim's documentation!
-===============================================
+Django-oscar-helcim Documentation
+=================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
+This package provides integration between the `Helcim Commerce API`_ and `django-oscar`_. You can view the source code on GitHub_.
 
+.. _Helcim Commerce API: https://www.helcim.com/support/article/625-helcim-commerce-api-api-overview/
+.. _django-oscar: https://github.com/django-oscar/django-oscar
+.. _GitHub: https://github.com/studybuffalo/django-oscar-helcim
 
-Indices and tables
-==================
+Table of Contents
+=================
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-Testing
-=======
-
-This is the initial build of the package docs
