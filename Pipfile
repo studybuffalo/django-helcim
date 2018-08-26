@@ -4,12 +4,14 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+requests = ">=2.19"  # https://github.com/requests/requests/
 
 [dev-packages]
 # Django (for testing)
 # ------------------------------------------------------------------------------
 django = ">=2.1"  # https://github.com/django/django
 django-oscar = ">=1.6"  # https://github.com/django-oscar/django-oscar
+django-environ = ">=0.4"  # https://github.com/joke2k/django-environ
 
 # Code quality
 # ------------------------------------------------------------------------------
