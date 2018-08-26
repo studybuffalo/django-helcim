@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 requests = ">=2.19"  # https://github.com/requests/requests/
+xmltodict = ">=0.11.0"  # https://github.com/martinblech/xmltodict
 
 [dev-packages]
 # Django (for testing)
@@ -15,12 +16,16 @@ django-environ = ">=0.4"  # https://github.com/joke2k/django-environ
 
 # Code quality
 # ------------------------------------------------------------------------------
-coverage = ">=4.5" # https://github.com/nedbat/coveragepy
+coverage = ">=4.5"  # https://github.com/nedbat/coveragepy
 pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
+
+# Testing
+# ------------------------------------------------------------------------------
+pytest = ">=3.7"  # https://github.com/pytest-dev/pytest
 
 # Package Documentation
 # ------------------------------------------------------------------------------
-sphinx = ">=1.7" # https://github.com/sphinx-doc/sphinx
+sphinx = ">=1.7"  # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild = ">=0.7"  # https://github.com/GaretJax/sphinx-autobuild
 sphinx_rtd_theme = ">=0.4"  # https://github.com/rtfd/sphinx_rtd_theme
 
