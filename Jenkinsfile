@@ -1,8 +1,5 @@
 pipeline {
   agent any
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '10'))
-  }
   stages {
     stage('Build') {
       steps {
@@ -10,6 +7,7 @@ pipeline {
         script {
           sh 'pipenv install --dev'
         }
+
       }
     }
     stage('Test') {
@@ -18,7 +16,11 @@ pipeline {
         script {
           sh 'pipenv run pytest'
         }
+
       }
     }
+  }
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '10'))
   }
 }
