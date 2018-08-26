@@ -1,7 +1,8 @@
 django-oscar-helcim
 ===================
 
-.. image:: https://img.shields.io/github/package-json/v/badges/shields.svg :alt: GitHub 0.1.0
+.. image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
+   :alt: GitHub (pre-)release
 
 This application integrates the Helcim Payment API with django-oscar.
 
