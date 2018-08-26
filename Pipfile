@@ -20,6 +20,7 @@ pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
 # ------------------------------------------------------------------------------
 sphinx = ">=1.7" # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild = ">=0.7"  # https://github.com/GaretJax/sphinx-autobuild
+sphinx_rtd_theme = ">=0.4"  # https://github.com/rtfd/sphinx_rtd_theme
 
 [requires]
 python_version = "3.6"
