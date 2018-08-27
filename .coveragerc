@@ -2,5 +2,5 @@
 data_file = reports/coverage_report
 omit = helcim/migrations/*
 
-[html]
-directory = reports
+[xml]
+output = reports/coverage.xml
