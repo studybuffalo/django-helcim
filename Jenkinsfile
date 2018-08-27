@@ -14,14 +14,14 @@ pipeline {
       steps {
         echo 'Running unit tests'
         script {
-          sh 'pipenv run py.test --cov=helcim tests/'
+          sh 'pipenv run py.test --junit=reports/tests.xml --cov=helcim tests/'
         }
 
       }
     }
     stage('Reporting') {
       steps {
-        echo 'Generating coverage report'
+        echo 'Generating report'
         script {
           sh 'pipenv run coverage xml'
         }
