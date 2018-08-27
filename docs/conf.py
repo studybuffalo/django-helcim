@@ -15,7 +15,6 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(0, os.path.abspath('../helcim'))
 
 
 # -- Project information -----------------------------------------------------
@@ -156,3 +155,8 @@ texinfo_documents = [
      author, 'django-oscar-helcim', 'One line description of project.',
      'Miscellaneous'),
 ]
+
+
+# -- Options for Autodoc -----------------------------------------------------
+
+autodoc_mock_imports = ['xmltodict']
