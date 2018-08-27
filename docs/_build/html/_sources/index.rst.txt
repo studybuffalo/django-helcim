@@ -16,7 +16,7 @@ This package provides integration between the `Helcim Commerce API`_ and `django
    :maxdepth: 2
    :caption: Contents:
 
-   source/modules
+   source/helcim
 
 Table of Contents
 =================
