@@ -14,7 +14,7 @@ pipeline {
       steps {
         echo 'Running unit tests'
         script {
-          sh 'pipenv run py.test --junit=reports/tests.xml --cov=helcim tests/'
+          sh 'pipenv run py.test --junitxml=reports/tests.xml --cov=helcim tests/'
         }
 
       }
@@ -30,7 +30,7 @@ pipeline {
   }
   post {
     always {
-      step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+      step([$class: 'CoberturaPublisher', coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
     }
   }
   options {
