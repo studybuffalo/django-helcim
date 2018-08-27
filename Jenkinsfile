@@ -27,6 +27,11 @@ pipeline {
         }
       }
     }
+    post {
+        always {
+            step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+        }
+    }
   }
   options {
     buildDiscarder(logRotator(numToKeepStr: '10'))
