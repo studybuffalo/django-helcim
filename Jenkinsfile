@@ -22,6 +22,9 @@ pipeline {
     stage('Reporting') {
       steps {
         echo 'Generating coverage report'
+        script {
+          sh 'pipenv run coverage xml'
+        }
       }
     }
   }
