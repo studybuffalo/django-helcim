@@ -2,13 +2,19 @@ import requests
 import xmltodict
 
 
-def post(url, post_data):
-    """
-    Make a POST request to the provided URL and return response
-    as dictionary
+def post(url, post_data={}):
+    """Makes POST to Helcim API and provides response as dictionary.
 
-    url: URL to post to
-    post_data: dictionary of data to include with POST request
+    Args:
+        url (str): URL to the Helcim API.
+        post_data (dict): The parameters to pass with the POST request.
+
+    Returns:
+        dict: The API response.
+
+    Raises:
+        ValueError: TBD.
+
     """
 
     # Setup the POST header
@@ -23,38 +29,32 @@ def post(url, post_data):
     return xmltodict.parse(response)
 
 def purchase():
+    """Makes a purchase request
     """
-    Makes a purchase request
-
-    Will need to work out handling new card vs. token vs. customer code
-    """
+    # TODO: Will need to work out handling new card vs. token vs. customer code
 
     pass
 
 def refund():
-    """
-    Makes a refund request
+    """Makes a refund request
     """
 
     pass
 
 def verify():
-    """
-    Makes a verification request
+    """Makes a verification request
     """
 
     pass
 
 def preauthorize():
-    """
-    Makes a pre-authorization request
+    """Makes a pre-authorization request
     """
 
     pass
 
 def capture():
-    """
-    Makes a capture request (to complete a preauthorization)
+    """Makes a capture request (to complete a preauthorization)
     """
 
     pass
