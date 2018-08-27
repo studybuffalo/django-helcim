@@ -14,7 +14,7 @@ pipeline {
       steps {
         echo 'Running unit tests'
         script {
-          sh 'pipenv run pytest'
+          sh 'pipenv run py.test --cov=helcim tests/'
         }
 
       }
