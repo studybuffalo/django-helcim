@@ -12,11 +12,16 @@ pipeline {
     }
     stage('Test') {
       steps {
-        echo 'This is the Testing Stage'
+        echo 'Running unit tests'
         script {
           sh 'pipenv run pytest'
         }
 
+      }
+    }
+    stage('Reporting') {
+      steps {
+        echo 'Generating coverage report'
       }
     }
   }
