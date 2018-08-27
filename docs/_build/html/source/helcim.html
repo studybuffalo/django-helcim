@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>helcim package &mdash; django-oscar-helcim  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> django-oscar-helcim
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">helcim package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-helcim.development">helcim.development module</a></li>
+<li><a class="reference internal" href="#module-helcim.facade">helcim.facade module</a></li>
+<li><a class="reference internal" href="#module-helcim.gateway">helcim.gateway module</a></li>
+<li><a class="reference internal" href="#module-helcim">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">django-oscar-helcim</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>helcim package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/source/helcim.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="helcim-package">
+<h1>helcim package<a class="headerlink" href="#helcim-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-helcim.development">
+<span id="helcim-development-module"></span><h2>helcim.development module<a class="headerlink" href="#module-helcim.development" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-helcim.facade">
+<span id="helcim-facade-module"></span><h2>helcim.facade module<a class="headerlink" href="#module-helcim.facade" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-helcim.gateway">
+<span id="helcim-gateway-module"></span><h2>helcim.gateway module<a class="headerlink" href="#module-helcim.gateway" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="helcim.gateway.capture">
+<code class="descclassname">helcim.gateway.</code><code class="descname">capture</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.capture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a capture request (to complete a preauthorization)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="helcim.gateway.post">
+<code class="descclassname">helcim.gateway.</code><code class="descname">post</code><span class="sig-paren">(</span><em>url</em>, <em>post_data={}</em><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.post" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes POST to Helcim API and provides response as dictionary.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>url</strong> (<em>str</em>) – URL to the Helcim API.</li>
+<li><strong>post_data</strong> (<em>dict</em>) – The parameters to pass with the POST request.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The API response.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">dict</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code> – TBD.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="helcim.gateway.preauthorize">
+<code class="descclassname">helcim.gateway.</code><code class="descname">preauthorize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.preauthorize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a pre-authorization request</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="helcim.gateway.purchase">
+<code class="descclassname">helcim.gateway.</code><code class="descname">purchase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.purchase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a purchase request</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="helcim.gateway.refund">
+<code class="descclassname">helcim.gateway.</code><code class="descname">refund</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.refund" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a refund request</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="helcim.gateway.verify">
+<code class="descclassname">helcim.gateway.</code><code class="descname">verify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#helcim.gateway.verify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a verification request</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-helcim">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-helcim" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2018, Joshua Robert Torrance.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            LANGUAGE:'None',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

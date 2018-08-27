@@ -10,6 +10,9 @@ Django-oscar-helcim Documentation
    :maxdepth: 2
    :caption: Contents:
 
+   source/helcim.rst
+   source/modules.rst
+
 This package provides integration between the `Helcim Commerce API`_ and `django-oscar`_. You can view the source code on GitHub_.
 
 .. _Helcim Commerce API: https://www.helcim.com/support/article/625-helcim-commerce-api-api-overview/

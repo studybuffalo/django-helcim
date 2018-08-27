@@ -28,6 +28,7 @@ pytest = ">=3.7"  # https://github.com/pytest-dev/pytest
 sphinx = ">=1.7"  # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild = ">=0.7"  # https://github.com/GaretJax/sphinx-autobuild
 sphinx_rtd_theme = ">=0.4"  # https://github.com/rtfd/sphinx_rtd_theme
+sphinxcontrib-napoleon = ">=0.6"  # https://github.com/sphinx-contrib/napoleon
 
 [requires]
 python_version = "3.6"
