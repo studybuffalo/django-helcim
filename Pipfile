@@ -22,6 +22,7 @@ pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
 # Testing
 # ------------------------------------------------------------------------------
 pytest = ">=3.7"  # https://github.com/pytest-dev/pytest
+pytest-cov = ">=2.5"  # https://github.com/pytest-dev/pytest-cov
 
 # Package Documentation
 # ------------------------------------------------------------------------------
