@@ -1,13 +1,16 @@
 django-oscar-helcim
 ===================
 
-|github release| |build status| |license|
+|github release| |build status| |coverage| |license|
 
 .. |github release| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
    :alt: GitHub release version
 
 .. |build status| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
    :alt: Jenkins build status
+   
+.. |coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-oscar-helcim/job/master
+   :alt: Code coverage
    
 .. |license| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
    :alt: License
