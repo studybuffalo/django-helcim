@@ -6,7 +6,7 @@ django-oscar-helcim
 .. |github release| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
    :alt: GitHub release version
 
-.. |build status| image:: https://ci.studybuffalo.com/buildStatus/icon?job=django-oscar-helcim/master
+.. |build status| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
    :alt: Jenkins build status
    
 .. |license| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
