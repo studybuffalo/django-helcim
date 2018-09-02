@@ -23,6 +23,8 @@ pylint = ">=2.1"  # https://github.com/PyCQA/pylint/
 # ------------------------------------------------------------------------------
 pytest = ">=3.7"  # https://github.com/pytest-dev/pytest
 pytest-cov = ">=2.5"  # https://github.com/pytest-dev/pytest-cov
+tox-pipenv = ">=1.6"  # https://github.com/tox-dev/tox-pipenv
+#tox = ">=3.0.0"  # https://github.com/tox-dev/tox/
 
 # Package Documentation
 # ------------------------------------------------------------------------------
