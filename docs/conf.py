@@ -152,7 +152,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'django-oscar-helcim', 'django-oscar-helcim Documentation',
-     author, 'django-oscar-helcim', 'One line description of project.',
+     author, 'django-oscar-helcim', 'This package provides integration of the Helcim Payment API with django-oscar.',
      'Miscellaneous'),
 ]
 
