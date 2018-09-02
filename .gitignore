@@ -2,7 +2,8 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
-# Unit test / coverage reports
+# Testing files and reports
+.tox
 .pytest_cache
 reports/*
 !reports/.gitkeep
