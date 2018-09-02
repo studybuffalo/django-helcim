@@ -1,13 +1,19 @@
 django-oscar-helcim
 ===================
 
-|github release| |license|
+|github release| |build status| |coverage| |license|
 
 .. |github release| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
-   :alt: GitHub (pre-)release
+   :alt: GitHub release version
 
+.. |build status| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
+   :alt: Jenkins build status
+   
+.. |coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-oscar-helcim/job/master
+   :alt: Code coverage
+   
 .. |license| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
-   :alt: GitHub
+   :alt: License
 
 This package provides integration of the Helcim Payment API with django-oscar.
 
