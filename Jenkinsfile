@@ -12,26 +12,18 @@ pipeline {
     }
     stage('Test') {
       steps {
-        echo 'Running unit tests'
+        echo 'Running tests'
         script {
-          sh 'pipenv run py.test --junitxml=reports/tests.xml --cov=helcim tests/'
+          sh 'pipenv run tox'
         }
 
-      }
-    }
-    stage('Reporting') {
-      steps {
-        echo 'Generating report'
-        script {
-          sh 'pipenv run coverage xml'
-        }
       }
     }
   }
   post {
     always {
       step([$class: 'CoberturaPublisher', coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 10, onlyStable: false, sourceEncoding: 'ASCII'])
-      junit 'reports/tests.xml'
+      junit 'reports/tests.py36.xml'
     }
   }
   options {
