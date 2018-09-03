@@ -1,19 +1,27 @@
 django-oscar-helcim
 ===================
 
-|github release| |build status| |coverage| |license|
+|GithubRelease|_ |BuildStatus|_ |Coverage|_ |License|_
 
-.. |github release| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
+.. |GithubRelease| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
    :alt: GitHub release version
+   
+.. _GithubRelease: https://github.com/studybuffalo/django-oscar-helcim/releases
 
-.. |build status| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
+.. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
    :alt: Jenkins build status
    
-.. |coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-oscar-helcim/job/master
+.. _BuildStatus: https://ci.studybuffalo.com/blue/organizations/jenkins/django-oscar-helcim/
+
+.. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-oscar-helcim/job/master
    :alt: Code coverage
    
-.. |license| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
+.. _Coverage: https://ci.studybuffalo.com/job/django-oscar-helcim/job/master/lastBuild/cobertura/
+
+.. |License| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
    :alt: License
+
+.. _License: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
 
 This package provides integration of the Helcim Payment API with django-oscar.
 
