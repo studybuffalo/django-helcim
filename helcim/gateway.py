@@ -113,29 +113,30 @@ def purchase(amount, payment_details, **kwargs):
     """Makes a purchase request
     Args:
         amount (dec): The amount being purchased.
+        payment_details (dict): Details on the payment method:
+
+            cc_name (str): Name of the credit cardholder.
+            cc_number (int): 16 digit credit card number.
+            cc_expiry (int): 4 digit (MMYY) credit card expiry.
+            cc_cvv (int): 3 digit credit card CVV.
+            cc_address (str): Address of the credit cardholder.
+            cc_postal_code (str): Postal code/zip code of the credit
+                cardholder.
+            customer_code (str): Helcim customer code.
+            token (str): 23 digit Helcim card token.
+            token_f4l4 (int): 8 digit "first four digits and last four
+                digits" of the credit card number
+            token_f4l4_skip (bool): Whether to skip the F4L4
+                verification.
+            mag (string): Non-encrypted credit card magnetic strip
+                data.
+            mag_enc (str): Encrypted credit card magnestic strip
+                data.
+            mag_enc_serial_number (string): Terminal serial number.
+
         **kwargs: Payment, billing, shipping, and other details.
 
     Keyword Args:
-        cc_name (str, optional): Name of the credit
-            cardholder.
-        cc_number (int, optional): 16 digit credit card number.
-        cc_expiry (int, optional): 4 digit (MMYY) credit card expiry.
-        cc_cvv (int, optional): 3 digit credit card CVV.
-        cc_address (str, optional): Address of the credit cardholder.
-        cc_postal_code (str, optional): Postal code/zip code of the
-            credit cardholder.
-        customer_code (str, optional): Helcim customer code.
-        token (str, optional): 23 digit Helcim card token.
-        token_f4l4 (int, optional): 8 digit "first four digits and last
-            four digits" of the credit card number
-        token_f4l4_skip (bool, optional): Whether to skip the F4L4
-            verification.
-        mag (string, optional): Non-encrypted credit card magnetic
-            strip data.
-        mag_enc (str, optional): Encrypted credit card
-            magnestic strip data.
-        mag_enc_serial_number (string, optional): Terminal serial
-            number.
         order_number (str, optional): An assigned order number for the
             purchase.
         ecommerce (bool, optional): Whether this is an e-commerce
