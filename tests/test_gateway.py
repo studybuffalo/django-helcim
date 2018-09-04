@@ -1,3 +1,6 @@
+"""Tests for the gateway module."""
+# pylint: disable=missing-docstring
+
 from collections import OrderedDict
 from unittest.mock import patch
 
@@ -35,7 +38,7 @@ def test_post_returns_dictionary(mock_post):
 
     dictionary = gateway.post('', {})
 
-    assert type(dictionary) is OrderedDict
+    assert isinstance(dictionary, OrderedDict)
 
 
 @patch('helcim.gateway.requests.post')
@@ -55,7 +58,7 @@ def test_purchase(mock_post):
 
     response = gateway.purchase(api_details, amount, payment_details)
 
-    assert type(response) is OrderedDict
+    assert isinstance(response, OrderedDict)
 
 
 def test_determine_payment_details_token():
