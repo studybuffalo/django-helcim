@@ -1,8 +1,15 @@
+"""Interface functions with the Helcim Commerce API.
+
+These functions provide a interface with the Helcim Commerce API.
+These functions are agnostic and should work in any applications (i.e.
+not just django-oscar).
+"""
+
 import requests
 import xmltodict
 
 
-def post(url, post_data={}):
+def post(url, post_data=None):
     """Makes POST to Helcim API and provides response as dictionary.
 
     Args:
