@@ -39,22 +39,54 @@ def test_post_returns_dictionary(mock_post):
 
 def test_determine_payment_details_token():
     details = {
-        'card_token': 'abcdefghijklmnopqrstuvwxyz',
+        'token': 'abcdefghijklmnopqrstuvwxyz',
+        'customer_code': 'CST1000',
+        'token_f4l4': '11119999',
+    }
+
+    payment = gateway.determine_payment_details(details)
+
+    assert len(payment) == 3
+    assert payment['cardToken'] == details['token']
+    assert payment['customerCode'] == details['customer_code']
+    assert payment['cardF4L4'] == details['token_f4l4']
+
+def test_determine_payment_details_token_with_f4l4_skip():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvwxyz',
+        'customer_code': 'CST1000',
+        'token_f4l4_skip': True,
+    }
+
+    payment = gateway.determine_payment_details(details)
+
+    assert len(payment) == 3
+    assert payment['cardToken'] == details['token']
+    assert payment['customerCode'] == details['customer_code']
+    assert payment['cardF4L4Skip'] == 1
+
+def test_determine_payment_details_token_f4l4_missing_error():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvwxyz',
         'customer_code': 'CST1000',
     }
 
-    payment_type = gateway.determine_payment_details(details)
-
-    assert payment_type == 'token'
+    try:
+        gateway.determine_payment_details(details)
+    except ValueError:
+        assert True
+    else:
+        assert False
 
 def test_determine_payment_details_customer():
     details = {
         'customer_code': 'CST1000',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'customer'
+    assert len(payment) == 1
+    assert payment['customerCode'] == details['customer_code']
 
 def test_determine_payment_details_cc():
     details = {
@@ -62,28 +94,53 @@ def test_determine_payment_details_cc():
         'cc_expiry': '0125',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'cc'
+    assert len(payment) == 2
+    assert payment['cardNumber'] == details['cc_number']
+    assert payment['cardexpiry'] == details['cc_expiry']
+
+def test_determine_payment_details_cc_with_details():
+    details = {
+        'cc_number': '1234567890123456',
+        'cc_expiry': '0125',
+        'cc_name': 'Test Person',
+        'cc_cvv': '123',
+        'cc_address': '100 Fake Street',
+        'cc_postal_code': 'T1T 1T1',
+    }
+
+    payment = gateway.determine_payment_details(details)
+
+    assert len(payment) == 6
+    assert payment['cardNumber'] == details['cc_number']
+    assert payment['cardexpiry'] == details['cc_expiry']
+    assert payment['cardHolderName'] == details['cc_name']
+    assert payment['cardCVV'] == details['cc_cvv']
+    assert payment['cardHolderAddress'] == details['cc_address']
+    assert payment['cardHolderPostalCode'] == details['cc_postal_code']
 
 def test_determine_payment_details_mag_encrypted():
     details = {
-        'cc_mag_encrypted': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
-        'serial_number': 'SERIAL1230129912',
+        'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
+        'mag_enc_serial_number': 'SERIAL1230129912',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'mage'
+    assert len(payment) == 2
+    assert payment['cardMagEnc'] == details['mag_enc']
+    assert payment['serialNumber'] == details['mag_enc_serial_number']
 
 def test_determine_payment_details_mag():
     details = {
-        'cc_mag': '%B45**********SENSITIVE*DATA******************01?2',
+        'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'mag'
+    assert len(payment) == 1
+    assert payment['cardMag'] == details['mag']
 
 def test_determine_payment_details_value_error():
     details = {}
@@ -97,53 +154,58 @@ def test_determine_payment_details_value_error():
 
 def determine_payment_details_token_priority():
     details = {
-        'card_token': 'abcdefghijklmnopqrstuvwxyz',
+        'token': 'abcdefghijklmnopqrstuvwxyz',
+        'token_f4l4': '11119999',
         'customer_code': 'CST1000',
         'cc_number': '1234567890123456',
         'cc_expiry': '0125',
-        'cc_mag_encrypted': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
-        'serial_number': 'SERIAL1230129912',
-        'cc_mag': '%B45**********SENSITIVE*DATA******************01?2',
+        'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
+        'mag_enc_serial_number': 'SERIAL1230129912',
+        'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'token'
+    assert len(payment) == 3
+    assert 'cardToken' in payment
 
 def determine_payment_details_customer_priority():
     details = {
         'customer_code': 'CST1000',
         'cc_number': '1234567890123456',
         'cc_expiry': '0125',
-        'cc_mag_encrypted': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
-        'serial_number': 'SERIAL1230129912',
-        'cc_mag': '%B45**********SENSITIVE*DATA******************01?2',
+        'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
+        'mag_enc_serial_number': 'SERIAL1230129912',
+        'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'customer'
+    assert len(payment) == 1
+    assert 'customerCode' in payment
 
 def determine_payment_details_cc_priority():
     details = {
         'cc_number': '1234567890123456',
         'cc_expiry': '0125',
-        'cc_mag_encrypted': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
-        'serial_number': 'SERIAL1230129912',
-        'cc_mag': '%B45**********SENSITIVE*DATA******************01?2',
+        'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
+        'mag_enc_serial_number': 'SERIAL1230129912',
+        'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'cc'
+    assert len(payment) == 2
+    assert 'cardNumber' in payment
 
 def determine_payment_details_mag_encrypted_priority():
     details = {
-        'cc_mag_encrypted': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
-        'serial_number': 'SERIAL1230129912',
-        'cc_mag': '%B45**********SENSITIVE*DATA******************01?2',
+        'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
+        'mag_enc_serial_number': 'SERIAL1230129912',
+        'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment_type = gateway.determine_payment_details(details)
+    payment = gateway.determine_payment_details(details)
 
-    assert payment_type == 'mage'
+    assert len(payment) == 2
+    assert 'cardMagEnc' in payment

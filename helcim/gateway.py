@@ -29,7 +29,7 @@ def post(url, post_data={}):
     return xmltodict.parse(response)
 
 def determine_payment_details(details):
-    """Identifies which payment details have been provided.
+    """Returns most appropriate payment details for Helcim API request.
 
     Cycles through the provided details to determine the most
     appropriate payment method. If multiple methods provided, only the
@@ -40,32 +40,83 @@ def determine_payment_details(details):
         details (dict): A dictionary of payment details (typically
             provided by **kwargs).
     Returns:
-        str: the payment type detected
+        dict: Dictionary of the appropriate payment details.
     Raises:
-        SomeError: No valid payment details provided.
+        ValueError: No valid payment details provided.
     """
 
-    if 'card_token' in details and 'customer_code' in details:
-        return 'token'
+    if 'token' in details and 'customer_code' in details:
+        # F4L4 required or it must be explicitly skipped
+        f4l4_skip = details.get('token_f4l4_skip', False)
+
+        if f4l4_skip:
+            return {
+                'cardToken': details['token'],
+                'customerCode': details['customer_code'],
+                'cardF4L4Skip': 1,
+            }
+
+        if 'token_f4l4' in details:
+            return {
+                'cardToken': details['token'],
+                'customerCode': details['customer_code'],
+                'cardF4L4': details['token_f4l4'],
+            }
+
     elif 'customer_code' in details:
-        return 'customer'
+        return {
+            'customerCode': details['customer_code']
+        }
+
     elif 'cc_number' in details and 'cc_expiry' in details:
-        return 'cc'
-    elif 'cc_mag_encrypted' in details and 'serial_number' in details:
-        return 'mage'
-    elif 'cc_mag' in details:
-        return 'mag'
+        cc_details = {
+            'cardNumber': details['cc_number'],
+            'cardexpiry': details['cc_expiry'],
+        }
 
-    raise ValueError('No valid payment type identified.')
+        # Add any additional CC details (as provided)
+        if 'cc_name' in details:
+            cc_details.update(
+                {'cardHolderName': details['cc_name']}
+            )
 
-def purchase(amount, **kwargs):
+        if 'cc_cvv' in details:
+            cc_details.update(
+                {'cardCVV': details['cc_cvv']}
+            )
+
+        if 'cc_address' in details:
+            cc_details.update(
+                {'cardHolderAddress': details['cc_address']}
+            )
+
+        if 'cc_postal_code' in details:
+            cc_details.update(
+                {'cardHolderPostalCode': details['cc_postal_code']}
+            )
+
+        return cc_details
+
+    elif 'mag_enc' in details and 'mag_enc_serial_number' in details:
+        return {
+            'cardMagEnc': details['mag_enc'],
+            'serialNumber': details['mag_enc_serial_number'],
+        }
+    elif 'mag' in details:
+        return {
+            'cardMag': details['mag'],
+        }
+
+    raise ValueError('No valid payment details provided.')
+
+def purchase(amount, payment_details, **kwargs):
     """Makes a purchase request
     Args:
         amount (dec): The amount being purchased.
         **kwargs: Payment, billing, shipping, and other details.
 
     Keyword Args:
-        cc_cardholder_name (str, optional): Name of the credit
+        cc_name (str, optional): Name of the credit
             cardholder.
         cc_number (int, optional): 16 digit credit card number.
         cc_expiry (int, optional): 4 digit (MMYY) credit card expiry.
@@ -74,16 +125,17 @@ def purchase(amount, **kwargs):
         cc_postal_code (str, optional): Postal code/zip code of the
             credit cardholder.
         customer_code (str, optional): Helcim customer code.
-        card_token (str, optional): 23 digit Helcim card token.
-        cc_f4_l4 (int, optional): 8 digit "first four digits and last
+        token (str, optional): 23 digit Helcim card token.
+        token_f4l4 (int, optional): 8 digit "first four digits and last
             four digits" of the credit card number
-        cc_f4_l4_skip (bool, optional): Whether to skip the F4L4
+        token_f4l4_skip (bool, optional): Whether to skip the F4L4
             verification.
-        cc_mag (string, optional): Non-encrypted credit card magnetic
+        mag (string, optional): Non-encrypted credit card magnetic
             strip data.
-        serial_number (string, optional): Terminal serial number.
-        cc_mag_encrypted (str, optional): Encrypted credit card
+        mag_enc (str, optional): Encrypted credit card
             magnestic strip data.
+        mag_enc_serial_number (string, optional): Terminal serial
+            number.
         order_number (str, optional): An assigned order number for the
             purchase.
         ecommerce (bool, optional): Whether this is an e-commerce
@@ -119,8 +171,19 @@ def purchase(amount, **kwargs):
         shipping_method (str, optional): Method of shipping.
         tax_details (str, optional): Tax name.
     """
-    # TODO: Will need to work out handling new card vs. token vs. customer code
 
+    payment = determine_payment_details(payment_details)
+
+    purchase_data = {
+        'accountId': '',
+        'apiToken': '',
+        'terminalId': '',
+        'transactionType': 'purchase',
+        'test': 1 if kwargs.get('test', False) else 0,
+        'amount': amount
+    }.update(payment)
+
+    post('', purchase_data)
 
 def refund():
     """Makes a refund request
