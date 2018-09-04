@@ -37,6 +37,27 @@ def test_post_returns_dictionary(mock_post):
 
     assert type(dictionary) is OrderedDict
 
+
+@patch('helcim.gateway.requests.post')
+def test_purchase(mock_post):
+    mock_post.return_value = TEST_XML_RESPONSE
+
+    api_details = {
+        'url': 'https://www.test.com',
+        'account_id': '12345678',
+        'token': 'abcdefg',
+        'terminal_id': '98765432',
+    }
+    amount = 100.00
+    payment_details = {
+        'customer_code': 'CST1000',
+    }
+
+    response = gateway.purchase(api_details, amount, payment_details)
+
+    assert type(response) is OrderedDict
+
+
 def test_determine_payment_details_token():
     details = {
         'token': 'abcdefghijklmnopqrstuvwxyz',

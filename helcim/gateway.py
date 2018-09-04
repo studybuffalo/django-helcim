@@ -28,6 +28,8 @@ def post(url, post_data={}):
     # Return the response
     return xmltodict.parse(response)
 
+# TODO: Add validation of payment details
+
 def determine_payment_details(details):
     """Returns most appropriate payment details for Helcim API request.
 
@@ -109,9 +111,17 @@ def determine_payment_details(details):
 
     raise ValueError('No valid payment details provided.')
 
-def purchase(amount, payment_details, **kwargs):
+def purchase(api_details, amount, payment_details, **kwargs):
     """Makes a purchase request
     Args:
+        api_credentials (dict): Details to connect to Helcim Commerce
+            API:
+
+            url (str): API URL.
+            account_id (str): Helcim account ID.
+            token (str): Helcim API token.
+            terminal (str): Helcim terminal ID.
+
         amount (dec): The amount being purchased.
         payment_details (dict): Details on the payment method:
 
@@ -176,15 +186,15 @@ def purchase(amount, payment_details, **kwargs):
     payment = determine_payment_details(payment_details)
 
     purchase_data = {
-        'accountId': '',
-        'apiToken': '',
-        'terminalId': '',
+        'accountId': api_details['account_id'],
+        'apiToken': api_details['token'],
+        'terminalId': api_details['terminal_id'],
         'transactionType': 'purchase',
         'test': 1 if kwargs.get('test', False) else 0,
         'amount': amount
     }.update(payment)
 
-    post('', purchase_data)
+    return post(api_details['url'], purchase_data)
 
 def refund():
     """Makes a refund request
