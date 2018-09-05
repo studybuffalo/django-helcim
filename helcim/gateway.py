@@ -23,34 +23,37 @@ class BaseRequest(object):
             **kwargs (dict): Any additional transaction details.
 
         Keyword Args:
-            amount (dec): The amount being purchased.
-            currency (str): The currency of the transaction.
-            cc_name (str): Name of the credit cardholder.
-            cc_number (int): 16 digit credit card number.
-            cc_expiry (int): 4 digit (MMYY) credit card expiry.
-            cc_cvv (int): 3 digit credit card CVV.
-            cc_address (str): Address of the credit cardholder.
-            cc_postal_code (str): Postal code/zip code of the credit
+            amount (dec, optional): The amount being purchased.
+            currency (str, optional): The currency of the transaction.
+            cc_name (str, optional): Name of the credit cardholder.
+            cc_number (int, optional): 16 digit credit card number.
+            cc_expiry (int, optional): 4 digit (MMYY) credit card
+                expiry.
+            cc_cvv (int, optional): 3 digit credit card CVV.
+            cc_address (str, optional): Address of the credit
                 cardholder.
-            customer_code (str): Helcim customer code.
-            token (str): 23 digit Helcim card token.
-            token_f4l4 (int): 8 digit "first four digits and last four
-                digits" of the credit card number
-            token_f4l4_skip (bool): Whether to skip the F4L4
+            cc_postal_code (str, optional): Postal code/zip code of
+                the credit cardholder.
+            customer_code (str, optional): Helcim customer code.
+            token (str, optional): 23 digit Helcim card token.
+            token_f4l4 (int, optional): 8 digit "first four digits and
+                last four digits" of the credit card number
+            token_f4l4_skip (bool, optional): Whether to skip the F4L4
                 verification.
-            mag (string): Non-encrypted credit card magnetic strip
-                data.
-            mag_enc (str): Encrypted credit card magnestic strip
-                data.
-            mag_enc_serial_number (string): Terminal serial number.
-            order_number (str, optional): An assigned order number for the
-                purchase.
+            mag (string, optional): Non-encrypted credit card magnetic
+                strip data.
+            mag_enc (str, optional): Encrypted credit card magnestic
+                strip data.
+            mag_enc_serial_number (string, optional): Terminal serial
+                number.
+            order_number (str, optional): An assigned order number for
+                the purchase.
             ecommerce (bool, optional): Whether this is an e-commerce
                 transaction or not.
             comments (str, optional): Any additional comments with this
                 transaction.
-            billing_contact_name (str, optional): Billing address contact
-                name.
+            billing_contact_name (str, optional): Billing address
+                contact name.
             billing_business_name (str, optional): Billing address
                 business name.
             billing_street_1 (str, optional): Billing street address.
@@ -62,8 +65,10 @@ class BaseRequest(object):
             billing_phone (str, optional): Billing phone number.
             billing_fax (str, optional): Billing fax number
             billing_email (str, optional): Billing email.
-            shipping_contact_name (str, optional): Shipping contact name.
-            shipping_business_name (str, optional): Shipping business name.
+            shipping_contact_name (str, optional): Shipping contact
+                 name.
+            shipping_business_name (str, optional): Shipping business
+                name.
             shipping_street_1 (str, optional): Shipping street address.
             shipping_street_2 (str, optional): Shipping street address.
             shipping_city (str, optional): Shipping city.
