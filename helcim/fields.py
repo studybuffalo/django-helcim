@@ -4,7 +4,6 @@ class Field(object):
     """A single API field.
 
     Attributes:
-        python_name (str): The django-oscar-helcim name of the field.
         api_name (str): The Helcim API field name for the field.
         field_type (str): The field type: ``s`` (string), ``d`` (decimal),
             ``i`` (integer), or ``b`` (boolean).
