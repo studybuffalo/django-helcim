@@ -20,6 +20,14 @@ helcim.facade module
     :undoc-members:
     :show-inheritance:
 
+helcim.fields module
+--------------------
+
+.. automodule:: helcim.fields
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 helcim.gateway module
 ---------------------
 
