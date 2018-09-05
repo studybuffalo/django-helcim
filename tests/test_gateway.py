@@ -1,5 +1,5 @@
 """Tests for the gateway module."""
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring, protected-access
 
 from collections import OrderedDict
 from unittest.mock import patch
@@ -31,44 +31,47 @@ TEST_XML_RESPONSE = """<?xml version="1.0"?>
         </transaction>
     </message>
     """
+API_DETAILS = {
+    'url': 'https://www.test.com',
+    'account_id': '12345678',
+    'token': 'abcdefg',
+    'terminal_id': '98765432',
+}
 
 @patch('helcim.gateway.requests.post')
 def test_post_returns_dictionary(mock_post):
     mock_post.return_value = TEST_XML_RESPONSE
 
-    dictionary = gateway.post('', {})
+    base_request = gateway.BaseRequest(API_DETAILS)
+    dictionary = base_request.post()
 
     assert isinstance(dictionary, OrderedDict)
 
 
 @patch('helcim.gateway.requests.post')
-def test_purchase(mock_post):
+def test_purchase_processing(mock_post):
     mock_post.return_value = TEST_XML_RESPONSE
 
-    api_details = {
-        'url': 'https://www.test.com',
-        'account_id': '12345678',
-        'token': 'abcdefg',
-        'terminal_id': '98765432',
-    }
-    amount = 100.00
-    payment_details = {
+    details = {
+        'amount': 100.00,
         'customer_code': 'CST1000',
     }
 
-    response = gateway.purchase(api_details, amount, payment_details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    response = purchase.process()
 
     assert isinstance(response, OrderedDict)
 
 
-def test_determine_payment_details_token():
+def test_determine_purchase_payment_details_token():
     details = {
         'token': 'abcdefghijklmnopqrstuvwxyz',
         'customer_code': 'CST1000',
         'token_f4l4': '11119999',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 3
     assert payment['cardToken'] == details['token']
@@ -82,7 +85,8 @@ def test_determine_payment_details_token_with_f4l4_skip():
         'token_f4l4_skip': True,
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 3
     assert payment['cardToken'] == details['token']
@@ -96,7 +100,8 @@ def test_determine_payment_details_token_f4l4_missing_error():
     }
 
     try:
-        gateway.determine_payment_details(details)
+        purchase = gateway.Purchase(API_DETAILS, **details)
+        purchase._determine_payment_details()
     except ValueError:
         assert True
     else:
@@ -107,7 +112,8 @@ def test_determine_payment_details_customer():
         'customer_code': 'CST1000',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 1
     assert payment['customerCode'] == details['customer_code']
@@ -118,7 +124,8 @@ def test_determine_payment_details_cc():
         'cc_expiry': '0125',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 2
     assert payment['cardNumber'] == details['cc_number']
@@ -134,7 +141,8 @@ def test_determine_payment_details_cc_with_details():
         'cc_postal_code': 'T1T 1T1',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 6
     assert payment['cardNumber'] == details['cc_number']
@@ -145,12 +153,14 @@ def test_determine_payment_details_cc_with_details():
     assert payment['cardHolderPostalCode'] == details['cc_postal_code']
 
 def test_determine_payment_details_mag_encrypted():
+
     details = {
         'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
         'mag_enc_serial_number': 'SERIAL1230129912',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 2
     assert payment['cardMagEnc'] == details['mag_enc']
@@ -161,7 +171,8 @@ def test_determine_payment_details_mag():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 1
     assert payment['cardMag'] == details['mag']
@@ -170,7 +181,8 @@ def test_determine_payment_details_value_error():
     details = {}
 
     try:
-        gateway.determine_payment_details(details)
+        purchase = gateway.Purchase(API_DETAILS, **details)
+        purchase._determine_payment_details()
     except ValueError:
         assert True
     else:
@@ -188,7 +200,8 @@ def determine_payment_details_token_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 3
     assert 'cardToken' in payment
@@ -203,7 +216,8 @@ def determine_payment_details_customer_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 1
     assert 'customerCode' in payment
@@ -217,7 +231,8 @@ def determine_payment_details_cc_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 2
     assert 'cardNumber' in payment
@@ -229,7 +244,8 @@ def determine_payment_details_mag_encrypted_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    payment = gateway.determine_payment_details(details)
+    purchase = gateway.Purchase(API_DETAILS, **details)
+    payment = purchase._determine_payment_details()
 
     assert len(payment) == 2
     assert 'cardMagEnc' in payment
