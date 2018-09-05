@@ -16,10 +16,10 @@ class BaseRequest(object):
         Attributes:
             api_details (dict): Details to connect to Helcim API:
 
-                url (str): API URL.
-                account_id (str): Helcim account ID.
-                token (str): Helcim API token.
-                terminal (str): Helcim terminal ID.
+                - url (str): API URL.
+                - account_id (str): Helcim account ID.
+                - token (str): Helcim API token.
+                - terminal (str): Helcim terminal ID.
 
             **kwargs (dict): All transaction details.
 
