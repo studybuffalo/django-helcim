@@ -29,7 +29,7 @@ class BaseRequest(object):
             cc_number (int, optional): 16 digit credit card number.
             cc_expiry (int, optional): 4 digit (MMYY) credit card
                 expiry.
-            cc_cvv (int, optional): 3 or 4 digit credit card CVV.
+            cc_cvv (str, optional): 3 or 4 digit credit card CVV.
             cc_address (str, optional): Address of the credit
                 cardholder.
             cc_postal_code (str, optional): Postal code/zip code of
@@ -128,127 +128,158 @@ class BaseRequest(object):
         for field_name, field_value in self.details.items():
             validation = FIELD_LIST[field_name]
 
-            # Check that value can be coerced
+            # Coerce value and any validation
             try:
                 if validation.field_type == 's':
                     cleaned_value = str(field_value)
+
+                    if validation.min and len(cleaned_value) < validation.min:
+                        raise ValueError(
+                            '{} field length too short.'.format(field_name)
+                        )
+
+                    if validation.max and len(cleaned_value) > validation.max:
+                        raise ValueError(
+                            '{} field length too long.'.format(field_name)
+                        )
+
                 elif validation.field_type == 'i':
                     cleaned_value = int(field_value)
+
+                    if validation.min and cleaned_value < validation.min:
+                        raise ValueError(
+                            '{} field value too small.'.format(field_name)
+                        )
+
+                    if validation.max and cleaned_value > validation.max:
+                        raise ValueError(
+                            '{} field value too large.'.format(field_name)
+                        )
+
                 elif validation.field_type == 'd':
-                    cleaned_value = Decimal(field_value)
+                    cleaned_value = Decimal(str(field_value))
+
+                    if validation.min and cleaned_value < validation.min:
+                        raise ValueError(
+                            '{} field value too small.'.format(field_name)
+                        )
+
+                    if validation.max and cleaned_value > validation.max:
+                        raise ValueError(
+                            '{} field value too large.'.format(field_name)
+                        )
+
                 elif validation.field_type == 'b':
                     cleaned_value = bool(field_value)
+
             except ValueError:
                 raise ValueError
 
             # Check that value fits length restrictions
-            if validation.min and len(cleaned_value) < validation.min:
-                raise ValueError
 
-            if validation.max and len(cleaned_value) < validation.max:
-                raise ValueError
+
 
             # Add the field to the cleaned data
             self.cleaned[field_name] = cleaned_value
+
+    def prepare_post_data(self, additional_data):
+        """Creates POST data from self.cleaned and any additional data.
+
+        """
+        post_data = {}
+
+        # Convert dictionary names to the Helcim API names
+        for field_name, field_value in self.cleaned.items():
+            post_data[FIELD_LIST[field_name].api_name] = field_value
+
+        # Combine with the additional data
+        post_data.update(additional_data)
+
+        return post_data
 
 class Purchase(BaseRequest):
     """Makes a purchase request to Helcim API
     """
 
     def _determine_payment_details(self):
-        """Returns most appropriate payment details for Helcim API request.
+        """Confirms valid payment details and updates self.cleaned.
 
         Cycles through the provided details to determine the most
         appropriate payment method. If multiple methods provided, only the
         first match is returned (token > customer code > CC number >
         encrypted magnetic strip > magnetic strip).
 
-        Returns:
-            dict: Dictionary of the appropriate payment details.
         Raises:
             ValueError: No valid payment details provided.
         """
 
-        if 'token' in self.details and 'customer_code' in self.details:
+        payment_fields = [
+            'token', 'customer_code', 'token_f4l4', 'token_f4l4_skip',
+            'cc_number', 'cc_expiry', 'cc_name', 'cc_cvv', 'cc_address',
+            'cc_postal_code', 'mag_enc', 'mag_enc_serial_number', 'mag'
+        ]
+
+        if 'token' in self.cleaned and 'customer_code' in self.cleaned:
             # F4L4 required or it must be explicitly skipped
-            f4l4_skip = self.details.get('token_f4l4_skip', False)
+            f4l4_skip = self.cleaned.get('token_f4l4_skip', False)
 
             if f4l4_skip:
-                return {
-                    'cardToken': self.details['token'],
-                    'customerCode': self.details['customer_code'],
-                    'cardF4L4Skip': 1,
-                }
+                payment_fields.remove('token')
+                payment_fields.remove('customer_code')
+                payment_fields.remove('token_f4l4_skip')
 
-            if 'token_f4l4' in self.details:
-                return {
-                    'cardToken': self.details['token'],
-                    'customerCode': self.details['customer_code'],
-                    'cardF4L4': self.details['token_f4l4'],
-                }
+            if 'token_f4l4' in self.cleaned:
+                payment_fields.remove('token')
+                payment_fields.remove('customer_code')
+                payment_fields.remove('token_f4l4')
 
-        elif 'customer_code' in self.details:
-            return {
-                'customerCode': self.details['customer_code']
-            }
+        elif 'customer_code' in self.cleaned:
+            payment_fields.remove('customer_code')
 
-        elif 'cc_number' in self.details and 'cc_expiry' in self.details:
-            cc_details = {
-                'cardNumber': self.details['cc_number'],
-                'cardexpiry': self.details['cc_expiry'],
-            }
+        elif 'cc_number' in self.cleaned and 'cc_expiry' in self.cleaned:
+            payment_fields.remove('cc_number')
+            payment_fields.remove('cc_expiry')
 
             # Add any additional CC details (as provided)
-            if 'cc_name' in self.details:
-                cc_details.update(
-                    {'cardHolderName': self.details['cc_name']}
-                )
+            if 'cc_name' in self.cleaned:
+                payment_fields.remove('cc_name')
 
-            if 'cc_cvv' in self.details:
-                cc_details.update(
-                    {'cardCVV': self.details['cc_cvv']}
-                )
+            if 'cc_cvv' in self.cleaned:
+                payment_fields.remove('cc_cvv')
 
-            if 'cc_address' in self.details:
-                cc_details.update(
-                    {'cardHolderAddress': self.details['cc_address']}
-                )
+            if 'cc_address' in self.cleaned:
+                payment_fields.remove('cc_address')
 
-            if 'cc_postal_code' in self.details:
-                cc_details.update(
-                    {'cardHolderPostalCode': self.details['cc_postal_code']}
-                )
-
-            return cc_details
+            if 'cc_postal_code' in self.cleaned:
+                payment_fields.remove('cc_postal_code')
 
         elif (
-                'mag_enc' in self.details
-                and 'mag_enc_serial_number' in self.details
+                'mag_enc' in self.cleaned
+                and 'mag_enc_serial_number' in self.cleaned
         ):
-            return {
-                'cardMagEnc': self.details['mag_enc'],
-                'serialNumber': self.details['mag_enc_serial_number'],
-            }
-        elif 'mag' in self.details:
-            return {
-                'cardMag': self.details['mag'],
-            }
+            payment_fields.remove('mag_enc')
+            payment_fields.remove('mag_enc_serial_number')
 
-        raise ValueError('No valid payment details provided.')
+        elif 'mag' in self.cleaned:
+            payment_fields.remove('mag')
+
+        # Raise error if no fields have been removed
+        if len(payment_fields) == 13:
+            raise ValueError('No valid payment details provided.')
+
+        # Remove any other fields from self.cleaned
+        for field in payment_fields:
+            self.cleaned.pop(field, None)
 
     def process(self, **kwargs):
         """Makes a purchase request"""
+        self.validate_fields()
+        self._determine_payment_details()
 
-        payment = self._determine_payment_details()
-
-        purchase_data = {
-            'accountId': self.api['account_id'],
-            'apiToken': self.api['token'],
-            'terminalId': self.api['terminal_id'],
+        purchase_data = self.prepare_post_data({
             'transactionType': 'purchase',
             'test': 1 if kwargs.get('test', False) else 0,
-            'amount': self.details['amount']
-        }.update(payment)
+        })
 
         return self.post(purchase_data)
 
