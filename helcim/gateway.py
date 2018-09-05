@@ -1,8 +1,7 @@
 """Interface functions with the Helcim Commerce API.
 
-These functions provide a interface with the Helcim Commerce API.
-These functions are agnostic and should work in any applications (i.e.
-not just django-oscar).
+These functions provide an agonstic interface with the Helcim Commerce
+API and should work in any application (i.e. not just django-oscar).
 """
 from decimal import Decimal
 import requests
@@ -14,14 +13,14 @@ class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
 
         Attributes:
-            api_details (dict): Details to connect to Helcim API:
+            api_details (dict): Details to connect to Helcim API::
 
-                - url (str): API URL.
-                - account_id (str): Helcim account ID.
-                - token (str): Helcim API token.
-                - terminal (str): Helcim terminal ID.
+                url (str): API URL.
+                account_id (str): Helcim account ID.
+                token (str): Helcim API token.
+                terminal (str): Helcim terminal ID.
 
-            **kwargs (dict): All transaction details.
+            **kwargs (dict): Any additional transaction details.
 
         Keyword Args:
             amount (dec): The amount being purchased.
@@ -115,7 +114,7 @@ class BaseRequest(object):
         return xmltodict.parse(response)
 
     def validate_fields(self):
-        """Validates Helcim API request fields."""
+        """Validates Helcim API request fields and ."""
 
         for field_name, field_value in self.details.items():
             validation = FIELD_LIST[field_name]

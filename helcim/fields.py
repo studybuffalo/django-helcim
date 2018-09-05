@@ -6,8 +6,8 @@ class Field(object):
     Attributes:
         python_name (str): The django-oscar-helcim name of the field.
         api_name (str): The Helcim API field name for the field.
-        field_type (str): The field type: `s` (string), `d` (decimal),
-            `i` (integer), or `b` (boolean).
+        field_type (str): The field type: ``s`` (string), ``d`` (decimal),
+            ``i`` (integer), or ``b`` (boolean).
         min (int, optional): The minimum field length.
         max (int, optional): The maximum field length.
     """
