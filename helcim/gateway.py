@@ -26,8 +26,8 @@ class BaseRequest(object):
             amount (dec, optional): The amount for the transaction.
             currency (str, optional): The currency for the transaction.
             cc_name (str, optional): Name of the credit cardholder.
-            cc_number (int, optional): 16 digit credit card number.
-            cc_expiry (int, optional): 4 digit (MMYY) credit card
+            cc_number (str, optional): 16 digit credit card number.
+            cc_expiry (str, optional): 4 digit (MMYY) credit card
                 expiry.
             cc_cvv (str, optional): 3 or 4 digit credit card CVV.
             cc_address (str, optional): Address of the credit
@@ -36,7 +36,7 @@ class BaseRequest(object):
                 the credit cardholder.
             customer_code (str, optional): Helcim customer code.
             token (str, optional): 23 digit Helcim card token.
-            token_f4l4 (int, optional): 8 digit "first four digits and
+            token_f4l4 (str, optional): 8 digit "first four digits and
                 last four digits" of the credit card number
             token_f4l4_skip (bool, optional): Whether to skip the F4L4
                 verification.
