@@ -23,13 +23,13 @@ class BaseRequest(object):
             **kwargs (dict): Any additional transaction details.
 
         Keyword Args:
-            amount (dec, optional): The amount being purchased.
-            currency (str, optional): The currency of the transaction.
+            amount (dec, optional): The amount for the transaction.
+            currency (str, optional): The currency for the transaction.
             cc_name (str, optional): Name of the credit cardholder.
             cc_number (int, optional): 16 digit credit card number.
             cc_expiry (int, optional): 4 digit (MMYY) credit card
                 expiry.
-            cc_cvv (int, optional): 3 digit credit card CVV.
+            cc_cvv (int, optional): 3 or 4 digit credit card CVV.
             cc_address (str, optional): Address of the credit
                 cardholder.
             cc_postal_code (str, optional): Postal code/zip code of
@@ -56,8 +56,10 @@ class BaseRequest(object):
                 contact name.
             billing_business_name (str, optional): Billing address
                 business name.
-            billing_street_1 (str, optional): Billing street address.
-            billing_street_2 (str, optional): Billing street address.
+            billing_street_1 (str, optional): Billing street address
+                (line 1).
+            billing_street_2 (str, optional): Billing street address
+                (line 2).
             billing_city (str, optional): Billing city.
             billing_province (str, optional): Billing province.
             billing_country (str, optional): Billing country.
@@ -69,8 +71,10 @@ class BaseRequest(object):
                  name.
             shipping_business_name (str, optional): Shipping business
                 name.
-            shipping_street_1 (str, optional): Shipping street address.
-            shipping_street_2 (str, optional): Shipping street address.
+            shipping_street_1 (str, optional): Shipping street address
+                (line 1).
+            shipping_street_2 (str, optional): Shipping street address
+                (line 2).
             shipping_city (str, optional): Shipping city.
             shipping_province (str, optional): Shipping province.
             shipping_country (str, optional): Shipping country.
@@ -81,7 +85,7 @@ class BaseRequest(object):
             amount_shipping (dec, optional): Shipping cost.
             amount_tax (dec, optional): Tax amount.
             shipping_method (str, optional): Method of shipping.
-            tax_details (str, optional): Tax name.
+            tax_details (str, optional): Name for the tax (e.g. GST).
     """
 
     def __init__(self, api_details, **kwargs):
