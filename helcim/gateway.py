@@ -7,7 +7,7 @@ from decimal import Decimal
 import requests
 import xmltodict
 
-from .fields import FIELD_LIST
+from helcim.fields import FIELD_LIST
 
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
