@@ -8,5 +8,5 @@ except ImportError:
         pass
 
 class HelcimError(PaymentError):
-    """Extended django-oscar PaymentError to improve interfacing"""
+    """Extended PaymentError to improve agnostic interfacing"""
     pass
