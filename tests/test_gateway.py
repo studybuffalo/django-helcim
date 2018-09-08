@@ -1,7 +1,6 @@
 """Tests for the gateway module."""
 # pylint: disable=missing-docstring, protected-access
 
-from collections import OrderedDict
 from unittest.mock import patch
 
 from helcim import gateway
@@ -49,7 +48,7 @@ def test_post_returns_dictionary():
     base_request = gateway.BaseRequest(API_DETAILS)
     dictionary = base_request.post()
 
-    assert isinstance(dictionary, OrderedDict)
+    assert isinstance(dictionary, dict)
 
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
@@ -62,7 +61,7 @@ def test_purchase_processing():
     purchase = gateway.Purchase(API_DETAILS, **details)
     response = purchase.process()
 
-    assert isinstance(response, OrderedDict)
+    assert isinstance(response, dict)
 
 
 def test_determine_purchase_payment_details_token():

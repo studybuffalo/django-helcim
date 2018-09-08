@@ -4,16 +4,12 @@ These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application (i.e. not just django-oscar).
 """
 
-from decimal import Decimal
-import logging
 import requests
 import xmltodict
 
-from helcim.fields import FIELD_LIST
+from helcim import conversions
 from helcim.exceptions import HelcimError
 
-logging.basicConfig(level=logging.DEBUG)
-LOG = logging.getLogger(__name__)
 
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
@@ -100,20 +96,18 @@ class BaseRequest(object):
         self.cleaned = {}
 
     def post(self, post_data=None):
-        """Makes POST to Helcim API and provides response as dictionary.
+        """Makes POST to Helcim API and returns response.
 
         Args:
             post_data (dict): The parameters to pass with the POST request.
 
         Returns:
-            dict: Helcim API response.
+            dict: Processed Helcim API response.
 
         Raises:
-            ValueError: TBD.
-
+            HelcimError: An error occurred connecting or communicating
+                with Helcim API.
         """
-
-        LOG.debug('POST Parameters: %s', post_data)
 
         # Make the POST request
         try:
@@ -132,97 +126,21 @@ class BaseRequest(object):
         # Catch any errors in the response
         if response.status_code != 200 or dict_response['response'] == '0':
             raise HelcimError(
-                'Unable to communicate with Helcim API: {}'.format(
+                'Helcim API request failed: {}'.format(
                     dict_response['responseMessage']
                 )
             )
 
         # Return the response
-        return dict_response
+        return conversions.process_api_response(
+            dict_response,
+            post_data,
+            response.content
+        )
 
     def validate_fields(self):
         """Validates Helcim API request fields and ."""
-
-        for field_name, field_value in self.details.items():
-            validation = FIELD_LIST[field_name]
-
-            # Coerce value and any validation
-            try:
-                if validation.field_type == 's':
-                    cleaned_value = str(field_value)
-
-                    if validation.min and len(cleaned_value) < validation.min:
-                        raise ValueError(
-                            '{} field length too short.'.format(field_name)
-                        )
-
-                    if validation.max and len(cleaned_value) > validation.max:
-                        raise ValueError(
-                            '{} field length too long.'.format(field_name)
-                        )
-
-                elif validation.field_type == 'i':
-                    cleaned_value = int(field_value)
-
-                    if validation.min and cleaned_value < validation.min:
-                        raise ValueError(
-                            '{} field value too small.'.format(field_name)
-                        )
-
-                    if validation.max and cleaned_value > validation.max:
-                        raise ValueError(
-                            '{} field value too large.'.format(field_name)
-                        )
-
-                elif validation.field_type == 'd':
-                    cleaned_value = Decimal(str(field_value))
-
-                    if validation.min and cleaned_value < validation.min:
-                        raise ValueError(
-                            '{} field value too small.'.format(field_name)
-                        )
-
-                    if validation.max and cleaned_value > validation.max:
-                        raise ValueError(
-                            '{} field value too large.'.format(field_name)
-                        )
-
-                elif validation.field_type == 'b':
-                    cleaned_value = 1 if bool(field_value) else 0
-
-            except ValueError:
-                raise ValueError
-
-            # Check that value fits length restrictions
-
-
-
-            # Add the field to the cleaned data
-            self.cleaned[field_name] = cleaned_value
-
-    def prepare_post_data(self, additional_data):
-        """Creates POST data from object data
-
-        Data is collected from the self.api dictionary, self.cleaned,
-        and any additional_data provided.
-
-        """
-        post_data = {}
-
-        # Convert dictionary names to the Helcim API names
-        # API Data
-        post_data['accountId'] = str(self.api['account_id'])
-        post_data['apiToken'] = str(self.api['token'])
-        post_data['terminalId'] = str(self.api['terminal'])
-
-        # Cleaned Data
-        for field_name, field_value in self.cleaned.items():
-            post_data[FIELD_LIST[field_name].api_name] = str(field_value)
-
-        # Combine with the additional data
-        post_data.update(additional_data)
-
-        return post_data
+        self.cleaned = conversions.validate_request_fields(self.details)
 
 class Purchase(BaseRequest):
     """Makes a purchase request to Helcim API
@@ -303,9 +221,13 @@ class Purchase(BaseRequest):
         self.validate_fields()
         self._determine_payment_details()
 
-        purchase_data = self.prepare_post_data({
-            'transactionType': 'purchase',
-        })
+        purchase_data = conversions.process_request_fields(
+            self.api,
+            self.cleaned,
+            {
+                'transactionType': 'purchase',
+            }
+        )
 
         return self.post(purchase_data)
 
