@@ -10,6 +10,7 @@ import requests
 import xmltodict
 
 from helcim.fields import FIELD_LIST
+from helcim.exceptions import HelcimError
 
 logging.basicConfig(level=logging.DEBUG)
 LOG = logging.getLogger(__name__)
@@ -115,15 +116,29 @@ class BaseRequest(object):
         LOG.debug('POST Parameters: %s', post_data)
 
         # Make the POST request
-        response = requests.post(
-            self.api['url'],
-            data=post_data,
-        )
+        try:
+            response = requests.post(
+                self.api['url'],
+                data=post_data,
+            )
+        except requests.ConnectionError:
+            raise HelcimError(
+                'Unable to connect to Helcim API ({})'.format(self.api['url'])
+            )
 
-        # Error handling
+        # Create the dictionary ('message' is the XML structure object)
+        dict_response = xmltodict.parse(response.content)['message']
+
+        # Catch any errors in the response
+        if response.status_code != 200 or dict_response['response'] == '0':
+            raise HelcimError(
+                'Unable to communicate with Helcim API: {}'.format(
+                    dict_response['responseMessage']
+                )
+            )
 
         # Return the response
-        return xmltodict.parse(response.content)
+        return dict_response
 
     def validate_fields(self):
         """Validates Helcim API request fields and ."""

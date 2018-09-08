@@ -33,6 +33,7 @@ class MockPostResponse(object):
                 </transaction>
             </message>
             """
+        self.status_code = 200
         self.url = url
         self.data = data
 
