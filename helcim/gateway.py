@@ -12,7 +12,7 @@ import xmltodict
 from helcim.fields import FIELD_LIST
 
 logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
@@ -112,7 +112,7 @@ class BaseRequest(object):
 
         """
 
-        log.debug('POST Parameters: %s', post_data)
+        LOG.debug('POST Parameters: %s', post_data)
 
         # Make the POST request
         response = requests.post(
@@ -283,7 +283,7 @@ class Purchase(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
-    def process(self, **kwargs):
+    def process(self):
         """Makes a purchase request"""
         self.validate_fields()
         self._determine_payment_details()
