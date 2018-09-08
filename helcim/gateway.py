@@ -3,11 +3,16 @@
 These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application (i.e. not just django-oscar).
 """
+
 from decimal import Decimal
+import logging
 import requests
 import xmltodict
 
 from helcim.fields import FIELD_LIST
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger(__name__)
 
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
@@ -107,20 +112,18 @@ class BaseRequest(object):
 
         """
 
-        # Setup the POST header
-        post_headers = {'content-type': 'text/plain; charset=utf-8'}
+        log.debug('POST Parameters: %s', post_data)
 
         # Make the POST request
         response = requests.post(
             self.api['url'],
-            post_data,
-            headers=post_headers
+            data=post_data,
         )
 
         # Error handling
 
         # Return the response
-        return xmltodict.parse(response)
+        return xmltodict.parse(response.content)
 
     def validate_fields(self):
         """Validates Helcim API request fields and ."""
@@ -170,7 +173,7 @@ class BaseRequest(object):
                         )
 
                 elif validation.field_type == 'b':
-                    cleaned_value = bool(field_value)
+                    cleaned_value = 1 if bool(field_value) else 0
 
             except ValueError:
                 raise ValueError
@@ -183,14 +186,23 @@ class BaseRequest(object):
             self.cleaned[field_name] = cleaned_value
 
     def prepare_post_data(self, additional_data):
-        """Creates POST data from self.cleaned and any additional data.
+        """Creates POST data from object data
+
+        Data is collected from the self.api dictionary, self.cleaned,
+        and any additional_data provided.
 
         """
         post_data = {}
 
         # Convert dictionary names to the Helcim API names
+        # API Data
+        post_data['accountId'] = str(self.api['account_id'])
+        post_data['apiToken'] = str(self.api['token'])
+        post_data['terminalId'] = str(self.api['terminal'])
+
+        # Cleaned Data
         for field_name, field_value in self.cleaned.items():
-            post_data[FIELD_LIST[field_name].api_name] = field_value
+            post_data[FIELD_LIST[field_name].api_name] = str(field_value)
 
         # Combine with the additional data
         post_data.update(additional_data)
@@ -278,7 +290,6 @@ class Purchase(BaseRequest):
 
         purchase_data = self.prepare_post_data({
             'transactionType': 'purchase',
-            'test': 1 if kwargs.get('test', False) else 0,
         })
 
         return self.post(purchase_data)
