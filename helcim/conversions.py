@@ -192,7 +192,7 @@ def process_request_fields(api, cleaned, additional=None):
 
     return request_data
 
-def process_api_response(response, raw_request, raw_response):
+def process_api_response(response, raw_request=None, raw_response=None):
     """Updates API field names/types, and adds additional audit data.
 
     Args
