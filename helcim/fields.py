@@ -62,6 +62,7 @@ FIELD_LIST = {
     'shipping_street_1': Field('shipping_street1', 's'),
     'shipping_street_2': Field('shipping_street2', 's'),
     'tax_details': Field('taxDetails', 's'),
+    'test': Field('test', 'b'),
     'token': Field('cardToken', 's', 23, 23),
     'token_f4l4': Field('cardF4L4', 's', 8, 8),
     'token_f4l4_skip': Field('cardF4L4Skip', 'b'),
