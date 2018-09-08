@@ -20,6 +20,14 @@ class Field(object):
             self, api_name, field_type='s',
             min_length=None, max_length=None
     ):
+        # Ensure a valid field type is provided
+        if field_type not in ['s', 'c', 'i', 'b', 'd', 't']:
+            raise ValueError(
+                'Invalid field type provided for {}: {}'.format(
+                    api_name, field_type
+                )
+            )
+
         self.field_name = api_name
         self.field_type = field_type
         self.min = min_length
@@ -53,6 +61,7 @@ TO_API_FIELDS = {
     'mag_enc': Field('cardMagEnc', 's'),
     'mag_enc_serial_number': Field('serialNumber', 's'),
     'order_number': Field('orderNumber', 's'),
+    'product_id': Field('productId', 'i', 1),
     'shipping_business_name': Field('shipping_businessName', 's'),
     'shipping_city': Field('shipping_city', 's'),
     'shipping_contact_name': Field('shipping_contactName', 's'),
@@ -107,58 +116,58 @@ def validate_request_fields(details):
         validation = TO_API_FIELDS[field_name]
 
         # Coerce value and any validation
-        try:
-            if validation.field_type == 's':
-                cleaned_value = str(field_value)
+        # String Types
+        if validation.field_type == 's':
+            cleaned_value = str(field_value)
 
-                if validation.min and len(cleaned_value) < validation.min:
-                    raise ValueError(
-                        '{} field length too short.'.format(field_name)
-                    )
+            if validation.min and len(cleaned_value) < validation.min:
+                raise ValueError(
+                    '{} field length too short.'.format(field_name)
+                )
 
-                if validation.max and len(cleaned_value) > validation.max:
-                    raise ValueError(
-                        '{} field length too long.'.format(field_name)
-                    )
+            if validation.max and len(cleaned_value) > validation.max:
+                raise ValueError(
+                    '{} field length too long.'.format(field_name)
+                )
 
-            elif validation.field_type == 'i':
-                cleaned_value = int(field_value)
+        # Integer types
+        elif validation.field_type == 'i':
+            cleaned_value = int(field_value)
 
-                if validation.min and cleaned_value < validation.min:
-                    raise ValueError(
-                        '{} field value too small.'.format(field_name)
-                    )
+            if validation.min and cleaned_value < validation.min:
+                raise ValueError(
+                    '{} field value too small.'.format(field_name)
+                )
 
-                if validation.max and cleaned_value > validation.max:
-                    raise ValueError(
-                        '{} field value too large.'.format(field_name)
-                    )
+            if validation.max and cleaned_value > validation.max:
+                raise ValueError(
+                    '{} field value too large.'.format(field_name)
+                )
 
-            elif validation.field_type == 'c':
-                cleaned_value = Decimal(str(field_value))
+        # Decimal types
+        elif validation.field_type == 'c':
+            cleaned_value = Decimal(str(field_value))
 
-                if validation.min and cleaned_value < validation.min:
-                    raise ValueError(
-                        '{} field value too small.'.format(field_name)
-                    )
+            if validation.min and cleaned_value < validation.min:
+                raise ValueError(
+                    '{} field value too small.'.format(field_name)
+                )
 
-                if validation.max and cleaned_value > validation.max:
-                    raise ValueError(
-                        '{} field value too large.'.format(field_name)
-                    )
+            if validation.max and cleaned_value > validation.max:
+                raise ValueError(
+                    '{} field value too large.'.format(field_name)
+                )
 
-            elif validation.field_type == 'b':
-                cleaned_value = 1 if bool(field_value) else 0
-
-        except ValueError:
-            raise ValueError
+        # Boolean types
+        elif validation.field_type == 'b':
+            cleaned_value = 1 if bool(field_value) else 0
 
         # Add the field to the cleaned data
         cleaned[field_name] = cleaned_value
 
     return cleaned
 
-def process_request_fields(api, cleaned, additional):
+def process_request_fields(api, cleaned, additional=None):
     """Converts all data to proper Helcim API request fields.
     Args
 
@@ -178,7 +187,8 @@ def process_request_fields(api, cleaned, additional):
         request_data[TO_API_FIELDS[field_name].field_name] = str(field_value)
 
     # Combine with the additional data
-    request_data.update(additional)
+    if additional:
+        request_data.update(additional)
 
     return request_data
 
