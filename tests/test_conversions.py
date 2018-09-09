@@ -1,7 +1,7 @@
 """Tests for the conversions module."""
 # pylint: disable=missing-docstring, protected-access
 
-from datetime import datetime, date, time
+from datetime import date, time
 from decimal import Decimal
 from unittest.mock import patch
 
@@ -313,7 +313,7 @@ def test_process_api_response_boolean_field():
 
     response = conversions.process_api_response(api_response)
 
-    assert response['availability'] == True
+    assert response['availability'] is True
     assert isinstance(response['availability'], bool)
 
 @patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
