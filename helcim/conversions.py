@@ -1,4 +1,6 @@
 """Process and validates data to and from the Helcim API."""
+
+from datetime import datetime
 from decimal import Decimal
 import logging
 
@@ -83,6 +85,7 @@ TO_API_FIELDS = {
 
 FROM_API_FIELDS = {
     'amount': Field('amount', 'c'),
+    'availability': Field('availability', 'b'),
     'approvalCode': Field('approval_code', 's'),
     'avsResponse': Field('avs_response', 's'),
     'cardHolderName': Field('cc_name', 's'),
@@ -96,7 +99,7 @@ FROM_API_FIELDS = {
     'expiryDate': Field('cc_expiry', 's'),
     'orderNumber': Field('order_number', 's'),
     'time': Field('transaction_time', 't'),
-    'transactionId': Field('transaction_id', 's'),
+    'transactionId': Field('transaction_id', 'i'),
     'type': Field('transaction_type', 's'),
 }
 
@@ -214,25 +217,41 @@ def process_api_response(response, raw_request=None, raw_response=None):
 
             try:
                 api_field = FROM_API_FIELDS[field_name]
+                new_name = api_field.field_name
+
+                # String Field
+                if api_field.field_type == 's':
+                    processed[new_name] = str(field_value)
+
+                # Decimal Field
+                elif api_field.field_type == 'c':
+                    processed[new_name] = Decimal(field_value)
+
+                # Integer Field
+                elif api_field.field_type == 'i':
+                    processed[new_name] = int(field_value)
+
+                # Boolean Field
+                elif api_field.field_type == 'b':
+                    processed[new_name] = True if field_value == '1' else False
+
+                # Date Field
+                elif api_field.field_type == 'd':
+                    processed[new_name] = datetime.strptime(
+                        field_value, '%Y-%m-%d'
+                    ).date()
+
+                # Time Field
+                elif api_field.field_type == 't':
+                    processed[new_name] = datetime.strptime(
+                        field_value, '%H:%M:%S'
+                    ).time()
             except KeyError:
                 LOG.warning(
                     'Response field not in FROM_API_FIELDS: %s', field_name
                 )
                 processed[field_name] = field_value
 
-            new_name = api_field.field_name
-            if api_field.field_type == 's':
-                processed[new_name] = str(field_value)
-            elif api_field.field_type == 'c':
-                processed[new_name] = Decimal(field_value)
-            elif api_field.field_type == 'i':
-                processed[new_name] = int(field_value)
-            elif api_field.field_type == 'b':
-                processed[new_name] = True if field_value == '1' else False
-            elif api_field.field_type == 'd':
-                processed[new_name] = field_value
-            elif api_field.field_type == 't':
-                processed[new_name] = field_value
 
     # Add additional audit information
     processed['raw_request'] = raw_request
