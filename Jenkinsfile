@@ -7,7 +7,6 @@ pipeline {
         script {
           sh 'pipenv install --dev'
         }
-
       }
     }
     stage('Test') {
@@ -19,12 +18,12 @@ pipeline {
 
       }
     }
-  }
-  stage('Security') {
-    steps {
-      echo 'Running security checks'
-      script {
-        sh 'pipenv check'
+    stage('Security') {
+      steps {
+        echo 'Running security checks'
+        script {
+          sh 'pipenv check'
+        }
       }
     }
   }
