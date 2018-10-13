@@ -2,8 +2,10 @@
 # pylint: disable=missing-docstring, protected-access
 
 from unittest.mock import patch
+import requests
 
 from helcim import gateway
+from helcim.exceptions import HelcimError
 
 class MockPostResponse(object):
     def __init__(self, url, data):
@@ -33,6 +35,33 @@ class MockPostResponse(object):
             </message>
             """
         self.status_code = 200
+        self.url = url
+        self.data = data
+
+def mock_post_api_error(url, data): # pylint: disable=unused-argument
+    raise requests.ConnectionError
+
+class MockPostAPINon200StatusCode(object):
+    def __init__(self, url, data):
+        self.status_code = 404
+        self.content = """<?xml version="1.0"?>
+            <message>
+                <response>0</response>
+                <responseMessage>Error Message Goes Here</responseMessage>
+            </message>
+            """
+        self.url = url
+        self.data = data
+
+class MockPostAPIErrorResponse(object):
+    def __init__(self, url, data):
+        self.status_code = 200
+        self.content = """<?xml version="1.0"?>
+            <message>
+                <response>0</response>
+                <responseMessage>TEST ERROR</responseMessage>
+            </message>
+            """
         self.url = url
         self.data = data
 
@@ -201,9 +230,9 @@ def test_determine_payment_details_value_error():
     else:
         assert False
 
-def determine_payment_details_token_priority():
+def test_determine_payment_details_token_priority():
     details = {
-        'token': 'abcdefghijklmnopqrstuvwxyz',
+        'token': 'abcdefghijklmnopqrstuvw',
         'token_f4l4': '11119999',
         'customer_code': 'CST1000',
         'cc_number': '1234567890123456',
@@ -220,7 +249,7 @@ def determine_payment_details_token_priority():
     assert len(purchase.cleaned) == 3
     assert 'token' in purchase.cleaned
 
-def determine_payment_details_customer_priority():
+def test_determine_payment_details_customer_priority():
     details = {
         'customer_code': 'CST1000',
         'cc_number': '1234567890123456',
@@ -237,7 +266,7 @@ def determine_payment_details_customer_priority():
     assert len(purchase.cleaned) == 1
     assert 'customer_code' in purchase.cleaned
 
-def determine_payment_details_cc_priority():
+def test_determine_payment_details_cc_priority():
     details = {
         'cc_number': '1234567890123456',
         'cc_expiry': '0125',
@@ -253,7 +282,7 @@ def determine_payment_details_cc_priority():
     assert len(purchase.cleaned) == 2
     assert 'cc_number' in purchase.cleaned
 
-def determine_payment_details_mag_encrypted_priority():
+def test_determine_payment_details_mag_encrypted_priority():
     details = {
         'mag_enc': 'iscySW5ks7LeQQ8r4Tz7vb6el6QFpuQMbxGbh1==',
         'mag_enc_serial_number': 'SERIAL1230129912',
@@ -266,3 +295,41 @@ def determine_payment_details_mag_encrypted_priority():
 
     assert len(purchase.cleaned) == 2
     assert 'mag_enc' in purchase.cleaned
+
+@patch('helcim.gateway.requests.post', mock_post_api_error)
+def test_post_api_connection_error():
+    base_request = gateway.BaseRequest(API_DETAILS)
+
+    try:
+        base_request.post()
+    except HelcimError as error:
+        assert True
+        assert str(error) == (
+            "Unable to connect to Helcim API (https://www.test.com)"
+        )
+    else:
+        assert False
+
+@patch('helcim.gateway.requests.post', MockPostAPINon200StatusCode)
+def test_post_api_non_200_status_code():
+    base_request = gateway.BaseRequest(API_DETAILS)
+
+    try:
+        base_request.post()
+    except HelcimError as error:
+        assert True
+        assert str(error) == "Helcim API request failed with status code 404"
+    else:
+        assert False
+
+@patch('helcim.gateway.requests.post', MockPostAPIErrorResponse)
+def test_post_api_error_response_message():
+    base_request = gateway.BaseRequest(API_DETAILS)
+
+    try:
+        base_request.post()
+    except HelcimError as error:
+        assert True
+        assert str(error) == "Helcim API request failed: TEST ERROR"
+    else:
+        assert False
