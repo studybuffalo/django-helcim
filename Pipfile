@@ -18,6 +18,7 @@ django-environ = "*"  # https://github.com/joke2k/django-environ
 # ------------------------------------------------------------------------------
 coverage = "*"  # https://github.com/nedbat/coveragepy
 pylint = "*"  # https://github.com/PyCQA/pylint/
+pylint-django = "*"  # https://github.com/PyCQA/pylint-django
 
 # Testing
 # ------------------------------------------------------------------------------
@@ -31,6 +32,7 @@ tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
 sphinx = "*"  # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild = "*"  # https://github.com/GaretJax/sphinx-autobuild
 sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
+
 
 [requires]
 python_version = "3.6"
