@@ -120,11 +120,19 @@ class BaseRequest(object):
                 'Unable to connect to Helcim API ({})'.format(self.api['url'])
             )
 
+        # Catch any response errors in status code
+        if response.status_code != 200:
+            raise HelcimError(
+                'Helcim API request failed with status code {}'.format(
+                    response.status_code
+                )
+            )
+
         # Create the dictionary ('message' is the XML structure object)
         dict_response = xmltodict.parse(response.content)['message']
 
-        # Catch any errors in the response
-        if response.status_code != 200 or dict_response['response'] == '0':
+        # Catch any issues with the API response
+        if dict_response['response'] == '0':
             raise HelcimError(
                 'Helcim API request failed: {}'.format(
                     dict_response['responseMessage']
