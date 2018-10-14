@@ -1,32 +1,24 @@
 """Django settings file to get basic Django instance running."""
 # pylint: disable=unused-wildcard-import
 
-import environ
-
 from oscar import OSCAR_MAIN_TEMPLATE_DIR, get_core_apps
 from oscar.defaults import * # pylint: disable=wildcard-import
 
-# SETTINGS FILE
-# Add all secret setting variables to a config.env file in the
-# test directory
-ROOT_DIR = environ.Path(__file__) - 1
-ENV = environ.Env()
-ENV.read_env(env_file=ROOT_DIR.file("config.env"))
-
 # DJANGO-OSCAR-HELCIM SETTINGS
-HELCIM_ACCOUNT_ID = ENV('HELCIM_ACCOUNT_ID', default='')
-HELCIM_API_URL = ENV('HELCIM_API_URL', default='')
-HELCIM_API_TOKEN = ENV('HELCIM_API_TOKEN', default='')
-HELCIM_TERMINAL_ID = ENV('HELCIM_TERMINAL_ID', default='')
+HELCIM_ACCOUNT_ID = '123456789'
+HELCIM_API_URL = 'https://www.test.com/'
+HELCIM_API_TOKEN = '123456789'
+HELCIM_TERMINAL_ID = '12345'
 
 # BASE DJANGO SETTINGS
-SECRET_KEY = ENV('DJANGO_SECRET_KEY', default='214dfsdf7ughfgdasd3446@FDF46#')
+SECRET_KEY = 'abcdefghijklmnopqrstuvwxyz123456789'
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
     }
 }
+
 INSTALLED_APPS = [
     'django.contrib.auth',
     'django.contrib.admin',
@@ -83,7 +75,6 @@ TEMPLATES = [
         }
     }
 ]
-
 
 SITE_ID = 1
 ROOT_URLCONF = 'tests.urls'
