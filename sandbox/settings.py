@@ -10,6 +10,7 @@ from oscar.defaults import * # pylint: disable=wildcard-import
 # Add all secret setting variables to a config.env file in the
 # test directory
 ROOT_DIR = environ.Path(__file__) - 1
+PACKAGE_DIR = environ.Path(__file__) - 2
 ENV = environ.Env()
 ENV.read_env(env_file=ROOT_DIR.file("config.env"))
 
@@ -19,15 +20,42 @@ HELCIM_API_URL = ENV('HELCIM_API_URL', default='')
 HELCIM_API_TOKEN = ENV('HELCIM_API_TOKEN', default='')
 HELCIM_TERMINAL_ID = ENV('HELCIM_TERMINAL_ID', default='')
 
+# DEBUG SETTINGS
+# Used for sandbox - DO NOT USE IN PRODUCTION
+DEBUG = True
+TEMPLATE_DEBUG = True
+SQL_DEBUG = True
+
 # BASE DJANGO SETTINGS
 SECRET_KEY = ENV('DJANGO_SECRET_KEY', default='214dfsdf7ughfgdasd3446@FDF46#')
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-    }
-}
+SITE_ID = 1
+
+INTERNAL_IPS = ('127.0.0.1',)
+
+ROOT_URLCONF = 'urls'
+
+APPEND_SLASH = True
+
+# ADMIN SETTINGS
+ADMINS = (
+    # ('Your Name', 'your_email@domain.com'),
+)
+MANAGERS = ADMINS
+
+# EMAIL SETTINGS
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# LOCALIZATION SETTINGS
+USE_TZ = True
+TIME_ZONE = 'UTC'
+LANGUAGE_CODE = 'en-ca'
+USE_I18N = True
+USE_L10N = True
+
+# DJANGO APPLICATIONS
 INSTALLED_APPS = [
+    # Django Apps
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -35,9 +63,12 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.flatpages',
     'django.contrib.staticfiles',
+    # External Apps
     'helcim',
+    'debug_toolbar',
 ] + get_core_apps()
 
+# DJANGO MIDDLEWARE
 MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -45,15 +76,25 @@ MIDDLEWARE = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'oscar.apps.basket.middleware.BasketMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
-DEBUG = False
+# DATABASE SETTINGS
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': str(ROOT_DIR.path('db.sqlite3')),
+    }
+}
+ATOMIC_REQUESTS = True
+
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
     },
 }
 
+# TEMPLATE SETTINGS
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -84,9 +125,21 @@ TEMPLATES = [
     }
 ]
 
+# MEDIA SETTINGS
+MEDIA_ROOT = ROOT_DIR.path('media')
+MEDIA_URL = '/media/'
 
-SITE_ID = 1
-ROOT_URLCONF = 'tests.urls'
+# STATIC SETTINGS
+STATIC_URL = '/static/'
+STATIC_ROOT = ROOT_DIR.path('/static/')
 
-STATIC_URL = '/'
-STATIC_ROOT = '/static/'
+# AUTHENTICATION SETTINGS
+AUTHENTICATION_BACKENDS = (
+    'oscar.apps.customer.auth_backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+LOGIN_REDIRECT_URL = '/accounts/'
+
+# OSCAR SETTINGS
+OSCAR_ALLOW_ANON_CHECKOUT = True
+OSCAR_SHOP_TAGLINE = 'Helcim'

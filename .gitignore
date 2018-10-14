@@ -2,11 +2,15 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+
+# Environment Files (to prevent accidental commit to repo)
+*.env
+
 # Testing files and reports
 .tox
 .pytest_cache
 reports/*
 !reports/.gitkeep
 
-# Environment Files (to prevent accidental commit to repo)
-*.env
+# Sandbox Files
+sandbox/db.sqlite3

@@ -13,26 +13,23 @@ xmltodict = "*"  # https://github.com/martinblech/xmltodict
 django = "*"  # https://github.com/django/django
 django-oscar = "*"  # https://github.com/django-oscar/django-oscar
 django-environ = "*"  # https://github.com/joke2k/django-environ
-
 # Code quality
 # ------------------------------------------------------------------------------
 coverage = "*"  # https://github.com/nedbat/coveragepy
 pylint = "*"  # https://github.com/PyCQA/pylint/
 pylint-django = "*"  # https://github.com/PyCQA/pylint-django
-
 # Testing
 # ------------------------------------------------------------------------------
 pytest = "*"  # https://github.com/pytest-dev/pytest
 pytest-cov = "*"  # https://github.com/pytest-dev/pytest-cov
 tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
 #tox = "*"  # https://github.com/tox-dev/tox/
-
 # Package Documentation
 # ------------------------------------------------------------------------------
 sphinx = "*"  # https://github.com/sphinx-doc/sphinx
 sphinx-autobuild = "*"  # https://github.com/GaretJax/sphinx-autobuild
 sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
-
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.6"
