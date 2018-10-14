@@ -14,3 +14,4 @@ reports/*
 
 # Sandbox Files
 sandbox/db.sqlite3
+sandbox/media/
