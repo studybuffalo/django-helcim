@@ -1,31 +1,30 @@
 """URLs for the sandbox demo."""
 
-from django.conf.urls import include, url
-from django.conf.urls.i18n import i18n_patterns
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
+from django.urls import include, path
+from oscar.app import application
 
 # from apps.app import application
+
 # from paypal.payflow.dashboard.app import application as payflow
 # from paypal.express.dashboard.app import application as express_dashboard
 
 admin.autodiscover()
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^i18n/', include('django.conf.urls.i18n')),
+    path('i18n/', include('django.conf.urls.i18n')),
+    # Admin URLs
+    # NB: not officially supported with django-oscar; included for
+    # debugging purposes only
+    path('admin/', admin.site.urls),
+    # django-oscar-helcim URLs
+    path('checkout/helcim/', include('helcim.urls')),
+    # django-oscar URLs
+    path('', application.urls),
 ]
-urlpatterns += i18n_patterns(
-    # PayPal Express integration...
-    url(r'^checkout/helcim/', include('helcim.urls')),
-    # Dashboard views for Payflow Pro
-    # url(r'^dashboard/paypal/payflow/', payflow.urls),
-    # Dashboard views for Express
-    # url(r'^dashboard/paypal/express/', express_dashboard.urls),
-    #url(r'', application.urls),
-)
 
 if settings.DEBUG:
     urlpatterns += staticfiles_urlpatterns()
@@ -34,5 +33,5 @@ if settings.DEBUG:
 
     import debug_toolbar
     urlpatterns = [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns

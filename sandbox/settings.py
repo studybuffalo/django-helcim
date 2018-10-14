@@ -66,7 +66,8 @@ INSTALLED_APPS = [
     # External Apps
     'helcim',
     'debug_toolbar',
-] + get_core_apps()
+    'widget_tweaks',
+] + get_core_apps([])
 
 # DJANGO MIDDLEWARE
 MIDDLEWARE = (
