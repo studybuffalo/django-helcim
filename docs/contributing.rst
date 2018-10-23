@@ -30,6 +30,13 @@ Tests can be run locally with the following command::
 
     pipenv run py.test
 
+To check test coverage, you can use the following::
+
+    pipenv run py.test --cov=helcim --cov-report=html
+
+You may specify the output of the coverage report by changing the
+`--cov-report` option to `html` or `xml`.
+
 Testing with tox
 ================
 
