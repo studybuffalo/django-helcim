@@ -239,26 +239,26 @@ class Purchase(BaseRequest):
 
         return self.post(purchase_data)
 
-# def refund():
-#     """Makes a refund request
-#     """
+def refund():
+    """Makes a refund request
+    """
 
-#     pass
+    pass
 
-# def verify():
-#     """Makes a verification request
-#     """
+def verify():
+    """Makes a verification request
+    """
 
-#     pass
+    pass
 
-# def preauthorize():
-#     """Makes a pre-authorization request
-#     """
+def preauthorize():
+    """Makes a pre-authorization request
+    """
 
-#     pass
+    pass
 
-# def capture():
-#     """Makes a capture request (to complete a preauthorization)
-#     """
+def capture():
+    """Makes a capture request (to complete a preauthorization)
+    """
 
-#     pass
+    pass
