@@ -16,11 +16,6 @@ This package provides integration between the `Helcim Commerce API`_ and `django
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   contributing
    source/helcim
-
-Table of Contents
-=================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
