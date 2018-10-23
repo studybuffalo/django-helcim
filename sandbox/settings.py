@@ -67,7 +67,9 @@ INSTALLED_APPS = [
     'helcim',
     'debug_toolbar',
     'widget_tweaks',
-] + get_core_apps([])
+] + get_core_apps([
+    'applications.checkout',
+])
 
 # DJANGO MIDDLEWARE
 MIDDLEWARE = (
@@ -100,6 +102,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
+            ROOT_DIR.path('templates'),
             OSCAR_MAIN_TEMPLATE_DIR,
         ],
         'OPTIONS': {

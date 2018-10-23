@@ -5,9 +5,8 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
 from django.urls import include, path
-from oscar.app import application
 
-# from apps.app import application
+from applications.apps import application
 
 # from paypal.payflow.dashboard.app import application as payflow
 # from paypal.express.dashboard.app import application as express_dashboard
