@@ -31,7 +31,6 @@ tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
 # Package Documentation
 # ------------------------------------------------------------------------------
 sphinx = "*"  # https://github.com/sphinx-doc/sphinx
-sphinx-autobuild = "*"  # https://github.com/GaretJax/sphinx-autobuild
 sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
 
 [requires]
