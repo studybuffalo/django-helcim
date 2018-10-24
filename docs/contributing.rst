@@ -131,11 +131,13 @@ Updating documentation
 
 All documentation is hosted on `Read the Docs`_ and is built using
 Sphinx_. All the module content is automatically built from the
-docstrings and the `sphinx-apidoc`_ tool.
+docstrings and the `sphinx-apidoc`_ tool and the
+`sphinxcontrib-napoleon`_ extension.
 
 .. _Read the Docs: https://readthedocs.org/
 .. _Sphinx: http://www.sphinx-doc.org/en/master/
 .. _sphinx-apidoc: http://www.sphinx-doc.org/en/stable/man/sphinx-apidoc.html
+.. _sphinxcontrib-napoleon: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/
 
 Docstring Format
 ================
@@ -143,10 +145,10 @@ Docstring Format
 The docstrings of this package follow the `Google Python Style Guide`_
 wherever possible. This ensures proper formatting of the documentation
 generated automatically by Sphinx. Additional examples can be found on
-the `sphinx-napoleon documentation`_.
+the `Sphinx napoleon extension documentation`_.
 
 .. _Google Python Style Guide: https://github.com/google/styleguide/blob/gh-pages/pyguide.md
-.. _sphinx-naopleon documentation: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google
+.. _Sphinx napoleon extension documentation: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/
 
 Building package reference documentation
 ========================================
