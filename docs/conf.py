@@ -177,3 +177,8 @@ texinfo_documents = [
 
 # Mocks import of this module to prevent errors during doc build
 autodoc_mock_imports = ['xmltodict']
+
+# -- Options for napoleon ----------------------------------------------------
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+napoleon_include_private_with_doc = True
