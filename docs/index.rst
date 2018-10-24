@@ -12,10 +12,4 @@ This package provides integration between the `Helcim Commerce API`_ and `django
 .. _django-oscar: https://github.com/django-oscar/django-oscar
 .. _GitHub: https://github.com/studybuffalo/django-oscar-helcim
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
-   installation
-   contributing
-   Package reference <source/helcim>
+.. include:: toc.rst
