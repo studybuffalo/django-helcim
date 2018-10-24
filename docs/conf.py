@@ -6,6 +6,8 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
+# pylint: disable=missing-docstring,invalid-name,redefined-builtin
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -130,8 +132,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'django-oscar-helcim.tex', 'django-oscar-helcim Documentation',
-     'Joshua Robert Torrance', 'manual'),
+    (
+        master_doc,
+        'django-oscar-helcim.tex',
+        'django-oscar-helcim Documentation',
+        'Joshua Robert Torrance',
+        'manual'
+    ),
 ]
 
 
@@ -151,12 +158,22 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'django-oscar-helcim', 'django-oscar-helcim Documentation',
-     author, 'django-oscar-helcim', 'This package provides integration of the Helcim Payment API with django-oscar.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        'django-oscar-helcim',
+        'django-oscar-helcim Documentation',
+        author,
+        'django-oscar-helcim',
+        (
+            'This package provides integration of the Helcim Payment API with'
+            'django-oscar.'
+        ),
+        'Miscellaneous'
+    ),
 ]
 
 
 # -- Options for Autodoc -----------------------------------------------------
 
+# Mocks import of this module to prevent errors during doc build
 autodoc_mock_imports = ['xmltodict']
