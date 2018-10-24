@@ -151,7 +151,7 @@ class BaseRequest(object):
         self.cleaned = conversions.validate_request_fields(self.details)
 
 class Purchase(BaseRequest):
-    """Makes a purchase request to Helcim API
+    """Makes a purchase request to Helcim API.
     """
 
     def _determine_payment_details(self):
@@ -225,7 +225,7 @@ class Purchase(BaseRequest):
             self.cleaned.pop(field, None)
 
     def process(self):
-        """Makes a purchase request"""
+        """Makes a purchase request."""
         self.validate_fields()
         self._determine_payment_details()
 
@@ -240,25 +240,25 @@ class Purchase(BaseRequest):
         return self.post(purchase_data)
 
 def refund():
-    """Makes a refund request
+    """Makes a refund request.
     """
 
     pass
 
 def verify():
-    """Makes a verification request
+    """Makes a verification request.
     """
 
     pass
 
 def preauthorize():
-    """Makes a pre-authorization request
+    """Makes a pre-authorization request.
     """
 
     pass
 
 def capture():
-    """Makes a capture request (to complete a preauthorization)
+    """Makes a capture request (to complete a preauthorization).
     """
 
     pass
