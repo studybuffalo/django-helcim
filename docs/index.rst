@@ -18,4 +18,4 @@ This package provides integration between the `Helcim Commerce API`_ and `django
 
    installation
    contributing
-   source/helcim
+   Package reference <source/helcim>

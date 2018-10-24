@@ -2,7 +2,38 @@
 Contributing
 ============
 
-This is the contributing section.
+Contributions or forking of the project is always welcome. Below will
+provide a quick outline of how to get setup and things to be aware of
+when contributing.
+
+--------------------------------------
+Setting up the development environment
+--------------------------------------
+
+This package is built using Pipenv_, which will take care of both
+your virtual environment and package management. If needed, you can
+install Pipenv through pip::
+
+    pip install pipenv
+
+.. _Pipenv: https://pipenv.readthedocs.io/en/latest/
+
+To download the repository from GitHub via git::
+
+    git clone git://github.com/studybuffalo/django-oscar-helcim.git
+
+You can then install all the required dependencies by changing to the
+package directory and installing from Pipfile.lock::
+
+    cd django-oscar-helcim
+    pipenv install --ignore-pipfile --dev
+
+Finally, you will need to build the package::
+
+    pipenv run python setup.py develop
+
+You should now have a working environment that you can use to run tests
+and setup the sandbox demo.
 
 -------
 Testing
@@ -35,7 +66,7 @@ To check test coverage, you can use the following::
     pipenv run py.test --cov=helcim --cov-report=html
 
 You may specify the output of the coverage report by changing the
-`--cov-report` option to `html` or `xml`.
+``--cov-report`` option to ``html`` or ``xml``.
 
 Testing with tox
 ================
@@ -52,3 +83,44 @@ You will need to have all versions of Python installed locally for
 tox to run tests. Any versions you are missing will be skipped. The
 Continuous Integration (CI) server will run tests against all versions
 on any pull requests or commits.
+
+---------------
+Sandbox Website
+---------------
+
+The Sandbox website is a barebones Django Oscar store that demonstrates
+how to use django-oscar-helcim in your project and provides a way to
+test any of your changes. You will need to setup your development
+environment (see above) to proceed.
+
+Deploying the site
+==================
+
+First migrate the the Django database::
+
+    pipenv run python sandbox/manage.py migrate
+
+Next you will need to load country data (see the `Django Oscar page for
+more details`_)::
+
+    pipenv run python sandbox/manage.py oscar_populate_countries
+
+.. _Django Oscar page for more details: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html#initial-data
+
+Finally, import a basic catalogue of store items to test with::
+
+    pipenv run python sandbox/manage.py oscar_import_catalogue sandbox/fixtures/catalogue.csv
+
+You can now start your site through the standard Django commands and
+access it at http://127.0.0.1:8000/::
+
+    pipenv run python sandbox/manage.py runserver
+
+----------------
+Reporting issues
+----------------
+
+If you just want to report an issue, you can use the
+`GitHub Issue page`_.
+
+.. _GitHub Issue page: https://github.com/studybuffalo/django-oscar-helcim/issues
