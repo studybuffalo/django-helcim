@@ -3,4 +3,4 @@
 
    installation
    contributing
-   Package reference <source/helcim>
+   Package reference <helcim>
