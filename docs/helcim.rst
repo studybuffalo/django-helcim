@@ -41,12 +41,4 @@ helcim.gateway module
     :undoc-members:
     :show-inheritance:
 
-helcim.urls module
-------------------
-
-.. automodule:: helcim.urls
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 

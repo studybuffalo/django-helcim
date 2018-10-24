@@ -14,80 +14,80 @@ from helcim.exceptions import HelcimError
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
 
-        Attributes:
-            api_details (dict): Details to connect to Helcim API:
+    Attributes:
+        api_details (dict): Details to connect to Helcim API:
 
-                - **url** (*str*): API URL.
-                - **account_id** (*str*): Helcim account ID.
-                - **token** (*str*): Helcim API token.
-                - **terminal** (*str*): Helcim terminal ID.
+            - **url** (*str*): API URL.
+            - **account_id** (*str*): Helcim account ID.
+            - **token** (*str*): Helcim API token.
+            - **terminal** (*str*): Helcim terminal ID.
 
-            **kwargs (dict): Any additional transaction details.
+        **kwargs (dict): Any additional transaction details.
 
-        Keyword Args:
-            amount (dec, optional): The amount for the transaction.
-            currency (str, optional): The currency for the transaction.
-            cc_name (str, optional): Name of the credit cardholder.
-            cc_number (str, optional): 16 digit credit card number.
-            cc_expiry (str, optional): 4 digit (MMYY) credit card
-                expiry.
-            cc_cvv (str, optional): 3 or 4 digit credit card CVV.
-            cc_address (str, optional): Address of the credit
-                cardholder.
-            cc_postal_code (str, optional): Postal code/zip code of
-                the credit cardholder.
-            customer_code (str, optional): Helcim customer code.
-            token (str, optional): 23 digit Helcim card token.
-            token_f4l4 (str, optional): 8 digit "first four digits and
-                last four digits" of the credit card number
-            token_f4l4_skip (bool, optional): Whether to skip the F4L4
-                verification.
-            mag (string, optional): Non-encrypted credit card magnetic
-                strip data.
-            mag_enc (str, optional): Encrypted credit card magnestic
-                strip data.
-            mag_enc_serial_number (string, optional): Terminal serial
-                number.
-            order_number (str, optional): An assigned order number for
-                the purchase.
-            ecommerce (bool, optional): Whether this is an e-commerce
-                transaction or not.
-            comments (str, optional): Any additional comments with this
-                transaction.
-            billing_contact_name (str, optional): Billing address
-                contact name.
-            billing_business_name (str, optional): Billing address
-                business name.
-            billing_street_1 (str, optional): Billing street address
-                (line 1).
-            billing_street_2 (str, optional): Billing street address
-                (line 2).
-            billing_city (str, optional): Billing city.
-            billing_province (str, optional): Billing province.
-            billing_country (str, optional): Billing country.
-            billing_postal_code (str, optional): Billing postal code.
-            billing_phone (str, optional): Billing phone number.
-            billing_fax (str, optional): Billing fax number
-            billing_email (str, optional): Billing email.
-            shipping_contact_name (str, optional): Shipping contact
-                 name.
-            shipping_business_name (str, optional): Shipping business
+    Keyword Args:
+        amount (dec, optional): The amount for the transaction.
+        currency (str, optional): The currency for the transaction.
+        cc_name (str, optional): Name of the credit cardholder.
+        cc_number (str, optional): 16 digit credit card number.
+        cc_expiry (str, optional): 4 digit (MMYY) credit card
+            expiry.
+        cc_cvv (str, optional): 3 or 4 digit credit card CVV.
+        cc_address (str, optional): Address of the credit
+            cardholder.
+        cc_postal_code (str, optional): Postal code/zip code of
+            the credit cardholder.
+        customer_code (str, optional): Helcim customer code.
+        token (str, optional): 23 digit Helcim card token.
+        token_f4l4 (str, optional): 8 digit "first four digits and
+            last four digits" of the credit card number
+        token_f4l4_skip (bool, optional): Whether to skip the F4L4
+            verification.
+        mag (string, optional): Non-encrypted credit card magnetic
+            strip data.
+        mag_enc (str, optional): Encrypted credit card magnestic
+            strip data.
+        mag_enc_serial_number (string, optional): Terminal serial
+            number.
+        order_number (str, optional): An assigned order number for
+            the purchase.
+        ecommerce (bool, optional): Whether this is an e-commerce
+            transaction or not.
+        comments (str, optional): Any additional comments with this
+            transaction.
+        billing_contact_name (str, optional): Billing address
+            contact name.
+        billing_business_name (str, optional): Billing address
+            business name.
+        billing_street_1 (str, optional): Billing street address
+            (line 1).
+        billing_street_2 (str, optional): Billing street address
+            (line 2).
+        billing_city (str, optional): Billing city.
+        billing_province (str, optional): Billing province.
+        billing_country (str, optional): Billing country.
+        billing_postal_code (str, optional): Billing postal code.
+        billing_phone (str, optional): Billing phone number.
+        billing_fax (str, optional): Billing fax number
+        billing_email (str, optional): Billing email.
+        shipping_contact_name (str, optional): Shipping contact
                 name.
-            shipping_street_1 (str, optional): Shipping street address
-                (line 1).
-            shipping_street_2 (str, optional): Shipping street address
-                (line 2).
-            shipping_city (str, optional): Shipping city.
-            shipping_province (str, optional): Shipping province.
-            shipping_country (str, optional): Shipping country.
-            shipping_postal_code (str, optional): Shipping postal code.
-            shipping_phone (str, optional): Shipping phone number.
-            shipping_fax (str, optional): Shipping fax number.
-            shipping_email (str, optional): Shipping email address.
-            amount_shipping (dec, optional): Shipping cost.
-            amount_tax (dec, optional): Tax amount.
-            shipping_method (str, optional): Method of shipping.
-            tax_details (str, optional): Name for the tax (e.g. GST).
+        shipping_business_name (str, optional): Shipping business
+            name.
+        shipping_street_1 (str, optional): Shipping street address
+            (line 1).
+        shipping_street_2 (str, optional): Shipping street address
+            (line 2).
+        shipping_city (str, optional): Shipping city.
+        shipping_province (str, optional): Shipping province.
+        shipping_country (str, optional): Shipping country.
+        shipping_postal_code (str, optional): Shipping postal code.
+        shipping_phone (str, optional): Shipping phone number.
+        shipping_fax (str, optional): Shipping fax number.
+        shipping_email (str, optional): Shipping email address.
+        amount_shipping (dec, optional): Shipping cost.
+        amount_tax (dec, optional): Tax amount.
+        shipping_method (str, optional): Method of shipping.
+        tax_details (str, optional): Name for the tax (e.g. GST).
     """
 
     def __init__(self, api_details, **kwargs):
