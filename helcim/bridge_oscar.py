@@ -10,7 +10,7 @@ from . import gateway # models
 def sale(order_number, amount, card, billing_address=None):
     """Make a sale request.
 
-    Attributes
+    Parameters:
         order_number (str): Order number for the transaction.
         amount (dec): The transaction total.
         card (obj): Instance of the Oscar bankcard class.

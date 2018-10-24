@@ -14,7 +14,7 @@ from helcim.exceptions import HelcimError
 class BaseRequest(object):
     """Base class to handle validation and submission to Helcim API.
 
-    Attributes:
+    Parameters:
         api_details (dict): Details to connect to Helcim API:
 
             - **url** (*str*): API URL.
@@ -24,7 +24,7 @@ class BaseRequest(object):
 
         **kwargs (dict): Any additional transaction details.
 
-    Keyword Args:
+    Keyword Arguments:
         amount (dec, optional): The amount for the transaction.
         currency (str, optional): The currency for the transaction.
         cc_name (str, optional): Name of the credit cardholder.
@@ -98,7 +98,7 @@ class BaseRequest(object):
     def post(self, post_data=None):
         """Makes POST to Helcim API and returns response.
 
-        Args:
+        Parameters:
             post_data (dict): The parameters to pass with the POST request.
 
         Returns:

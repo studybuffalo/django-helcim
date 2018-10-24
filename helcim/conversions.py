@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 class Field(object):
     """A single API field.
 
-    Attributes:
+    Parameters:
         api_name (str): The Helcim API field name for the field.
         field_type (str): The field type: ``s`` (string), ``c``
             (decimal), ``i`` (integer), ``b`` (boolean), ``d`` (date),
@@ -106,11 +106,11 @@ FROM_API_FIELDS = {
 def validate_request_fields(details):
     """Validates the request fields prior to submission.
 
-    Args
+    Parameters:
 
-    Returns
+    Returns:
 
-    Raises
+    Raises:
     """
 
     cleaned = {}
@@ -172,11 +172,11 @@ def validate_request_fields(details):
 
 def process_request_fields(api, cleaned, additional=None):
     """Converts all data to proper Helcim API request fields.
-    Args
+    Parameters:
 
-    Returns
+    Returns:
 
-    Raises
+    Raises:
     """
     request_data = {}
 
@@ -198,10 +198,10 @@ def process_request_fields(api, cleaned, additional=None):
 def process_api_response(response, raw_request=None, raw_response=None):
     """Updates API field names/types, and adds additional audit data.
 
-    Args
+    Parameters:
         Response (str): The API response (as an ``OrderedDict``).
 
-    Returns
+    Returns:
         dict: The validated and convereted API response.
     """
     # Add the common response fields
