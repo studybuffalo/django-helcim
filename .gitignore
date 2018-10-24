@@ -2,6 +2,10 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
+# Documentation Files
+_build/
+_static/
+_templates/
 
 # Environment Files (to prevent accidental commit to repo)
 *.env
