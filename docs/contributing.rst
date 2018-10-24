@@ -23,23 +23,23 @@ This package is built using Pipenv_, which will take care of both
 your virtual environment and package management. If needed, you can
 install Pipenv through pip::
 
-    pip install pipenv
+    $ pip install pipenv
 
 .. _Pipenv: https://pipenv.readthedocs.io/en/latest/
 
 To download the repository from GitHub via git::
 
-    git clone git://github.com/studybuffalo/django-oscar-helcim.git
+    $ git clone git://github.com/studybuffalo/django-oscar-helcim.git
 
 You can then install all the required dependencies by changing to the
 package directory and installing from Pipfile.lock::
 
-    cd django-oscar-helcim
-    pipenv install --ignore-pipfile --dev
+    $ cd django-oscar-helcim
+    $ pipenv install --ignore-pipfile --dev
 
 Finally, you will need to build the package::
 
-    pipenv run python setup.py develop
+    $ pipenv run python setup.py develop
 
 You should now have a working environment that you can use to run tests
 and setup the sandbox demo.
@@ -68,11 +68,11 @@ Testing with pytest
 
 Tests can be run locally with the following command::
 
-    pipenv run py.test
+    $ pipenv run py.test
 
 To check test coverage, you can use the following::
 
-    pipenv run py.test --cov=helcim --cov-report=html
+    $ pipenv run py.test --cov=helcim --cov-report=html
 
 You may specify the output of the coverage report by changing the
 ``--cov-report`` option to ``html`` or ``xml``.
@@ -84,7 +84,7 @@ To ensure compatability with as wide variety of Python and Django
 versions, this package uses tox_. You can tests via tox with the
 following command::
 
-    pipenv run tox
+    $ pipenv run tox
 
 .. _tox: https://tox.readthedocs.io/en/latest/
 
@@ -107,23 +107,23 @@ Deploying the site
 
 First migrate the the Django database::
 
-    pipenv run python sandbox/manage.py migrate
+    $ pipenv run python sandbox/manage.py migrate
 
 Next you will need to load country data (see the `Django Oscar page for
 more details`_)::
 
-    pipenv run python sandbox/manage.py oscar_populate_countries
+    $ pipenv run python sandbox/manage.py oscar_populate_countries
 
 .. _Django Oscar page for more details: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html#initial-data
 
 Finally, import a basic catalogue of store items to test with::
 
-    pipenv run python sandbox/manage.py oscar_import_catalogue sandbox/fixtures/catalogue.csv
+    $ pipenv run python sandbox/manage.py oscar_import_catalogue sandbox/fixtures/catalogue.csv
 
 You can now start your site through the standard Django commands and
 access it at http://127.0.0.1:8000/::
 
-    pipenv run python sandbox/manage.py runserver
+    $ pipenv run python sandbox/manage.py runserver
 
 ----------------------
 Updating documentation
@@ -156,4 +156,4 @@ The content for the Package reference is built using the
 deleted you will need to rebuild the file for the changes to populate
 on Read the Docs. You can do this with the following command::
 
-    pipenv run sphinx-apidoc -f -T -M -o docs helcim helcim/migrations
+    $ pipenv run sphinx-apidoc -f -T -M -o docs helcim helcim/migrations
