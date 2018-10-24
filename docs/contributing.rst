@@ -6,6 +6,15 @@ Contributions or forking of the project is always welcome. Below will
 provide a quick outline of how to get setup and things to be aware of
 when contributing.
 
+----------------
+Reporting issues
+----------------
+
+If you simply want to report an issue, you can use the
+`GitHub Issue page`_.
+
+.. _GitHub Issue page: https://github.com/studybuffalo/django-oscar-helcim/issues
+
 --------------------------------------
 Setting up the development environment
 --------------------------------------
@@ -116,11 +125,35 @@ access it at http://127.0.0.1:8000/::
 
     pipenv run python sandbox/manage.py runserver
 
-----------------
-Reporting issues
-----------------
+----------------------
+Updating documentation
+----------------------
 
-If you just want to report an issue, you can use the
-`GitHub Issue page`_.
+All documentation is hosted on `Read the Docs`_ and is built using
+Sphinx_. All the module content is automatically built from the
+docstrings and the `sphinx-apidoc`_ tool.
 
-.. _GitHub Issue page: https://github.com/studybuffalo/django-oscar-helcim/issues
+.. _Read the Docs: https://readthedocs.org/
+.. _Sphinx: http://www.sphinx-doc.org/en/master/
+.. _sphinx-apidoc: http://www.sphinx-doc.org/en/stable/man/sphinx-apidoc.html
+
+Docstring Format
+================
+
+The docstrings of this package follow the `Google Python Style Guide`_
+wherever possible. This ensures proper formatting of the documentation
+generated automatically by Sphinx. Additional examples can be found on
+the `sphinx-napoleon documentation`_.
+
+.. _Google Python Style Guide: https://github.com/google/styleguide/blob/gh-pages/pyguide.md
+.. _sphinx-naopleon documentation: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html#example-google
+
+Building package reference documentation
+========================================
+
+The content for the Package reference is built using the
+``sphinx-apidoc`` tool. If files in the ``helcim`` module are added or
+deleted you will need to rebuild the file for the changes to populate
+on Read the Docs. You can do this with the following command::
+
+    pipenv run sphinx-apidoc -f -T -M -o docs helcim helcim/migrations

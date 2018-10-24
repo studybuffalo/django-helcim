@@ -1,12 +1,10 @@
 helcim package
 ==============
 
-Subpackages
------------
-
-.. toctree::
-
-    helcim.migrations
+.. automodule:: helcim
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 Submodules
 ----------
@@ -52,10 +50,3 @@ helcim.urls module
     :show-inheritance:
 
 
-Module contents
----------------
-
-.. automodule:: helcim
-    :members:
-    :undoc-members:
-    :show-inheritance:
