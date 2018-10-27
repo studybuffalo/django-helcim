@@ -443,3 +443,13 @@ def test_configure_test_transaction_not_set():
     returned_post_data = base._configure_test_transaction({})
 
     assert 'test' not in returned_post_data
+
+# TODO: Tests for _identify_redact_fields
+
+# TODO: tests for _redact_api_data
+
+# TODO: tests for _redact_field
+
+# TODO: tests for _redact_data
+
+# TODO: tests for saving model

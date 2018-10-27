@@ -383,3 +383,7 @@ def test_process_api_response_missing_required_field():
         assert str(error) == "'notice'"
     else:
         assert False
+
+def test_create_raw_response():
+    # TODO: Builds tests to explicity test create_raw_response
+    pass
