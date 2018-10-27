@@ -99,7 +99,22 @@ class BaseRequest():
         self.cleaned = {}
 
     def _set_api_details(self, details):
-        """Sets the API details for this transaction."""
+        """Sets the API details for this transaction.
+
+        Will either return a dictionary of the API details from the
+        provided details argument, or will look to the Django settings
+        file.
+
+        Parameters:
+            details (dict): A dictionary of the API details.
+
+        Returns:
+            dict: The proper API details from the provided data.
+
+        Raises:
+            ImproperlyConfigured: Raised if API details cannot be
+                resolved.
+        """
         # Provided API details override ones in the settings
         if details:
             url = details['url']
@@ -135,7 +150,15 @@ class BaseRequest():
         }
 
     def _configure_test_transaction(self, post_data):
-        """Makes this a test transaction if specified in settings."""
+        """Adds test flag to post data if HELCIM_API_TEST is True.
+
+        Parameters:
+            post_data (dict): The post_data for the transaction.
+
+        Returns:
+            dict: post_data with the included test flag (if
+                appropriate)
+        """
         # Test flag in post_data takes precedence
         if post_data:
             if all([
@@ -150,7 +173,13 @@ class BaseRequest():
         return post_data
 
     def _identify_redact_fields(self):
-        """Identifies which fields (if any) should be redacted."""
+        """Identifies which fields (if any) should be redacted.
+
+            Configured using flags in the Django settings file.
+
+            Returns:
+                dict: A dictionary of fields to redact
+        """
         fields = {
             'name': False,
             'number': False,
@@ -202,7 +231,14 @@ class BaseRequest():
         return fields
 
     def _redact_api_data(self, data):
-        """Redacts all API data."""
+        """Redacts all API data.
+
+            Parameters:
+                data (dict): A dictionary of API response data.
+
+            Returns:
+                dict: The redacted response dictionary.
+        """
         data['raw_request'] = re.sub(
             r'(accountId=.+?)(?:&|$)',
             r'\g<1>accountId=REDACTED',
@@ -222,7 +258,18 @@ class BaseRequest():
         return data
 
     def _redact_field(self, data, api_name, python_name):
-        """Redacts all cardholder name references."""
+        """Redacts all information for the provided field.
+
+            Parameters:
+                data (dict): The API response data.
+                api_name (str): The field name used by the Helcim API.
+                python_name (str): The field name used by this
+                    application.
+
+            Returns:
+                dict: The API response data with the specified field
+                    redacted.
+        """
         # Redacts the raw_request data
         data['raw_request'] = re.sub(
             r'({}=.+?)(?:&|$)'.format(api_name),
@@ -243,7 +290,15 @@ class BaseRequest():
         return data
 
     def _redact_data(self, data):
-        """Removes sensitive and identifiable data."""
+        """Removes sensitive and identifiable data.
+
+            Parameters:
+                data (dict): The API response data.
+
+            Returns:
+                dict: The API response data with required fields
+                    redacted.
+        """
         # Remove any API content
         redacted_data = self._redact_api_data(data)
 
@@ -277,7 +332,16 @@ class BaseRequest():
         return redacted_data
 
     def process_error_response(self, response_message):
-        """Returns error response with proper exception type."""
+        """Returns error response with proper exception type.
+
+            Parameters:
+                response_message (str): The API error response message.
+
+            Raises:
+                PaymentError: Raised for any errors returned during a
+                    purchase transaction.
+                HelcimError: Raised for any other unhandled errors.
+        """
         exception_message = 'Helcim API request failed: {}'.format(
             response_message
         )
@@ -337,7 +401,17 @@ class BaseRequest():
         )
 
     def save_transaction(self, data, transaction_type):
-        """Saves provided transaction data as Django model instance."""
+        """Saves provided transaction data as Django model instance.
+
+            Parameters:
+                data (dict): The API response data.
+                transaction_type (str): The type of transaction (`s`
+                    for purchase (sale), `p` for pre-authorization,
+                    `c` for capture, and `r` for refund).
+
+            Returns:
+                obj: A Django model instance of the saved data.
+        """
         redacted_data = self._redact_data(data)
 
         saved_model = models.HelcimTransaction.objects.create(
@@ -349,7 +423,7 @@ class BaseRequest():
         return saved_model
 
     def validate_fields(self):
-        """Validates Helcim API request fields and ."""
+        """Validates Helcim API request fields and coerces values."""
         self.cleaned = conversions.validate_request_fields(self.details)
 
 class Purchase(BaseRequest):
