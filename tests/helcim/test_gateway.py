@@ -73,7 +73,7 @@ API_DETAILS = {
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
 def test_post_returns_dictionary():
-    base_request = gateway.BaseRequest(API_DETAILS)
+    base_request = gateway.BaseRequest(api_details=API_DETAILS)
     dictionary = base_request.post()
 
     assert isinstance(dictionary, dict)
@@ -86,7 +86,7 @@ def test_purchase_processing():
         'customer_code': 'CST1000',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     response = purchase.process()
 
     assert isinstance(response, dict)
@@ -99,7 +99,7 @@ def test_determine_purchase_payment_details_token():
         'token_f4l4': '11119999',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -115,7 +115,7 @@ def test_determine_payment_details_token_with_f4l4_skip():
         'token_f4l4_skip': True,
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -131,7 +131,7 @@ def test_determine_payment_details_token_f4l4_missing_error():
     }
 
     try:
-        purchase = gateway.Purchase(API_DETAILS, **details)
+        purchase = gateway.Purchase(api_details=API_DETAILS, **details)
         purchase.validate_fields()
         purchase._determine_payment_details()
     except ValueError:
@@ -144,7 +144,7 @@ def test_determine_payment_details_customer():
         'customer_code': 'CST1000',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -157,7 +157,7 @@ def test_determine_payment_details_cc():
         'cc_expiry': '0125',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -175,7 +175,7 @@ def test_determine_payment_details_cc_with_details():
         'cc_postal_code': 'T1T 1T1',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -194,7 +194,7 @@ def test_determine_payment_details_mag_encrypted():
         'mag_enc_serial_number': 'SERIAL1230129912',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -210,7 +210,7 @@ def test_determine_payment_details_mag():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -221,7 +221,7 @@ def test_determine_payment_details_value_error():
     details = {}
 
     try:
-        purchase = gateway.Purchase(API_DETAILS, **details)
+        purchase = gateway.Purchase(api_details=API_DETAILS, **details)
         purchase.validate_fields()
         purchase._determine_payment_details()
     except ValueError:
@@ -241,7 +241,7 @@ def test_determine_payment_details_token_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -258,7 +258,7 @@ def test_determine_payment_details_customer_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -274,7 +274,7 @@ def test_determine_payment_details_cc_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -288,7 +288,7 @@ def test_determine_payment_details_mag_encrypted_priority():
         'mag': '%B45**********SENSITIVE*DATA******************01?2',
     }
 
-    purchase = gateway.Purchase(API_DETAILS, **details)
+    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
     purchase._determine_payment_details()
 
@@ -297,7 +297,7 @@ def test_determine_payment_details_mag_encrypted_priority():
 
 @patch('helcim.gateway.requests.post', mock_post_api_error)
 def test_post_api_connection_error():
-    base_request = gateway.BaseRequest(API_DETAILS)
+    base_request = gateway.BaseRequest(api_details=API_DETAILS)
 
     try:
         base_request.post()
@@ -311,7 +311,7 @@ def test_post_api_connection_error():
 
 @patch('helcim.gateway.requests.post', MockPostAPINon200StatusCode)
 def test_post_api_non_200_status_code():
-    base_request = gateway.BaseRequest(API_DETAILS)
+    base_request = gateway.BaseRequest(api_details=API_DETAILS)
 
     try:
         base_request.post()
@@ -323,7 +323,7 @@ def test_post_api_non_200_status_code():
 
 @patch('helcim.gateway.requests.post', MockPostAPIErrorResponse)
 def test_post_api_error_response_message():
-    base_request = gateway.BaseRequest(API_DETAILS)
+    base_request = gateway.BaseRequest(api_details=API_DETAILS)
 
     try:
         base_request.post()
@@ -334,7 +334,7 @@ def test_post_api_error_response_message():
         assert False
 
 def test_process_error_response_base():
-    base_request = gateway.BaseRequest(None)
+    base_request = gateway.BaseRequest()
 
     try:
         base_request.process_error_response('')
@@ -344,7 +344,7 @@ def test_process_error_response_base():
         assert False
 
 def test_process_error_response_purchase():
-    purchase_request = gateway.Purchase(None)
+    purchase_request = gateway.Purchase()
 
     try:
         purchase_request.process_error_response('')

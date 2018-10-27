@@ -7,6 +7,8 @@ API and should work in any application (i.e. not just django-oscar).
 import requests
 import xmltodict
 
+from django.conf import settings
+
 from helcim import conversions
 from helcim import exceptions
 
@@ -90,10 +92,35 @@ class BaseRequest():
         tax_details (str, optional): Name for the tax (e.g. GST).
     """
 
-    def __init__(self, api_details, **kwargs):
-        self.api = api_details
+    def __init__(self, **kwargs):
+        self.api = self._set_api_details()
         self.details = kwargs
         self.cleaned = {}
+
+    def _set_api_details(self):
+        """Sets the API details for this transaction."""
+        # Provided API details override ones in the settings
+        # if api_details:
+        #     url =
+        #     account_id =
+        #     token =
+        #     terminal_id =
+        # # Default uses details from the settings files
+        # else:
+        #     url =
+        #     account_id =
+        #     token =
+        #     terminal_id =
+        url = None
+        account_id = None
+        token = None
+        terminal_id = None
+        return {
+            'url': url,
+            'account_id': account_id,
+            'token': token,
+            'terminal_id': terminal_id,
+        }
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type."""

@@ -21,12 +21,6 @@ def sale(order_number, amount, card, billing_address=None):
             processing the payment.
     """
     purchase = gateway.Purchase(
-        {
-            'url': '',
-            'account_id': '',
-            'token': '',
-            'terminal': '',
-        },
         order_number=order_number,
         amount=amount,
         cc=card,
