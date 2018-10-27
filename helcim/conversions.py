@@ -195,6 +195,18 @@ def process_request_fields(api, cleaned, additional=None):
 
     return request_data
 
+def create_raw_request(data):
+    """Converts the raw request into a POST string."""
+    if data:
+        raw_strings = []
+
+        for key, item in data.items():
+            raw_strings.append('{}={}'.format(key, item))
+
+        return '&'.join(raw_strings)
+
+    return data
+
 def process_api_response(response, raw_request=None, raw_response=None):
     """Updates API field names/types, and adds additional audit data.
 
@@ -254,7 +266,7 @@ def process_api_response(response, raw_request=None, raw_response=None):
 
 
     # Add additional audit information
-    processed['raw_request'] = raw_request
+    processed['raw_request'] = create_raw_request(raw_request)
     processed['raw_response'] = raw_response
 
     return processed

@@ -3,15 +3,14 @@
 These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application (i.e. not just django-oscar).
 """
-
+import re
 import requests
 import xmltodict
 
 from django.conf import settings
 from django.core import exceptions as django_exceptions
 
-from helcim import conversions
-from helcim import exceptions as helcim_exceptions
+from helcim import conversions, exceptions as helcim_exceptions, models
 
 
 class BaseRequest():
@@ -150,6 +149,133 @@ class BaseRequest():
 
         return post_data
 
+    def _identify_redact_fields(self):
+        """Identifies which fields (if any) should be redacted."""
+        fields = {
+            'name': False,
+            'number': False,
+            'expiry': False,
+            'type': False,
+            'token': False,
+        }
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_ALL')
+                and settings.HELCIM_REDACT_ALL
+        ):
+            fields['name'] = True
+            fields['number'] = True
+            fields['expiry'] = True
+            fields['type'] = True
+            fields['token'] = True
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_CC_NAME')
+                and settings.HELCIM_REDACT_CC_NAME
+        ):
+            fields['name'] = True
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_CC_NUMBER')
+                and settings.HELCIM_REDACT_CC_NUMBER
+        ):
+            fields['number'] = True
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_CC_EXPIRY')
+                and settings.HELCIM_REDACT_CC_EXPIRY
+        ):
+            fields['expiry'] = True
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_CC_TYPE')
+                and settings.HELCIM_REDACT_CC_TYPE
+        ):
+            fields['type'] = True
+
+        if (
+                hasattr(settings, 'HELCIM_REDACT_TOKEN')
+                and settings.HELCIM_REDACT_TOKEN
+        ):
+            fields['token'] = True
+
+        return fields
+
+    def _redact_api_data(self, data):
+        """Redacts all API data."""
+        data['raw_request'] = re.sub(
+            r'(accountId=.+?)(?:&|$)',
+            r'\g<1>accountId=REDACTED',
+            data['raw_request']
+        )
+        data['raw_request'] = re.sub(
+            r'(apiToken=.+?)(?:&|$)',
+            r'\g<1>apiToken=REDACTED',
+            data['raw_request']
+        )
+        data['raw_request'] = re.sub(
+            r'(terminalId=.+?)(?:&|$)',
+            r'\g<1>terminalId=REDACTED',
+            data['raw_request']
+        )
+
+        return data
+
+    def _redact_field(self, data, api_name, python_name):
+        """Redacts all cardholder name references."""
+        # Redacts the raw_request data
+        data['raw_request'] = re.sub(
+            r'({}=.+?)(?:&|$)'.format(api_name),
+            r'\g<1>{}=REDACTED'.format(api_name),
+            data['raw_request']
+        )
+
+        # Redacts the raw_response data
+        data['raw_response'] = re.sub(
+            r'<{}>.*</{}>'.format(api_name, api_name),
+            r'<{}>REDACTED</{}>'.format(api_name, api_name),
+            data['raw_request']
+        )
+
+        if python_name in data:
+            data[python_name] = None
+
+        return data
+
+    def _redact_data(self, data):
+        """Removes sensitive and identifiable data."""
+        # Remove any API content
+        redacted_data = self._redact_api_data(data)
+
+        fields = self._identify_redact_fields()
+
+        if fields['name']:
+            redacted_data = self._redact_field(
+                data, 'cardHolderName', 'cc_name'
+            )
+
+        if fields['number']:
+            redacted_data = self._redact_field(
+                data, 'cardNumber', 'cc_number'
+            )
+
+        if fields['expiry']:
+            redacted_data = self._redact_field(
+                data, 'expiryDate', 'cc_expiry'
+            )
+
+        if fields['type']:
+            redacted_data = self._redact_field(
+                data, 'cardType', 'cc_type'
+            )
+
+        if fields['token']:
+            redacted_data = self._redact_field(
+                data, 'cardToken', 'token'
+            )
+
+        return redacted_data
+
     def process_error_response(self, response_message):
         """Returns error response with proper exception type."""
         exception_message = 'Helcim API request failed: {}'.format(
@@ -209,6 +335,18 @@ class BaseRequest():
             post_data,
             response.content
         )
+
+    def save_transaction(self, data, transaction_type):
+        """Saves provided transaction data as Django model instance."""
+        redacted_data = self._redact_data(data)
+
+        saved_model = models.HelcimTransaction.objects.create(
+            raw_request=redacted_data['raw_request'],
+            raw_response=redacted_data['raw_response'],
+            transaction_type=transaction_type
+        )
+
+        return saved_model
 
     def validate_fields(self):
         """Validates Helcim API request fields and ."""
@@ -301,7 +439,10 @@ class Purchase(BaseRequest):
             }
         )
 
-        return self.post(purchase_data)
+        response = self.post(purchase_data)
+        purchase = self.save_transaction(response, 's')
+
+        return purchase
 
 def refund():
     """Makes a refund request.
