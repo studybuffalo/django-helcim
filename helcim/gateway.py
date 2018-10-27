@@ -8,10 +8,10 @@ import requests
 import xmltodict
 
 from helcim import conversions
-from helcim.exceptions import HelcimError
+from helcim import exceptions
 
 
-class BaseRequest(object):
+class BaseRequest():
     """Base class to handle validation and submission to Helcim API.
 
     Parameters:
@@ -95,6 +95,17 @@ class BaseRequest(object):
         self.details = kwargs
         self.cleaned = {}
 
+    def process_error_response(self, response_message):
+        """Returns error response with proper exception type."""
+        exception_message = 'Helcim API request failed: {}'.format(
+            response_message
+        )
+
+        if isinstance(self, Purchase):
+            raise exceptions.PaymentError(exception_message)
+
+        raise exceptions.HelcimError(exception_message)
+
     def post(self, post_data=None):
         """Makes POST to Helcim API and returns response.
 
@@ -105,8 +116,8 @@ class BaseRequest(object):
             dict: Processed Helcim API response.
 
         Raises:
-            HelcimError: An error occurred connecting or communicating
-                with Helcim API.
+            ProcessingError: An error occurred connecting or
+                communicating with Helcim API.
         """
 
         # Make the POST request
@@ -116,13 +127,13 @@ class BaseRequest(object):
                 data=post_data,
             )
         except requests.ConnectionError:
-            raise HelcimError(
+            raise exceptions.ProcessingError(
                 'Unable to connect to Helcim API ({})'.format(self.api['url'])
             )
 
         # Catch any response errors in status code
         if response.status_code != 200:
-            raise HelcimError(
+            raise exceptions.ProcessingError(
                 'Helcim API request failed with status code {}'.format(
                     response.status_code
                 )
@@ -133,11 +144,7 @@ class BaseRequest(object):
 
         # Catch any issues with the API response
         if dict_response['response'] == '0':
-            raise HelcimError(
-                'Helcim API request failed: {}'.format(
-                    dict_response['responseMessage']
-                )
-            )
+            self.process_error_response(dict_response['responseMessage'])
 
         # Return the response
         return conversions.process_api_response(

@@ -5,7 +5,7 @@ from unittest.mock import patch
 import requests
 
 from helcim import gateway
-from helcim.exceptions import HelcimError
+from helcim.exceptions import HelcimError, ProcessingError
 
 class MockPostResponse(object):
     def __init__(self, url, data):
@@ -302,7 +302,7 @@ def test_post_api_connection_error():
 
     try:
         base_request.post()
-    except HelcimError as error:
+    except ProcessingError as error:
         assert True
         assert str(error) == (
             "Unable to connect to Helcim API (https://www.test.com)"
@@ -316,7 +316,7 @@ def test_post_api_non_200_status_code():
 
     try:
         base_request.post()
-    except HelcimError as error:
+    except ProcessingError as error:
         assert True
         assert str(error) == "Helcim API request failed with status code 404"
     else:

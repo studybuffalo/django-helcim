@@ -1,12 +1,13 @@
 """Custom exceptions for package, Helcim API, and django-oscar"""
 
-try:
-    from oscar.apps.payment.exceptions import PaymentError
-except ImportError:
-    class PaymentError(Exception):
-        """Error to allow proper error handling with django-oscar"""
-        pass
+class HelcimError(Exception):
+    """Base exception for all package exceptions."""
+    pass
 
-class HelcimError(PaymentError):
-    """Extended PaymentError to improve agnostic interfacing"""
+class ProcessingError(HelcimError):
+    """Exceptions to handle system and API connection errors."""
+    pass
+
+class PaymentError(HelcimError):
+    """Exceptions to handle payment and refund errors."""
     pass
