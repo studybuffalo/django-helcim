@@ -107,7 +107,7 @@ class BaseRequest():
             account_id = details['account_id']
             token = details['token']
             terminal_id = details['terminal_id']
-        # # Default uses details from the settings files
+        # Default uses details from the settings files
         else:
             setting_names = [
                 'HELCIM_API_URL',
@@ -138,7 +138,7 @@ class BaseRequest():
     def _configure_test_transaction(self, post_data):
         """Makes this a test transaction if specified in settings."""
         # Test flag in post_data takes precedence
-        if post_data and not 'test' in post_data:
+        if not 'test' in post_data:
             if hasattr(settings, 'HELCIM_API_TEST'):
                 post_data['test'] = settings.HELCIM_API_TEST
 
@@ -155,7 +155,7 @@ class BaseRequest():
 
         raise helcim_exceptions.HelcimError(exception_message)
 
-    def post(self, post_data=None):
+    def post(self, post_data={}):
         """Makes POST to Helcim API and returns response.
 
         Parameters:

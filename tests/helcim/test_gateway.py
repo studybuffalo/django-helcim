@@ -2,9 +2,13 @@
 # pylint: disable=missing-docstring, protected-access
 
 from unittest.mock import patch
+
 import requests
 
-from helcim import gateway, exceptions
+from django.core import exceptions as django_exceptions
+
+from helcim import exceptions as helcim_exceptions, gateway
+
 
 class MockPostResponse():
     def __init__(self, url, data):
@@ -301,7 +305,7 @@ def test_post_api_connection_error():
 
     try:
         base_request.post()
-    except exceptions.ProcessingError as error:
+    except helcim_exceptions.ProcessingError as error:
         assert True
         assert str(error) == (
             "Unable to connect to Helcim API (https://www.test.com)"
@@ -315,7 +319,7 @@ def test_post_api_non_200_status_code():
 
     try:
         base_request.post()
-    except exceptions.ProcessingError as error:
+    except helcim_exceptions.ProcessingError as error:
         assert True
         assert str(error) == "Helcim API request failed with status code 404"
     else:
@@ -327,7 +331,7 @@ def test_post_api_error_response_message():
 
     try:
         base_request.post()
-    except exceptions.HelcimError as error:
+    except helcim_exceptions.HelcimError as error:
         assert True
         assert str(error) == "Helcim API request failed: TEST ERROR"
     else:
@@ -338,7 +342,7 @@ def test_process_error_response_base():
 
     try:
         base_request.process_error_response('')
-    except exceptions.HelcimError:
+    except helcim_exceptions.HelcimError:
         assert True
     else:
         assert False
@@ -348,7 +352,86 @@ def test_process_error_response_purchase():
 
     try:
         purchase_request.process_error_response('')
-    except exceptions.PaymentError:
+    except helcim_exceptions.PaymentError:
         assert True
     else:
         assert False
+
+def test_set_api_details_argument():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    assert 'url' in base.api
+    assert base.api['url'] == 'https://www.test.com'
+    assert 'account_id' in base.api
+    assert base.api['account_id'] == '12345678'
+    assert 'token' in base.api
+    assert base.api['token'] == 'abcdefg'
+    assert 'terminal_id' in base.api
+    assert base.api['terminal_id'] == '98765432'
+
+@patch('helcim.gateway.settings.HELCIM_API_URL', '1')
+@patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2')
+@patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3')
+@patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4')
+def test_set_api_details_settings():
+    base = gateway.BaseRequest()
+
+    assert 'url' in base.api
+    assert base.api['url'] == '1'
+    assert 'account_id' in base.api
+    assert base.api['account_id'] == '2'
+    assert 'token' in base.api
+    assert base.api['token'] == '3'
+    assert 'terminal_id' in base.api
+    assert base.api['terminal_id'] == '4'
+
+@patch('helcim.gateway.settings.HELCIM_API_URL', '1')
+def test_set_api_details_argument_overrides_settings():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    assert 'url' in base.api
+    assert base.api['url'] == 'https://www.test.com'
+
+@patch('helcim.gateway.settings', None)
+def test_set_api_details_none():
+    try:
+        gateway.BaseRequest()
+    except django_exceptions.ImproperlyConfigured:
+        assert True
+    else:
+        assert False
+
+def test_configure_test_transaction_in_data():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    post_data = {'test': True}
+
+    returned_post_data = base._configure_test_transaction(post_data)
+
+    assert post_data == returned_post_data
+
+@patch('helcim.gateway.settings.HELCIM_API_TEST', False)
+def test_configure_test_transaction_data_overrides_settings():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    post_data = {'test': True}
+
+    returned_post_data = base._configure_test_transaction(post_data)
+
+    assert returned_post_data['test'] is True
+
+@patch('helcim.gateway.settings.HELCIM_API_TEST', True)
+def test_configure_test_transaction_setting():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    returned_post_data = base._configure_test_transaction({})
+
+    assert returned_post_data['test'] is True
+
+@patch('helcim.gateway.settings', None)
+def test_configure_test_transaction_not_set():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+
+    returned_post_data = base._configure_test_transaction({})
+
+    assert 'test' not in returned_post_data
