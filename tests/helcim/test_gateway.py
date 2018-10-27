@@ -4,10 +4,9 @@
 from unittest.mock import patch
 import requests
 
-from helcim import gateway
-from helcim import exceptions
+from helcim import gateway, exceptions
 
-class MockPostResponse(object):
+class MockPostResponse():
     def __init__(self, url, data):
         self.content = """<?xml version="1.0"?>
             <message>
@@ -41,7 +40,7 @@ class MockPostResponse(object):
 def mock_post_api_error(url, data): # pylint: disable=unused-argument
     raise requests.ConnectionError
 
-class MockPostAPINon200StatusCode(object):
+class MockPostAPINon200StatusCode():
     def __init__(self, url, data):
         self.status_code = 404
         self.content = """<?xml version="1.0"?>
@@ -53,7 +52,7 @@ class MockPostAPINon200StatusCode(object):
         self.url = url
         self.data = data
 
-class MockPostAPIErrorResponse(object):
+class MockPostAPIErrorResponse():
     def __init__(self, url, data):
         self.status_code = 200
         self.content = """<?xml version="1.0"?>
