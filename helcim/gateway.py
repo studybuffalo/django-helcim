@@ -8,9 +8,10 @@ import requests
 import xmltodict
 
 from django.conf import settings
+from django.core import exceptions as django_exceptions
 
 from helcim import conversions
-from helcim import exceptions
+from helcim import exceptions as helcim_exceptions
 
 
 class BaseRequest():
@@ -22,7 +23,7 @@ class BaseRequest():
             - **url** (*str*): API URL.
             - **account_id** (*str*): Helcim account ID.
             - **token** (*str*): Helcim API token.
-            - **terminal** (*str*): Helcim terminal ID.
+            - **terminal_id** (*str*): Helcim terminal ID.
 
         **kwargs (dict): Any additional transaction details.
 
@@ -90,6 +91,7 @@ class BaseRequest():
         amount_tax (dec, optional): Tax amount.
         shipping_method (str, optional): Method of shipping.
         tax_details (str, optional): Name for the tax (e.g. GST).
+        test (bool, optional): Whether this is a test transaction or not.
     """
 
     def __init__(self, api_details=None, **kwargs):
@@ -107,10 +109,24 @@ class BaseRequest():
             terminal_id = details['terminal_id']
         # # Default uses details from the settings files
         else:
-            url = ''
-            account_id = ''
-            token = ''
-            terminal_id = ''
+            setting_names = [
+                'HELCIM_API_URL',
+                'HELCIM_ACCOUNT_ID',
+                'HELCIM_API_TOKEN',
+                'HELCIM_TERMINAL_ID',
+            ]
+
+            # Confirm all required settings are entered
+            for setting_name in setting_names:
+                if not hasattr(settings, setting_name):
+                    raise django_exceptions.ImproperlyConfigured(
+                        'You must define a {} setting'.format(setting_name)
+                    )
+
+            url = settings.HELCIM_API_URL
+            account_id = settings.HELCIM_ACCOUNT_ID
+            token = settings.HELCIM_API_TOKEN
+            terminal_id = settings.HELCIM_TERMINAL_ID
 
         return {
             'url': url,
@@ -119,6 +135,15 @@ class BaseRequest():
             'terminal_id': terminal_id,
         }
 
+    def _configure_test_transaction(self, post_data):
+        """Makes this a test transaction if specified in settings."""
+        # Test flag in post_data takes precedence
+        if post_data and not 'test' in post_data:
+            if hasattr(settings, 'HELCIM_API_TEST'):
+                post_data['test'] = settings.HELCIM_API_TEST
+
+        return post_data
+
     def process_error_response(self, response_message):
         """Returns error response with proper exception type."""
         exception_message = 'Helcim API request failed: {}'.format(
@@ -126,9 +151,9 @@ class BaseRequest():
         )
 
         if isinstance(self, Purchase):
-            raise exceptions.PaymentError(exception_message)
+            raise helcim_exceptions.PaymentError(exception_message)
 
-        raise exceptions.HelcimError(exception_message)
+        raise helcim_exceptions.HelcimError(exception_message)
 
     def post(self, post_data=None):
         """Makes POST to Helcim API and returns response.
@@ -144,6 +169,8 @@ class BaseRequest():
                 communicating with Helcim API.
         """
 
+        post_data = self._configure_test_transaction(post_data)
+
         # Make the POST request
         try:
             response = requests.post(
@@ -151,13 +178,13 @@ class BaseRequest():
                 data=post_data,
             )
         except requests.ConnectionError:
-            raise exceptions.ProcessingError(
+            raise helcim_exceptions.ProcessingError(
                 'Unable to connect to Helcim API ({})'.format(self.api['url'])
             )
 
         # Catch any response errors in status code
         if response.status_code != 200:
-            raise exceptions.ProcessingError(
+            raise helcim_exceptions.ProcessingError(
                 'Helcim API request failed with status code {}'.format(
                     response.status_code
                 )
