@@ -169,7 +169,7 @@ def test_process_request_fields_valid():
     api = {
         'account_id': '1',
         'token': '2',
-        'terminal': '3',
+        'terminal_id': '3',
     }
     cleaned = {
         'cc_cvv': '100.00',
@@ -191,7 +191,7 @@ def test_process_request_fields_valid_no_additional():
     api = {
         'account_id': '1',
         'token': '2',
-        'terminal': '3',
+        'terminal_id': '3',
     }
     cleaned = {
         'cc_cvv': '100.00',
@@ -208,7 +208,7 @@ def test_process_request_fields_valid_no_additional():
 def test_process_request_fields_invalid_api():
     api = {
         'account_id': '1',
-        'terminal': '3',
+        'terminal_id': '3',
     }
     cleaned = {
         'cc_cvv': '100.00',

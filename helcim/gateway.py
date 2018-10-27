@@ -92,29 +92,26 @@ class BaseRequest():
         tax_details (str, optional): Name for the tax (e.g. GST).
     """
 
-    def __init__(self, **kwargs):
-        self.api = self._set_api_details()
+    def __init__(self, api_details=None, **kwargs):
+        self.api = self._set_api_details(api_details)
         self.details = kwargs
         self.cleaned = {}
 
-    def _set_api_details(self):
+    def _set_api_details(self, details):
         """Sets the API details for this transaction."""
         # Provided API details override ones in the settings
-        # if api_details:
-        #     url =
-        #     account_id =
-        #     token =
-        #     terminal_id =
+        if details:
+            url = details['url']
+            account_id = details['account_id']
+            token = details['token']
+            terminal_id = details['terminal_id']
         # # Default uses details from the settings files
-        # else:
-        #     url =
-        #     account_id =
-        #     token =
-        #     terminal_id =
-        url = None
-        account_id = None
-        token = None
-        terminal_id = None
+        else:
+            url = ''
+            account_id = ''
+            token = ''
+            terminal_id = ''
+
         return {
             'url': url,
             'account_id': account_id,

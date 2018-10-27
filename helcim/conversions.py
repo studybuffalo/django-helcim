@@ -183,7 +183,7 @@ def process_request_fields(api, cleaned, additional=None):
     # API Data
     request_data['accountId'] = str(api['account_id'])
     request_data['apiToken'] = str(api['token'])
-    request_data['terminalId'] = str(api['terminal'])
+    request_data['terminalId'] = str(api['terminal_id'])
 
     # Cleaned Data
     for field_name, field_value in cleaned.items():

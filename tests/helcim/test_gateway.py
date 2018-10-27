@@ -68,7 +68,7 @@ API_DETAILS = {
     'url': 'https://www.test.com',
     'account_id': '12345678',
     'token': 'abcdefg',
-    'terminal': '98765432',
+    'terminal_id': '98765432',
 }
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
