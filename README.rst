@@ -24,21 +24,44 @@ django-oscar-helcim
 
 .. _License: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
 
-This package provides integration of the Helcim Payment API with django-oscar.
+This package provides integration of the Helcim Payment API with
+`Django Oscar`_. Django-oscar-helcim can also be easily extended for use used
+with other python-based commerce solutions, as all base modules are platform
+agnostic.
+
+.. _Django Oscar: https://github.com/django-oscar/django-oscar
 
 ---------------
 Getting Started
 ---------------
 
-Full instructions can be found on `Read The Docs`_.
+Instructions on installing and configuration can be found on `Read The Docs`_.
 
 .. _Read The Docs: https://django-oscar-helcim.readthedocs.io/en/latest/
+
+-------
+Support
+-------
+
+The docs_ provide examples for setup and common issues to be aware of. If the
+issue involves connecting this package to Django Oscar, this repository
+contains a `sandbox environment`_ you can review for a minimal working
+example. For any other issues, you can submit a `GitHub Issue`_.
+
+.. _docs: https://django-oscar-helcim.readthedocs.io/en/latest/installation.html
+
+.. _sandbox environment: https://django-oscar-helcim.readthedocs.io/en/latest/contributing.html#sandbox-website
+
+.. _GitHub Issue: https://github.com/studybuffalo/django-oscar-helcim/issues
 
 ------------
 Contributing
 ------------
 
-To be completed.
+Contributions are welcome, especially to address bugs and extend
+functionality. Full details on contributing can be found in the docs_.
+
+.. _docs: https://django-oscar-helcim.readthedocs.io/en/latest/contributing.html
 
 ----------
 Versioning
@@ -68,6 +91,7 @@ This project is licensed under the GPLv3. Please see the LICENSE_ file for detai
 Acknowledgements
 ----------------
 
-Thanks to the `django-oscar-paypal`_ developers, from which this package is designed after.
+Thanks to the `django-oscar-paypal`_ developers, from which many of this
+packages design decisions are based.
 
 .. _django-oscar-paypal: https://github.com/django-oscar/django-oscar-paypal

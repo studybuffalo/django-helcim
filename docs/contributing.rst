@@ -102,6 +102,14 @@ how to use django-oscar-helcim in your project and provides a way to
 test any of your changes. You will need to setup your development
 environment (see above) to proceed.
 
+.. attention::
+
+    These instructions assume you have already setup a pipenv virtual
+    environment with django-oscar-helcim installed. See `Getting started`_ if
+    you need additional instructions.
+
+    .. _Getting started: https://django-oscar-helcim.readthedocs.io/en/latest/installation.html#install-django-oscar-helcim-and-its-dependencies
+
 Deploying the site
 ==================
 
