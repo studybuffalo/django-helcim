@@ -1,6 +1,4 @@
-"""
-Bridging module between Django Oscar and gateway module.
-"""
+"""Bridging module between Django Oscar and gateway module."""
 from __future__ import unicode_literals
 
 from oscar.apps.payment import exceptions as oscar_exceptions
@@ -37,12 +35,12 @@ def sale(order_number, amount, card, billing_address=None):
 
     try:
         return purchase.process()
-    except helcim_exceptions.HelcimError() as error:
+    except helcim_exceptions.ProcessingError as error:
         raise oscar_exceptions.GatewayError(str(error))
-    except helcim_exceptions.ProcessingError() as error:
-        raise oscar_exceptions.GatewayError(str(error))
-    except helcim_exceptions.PaymentError() as error:
+    except helcim_exceptions.PaymentError as error:
         raise oscar_exceptions.PaymentError(str(error))
+    except helcim_exceptions.HelcimError as error:
+        raise oscar_exceptions.GatewayError(str(error))
 
 
 # def authorize(order_number, amount, card, billing_address=None):
