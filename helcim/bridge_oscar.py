@@ -1,11 +1,11 @@
 """
-Bridging module between Oscar and gateway module (which is Oscar agnostic).
+Bridging module between Django Oscar and gateway module.
 """
 from __future__ import unicode_literals
 
-# from oscar.apps.payment import exceptions
+from oscar.apps.payment import exceptions as oscar_exceptions
 
-from . import gateway # models
+from helcim import exceptions as helcim_exceptions, gateway
 
 def sale(order_number, amount, card, billing_address=None):
     """Make a sale request.
@@ -17,9 +17,11 @@ def sale(order_number, amount, card, billing_address=None):
         billing_address (dict): The billing address information.
 
     Raises:
-        OscarError: Various types of Oscar error codes.
+        GatewayError: An Oscar error raised when there was an error
+            with the payment API.
+        PaymentError: An Oscar error raised when there was an error
+            processing the payment.
     """
-    # TODO: Clarify attribute types, types of errors that can be raised.
     purchase = gateway.Purchase(
         {
             'url': '',
@@ -32,7 +34,16 @@ def sale(order_number, amount, card, billing_address=None):
         cc=card,
         billing_address=billing_address,
     )
-    return purchase.process()
+
+    try:
+        return purchase.process()
+    except helcim_exceptions.HelcimError() as error:
+        raise oscar_exceptions.GatewayError(str(error))
+    except helcim_exceptions.ProcessingError() as error:
+        raise oscar_exceptions.GatewayError(str(error))
+    except helcim_exceptions.PaymentError() as error:
+        raise oscar_exceptions.PaymentError(str(error))
+
 
 # def authorize(order_number, amount, card, billing_address=None):
 #     """Make an authorization request.
