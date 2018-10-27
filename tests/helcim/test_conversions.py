@@ -235,7 +235,10 @@ def test_process_api_response_valid():
             'cardNumber': '1111********9999',
         }
     }
-    raw_request = 'This is a raw request.'
+    raw_request = {
+        'field_1': 'Field value 1',
+        'field_2': 'Field value 2',
+    }
     raw_response = 'This is a raw response.'
 
     response = conversions.process_api_response(
@@ -246,7 +249,9 @@ def test_process_api_response_valid():
     assert response['response'] == 1
     assert response['message'] == 'Transaction successful.'
     assert response['notice'] == 'API v2 being depreciated.'
-    assert response['raw_request'] == 'This is a raw request.'
+    assert response['raw_request'] == (
+        'field_1=Field value 1&field_2=Field value 2'
+    )
     assert response['raw_response'] == 'This is a raw response.'
     assert response['amount'] == Decimal('50.01')
     assert response['cc_number'] == '1111********9999'

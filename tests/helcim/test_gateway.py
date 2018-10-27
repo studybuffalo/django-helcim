@@ -68,6 +68,10 @@ class MockPostAPIErrorResponse():
         self.url = url
         self.data = data
 
+class MockDjangoModel():
+    def __init__(self, **kwargs):
+        self.data = kwargs
+
 API_DETAILS = {
     'url': 'https://www.test.com',
     'account_id': '12345678',
@@ -84,6 +88,10 @@ def test_post_returns_dictionary():
 
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
 def test_purchase_processing():
     details = {
         'amount': 100.00,
@@ -93,7 +101,7 @@ def test_purchase_processing():
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     response = purchase.process()
 
-    assert isinstance(response, dict)
+    assert isinstance(response, MockDjangoModel)
 
 
 def test_determine_purchase_payment_details_token():
