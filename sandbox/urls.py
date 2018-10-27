@@ -8,9 +8,6 @@ from django.urls import include, path
 
 from applications.apps import application
 
-# from paypal.payflow.dashboard.app import application as payflow
-# from paypal.express.dashboard.app import application as express_dashboard
-
 admin.autodiscover()
 
 urlpatterns = [
