@@ -138,9 +138,15 @@ class BaseRequest():
     def _configure_test_transaction(self, post_data):
         """Makes this a test transaction if specified in settings."""
         # Test flag in post_data takes precedence
-        if not 'test' in post_data:
-            if hasattr(settings, 'HELCIM_API_TEST'):
+        if post_data:
+            if all([
+                    not 'test' in post_data,
+                    hasattr(settings, 'HELCIM_API_TEST')
+            ]):
                 post_data['test'] = settings.HELCIM_API_TEST
+        else:
+            if hasattr(settings, 'HELCIM_API_TEST'):
+                post_data = {'test': settings.HELCIM_API_TEST}
 
         return post_data
 
@@ -155,7 +161,7 @@ class BaseRequest():
 
         raise helcim_exceptions.HelcimError(exception_message)
 
-    def post(self, post_data={}):
+    def post(self, post_data=None):
         """Makes POST to Helcim API and returns response.
 
         Parameters:
