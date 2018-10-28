@@ -3,6 +3,8 @@
 These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application (i.e. not just django-oscar).
 """
+from calendar import monthrange
+from datetime import datetime
 import re
 import requests
 import xmltodict
@@ -263,7 +265,6 @@ class BaseRequest():
         """
 
         if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
-            print('add test from setting')
             self.cleaned['test'] = settings.HELCIM_API_TEST
 
     def redact_data(self):
@@ -316,6 +317,23 @@ class BaseRequest():
             raise helcim_exceptions.PaymentError(exception_message)
 
         raise helcim_exceptions.HelcimError(exception_message)
+
+    def convert_expiry_to_datetime(self, expiry):
+        """Converts a 4 digit expiry to a datetime object.
+
+            Parameters:
+                expiry (str): the four digit representaiton of the
+                    credit card expiry
+
+            Returns:
+                obj: the expiry as a datetime object.
+        """
+        # TODO: Add timezone support for this operation
+        year = int(expiry[2:])
+        month = int(expiry[:2])
+        day = monthrange(year, month)[1]
+
+        return datetime(year, month, day)
 
     def post(self, post_data=None):
         """Makes POST to Helcim API and updates response attribute.
@@ -371,12 +389,33 @@ class BaseRequest():
             Returns:
                 obj: A Django model instance of the saved data.
         """
+        # TODO: Figure out less fragile way to build this object
         self.redact_data()
 
         saved_model = models.HelcimTransaction.objects.create(
             raw_request=self.redacted_response['raw_request'],
             raw_response=self.redacted_response['raw_response'],
-            transaction_type=transaction_type
+            transaction_status=self.redacted_response['response'],
+            notice_message=self.redacted_response['notice'],
+            date_response=datetime.combine(
+                self.redacted_response['transaction_date'],
+                self.redacted_response['transaction_time']
+            ),
+            transaction_type=transaction_type,
+            amount=self.redacted_response['amount'],
+            currency=self.redacted_response['currency'],
+            card_name=self.redacted_response['cc_name'],
+            card_number=self.redacted_response['cc_number'],
+            card_expiry=self.convert_expiry_to_datetime(
+                self.redacted_response['cc_expiry']
+            ),
+            card_type=self.redacted_response['cc_type'],
+            card_token=self.redacted_response['token'],
+            avs_response=self.redacted_response['avs_response'],
+            cvv_response=self.redacted_response['cvv_response'],
+            approval_code=self.redacted_response['approval_code'],
+            order_number=self.redacted_response['order_number'],
+            customer_code=self.redacted_response['customer_code'],
         )
 
         return saved_model
