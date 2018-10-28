@@ -41,7 +41,7 @@ class MockPurchaseProcessPaymentError():
 )
 def test_sale_valid():
     try:
-        bridge_oscar.sale('1', 2, '1')
+        bridge_oscar.purchase('1', 2, '1')
     except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
         assert False
     else:
@@ -53,7 +53,7 @@ def test_sale_valid():
 )
 def test_sale_helcim_error():
     try:
-        bridge_oscar.sale('1', 2, '1')
+        bridge_oscar.purchase('1', 2, '1')
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -65,7 +65,7 @@ def test_sale_helcim_error():
 )
 def test_sale_processing_error():
     try:
-        bridge_oscar.sale('1', 2, '1')
+        bridge_oscar.purchase('1', 2, '1')
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -77,7 +77,7 @@ def test_sale_processing_error():
 )
 def test_sale_payment_error():
     try:
-        bridge_oscar.sale('1', 2, '1')
+        bridge_oscar.purchase('1', 2, '1')
     except oscar_exceptions.PaymentError:
         assert True
     else:

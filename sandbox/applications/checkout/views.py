@@ -53,8 +53,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
         )
 
     def do_place_order(self, request):
-        # Helper method to check that the hidden forms wasn't tinkered
-        # with.
+        """Helper method to check that hiddens forms were not modified."""
         bankcard_form = forms.BankcardForm(request.POST)
         billing_address_form = forms.BillingAddressForm(request.POST)
         if not all([bankcard_form.is_valid(),
@@ -72,15 +71,15 @@ class PaymentDetailsView(views.PaymentDetailsView):
         return self.submit(**submission)
 
     def handle_payment(self, order_number, total, **kwargs):
-        """
-        Make submission to PayPal
-        """
+        """Submit payment details to the Helcim Commerce API."""
         # Using authorization here (two-stage model).  You could use sale to
         # perform the auth and capture in one step.  The choice is dependent
         # on your business model.
-        bridge_oscar.sale(
+        print('test')
+        bridge_oscar.purchase(
             order_number, total.incl_tax,
-            kwargs['bankcard'], kwargs['billing_address'])
+            kwargs['bankcard'], kwargs['billing_address']
+        )
 
         # Record payment source and event
         source_type, _ = models.SourceType.objects.get_or_create(

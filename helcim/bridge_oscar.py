@@ -5,8 +5,8 @@ from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
 
-def sale(order_number, amount, card, billing_address=None):
-    """Make a sale request.
+def purchase(order_number, amount, card, billing_address=None):
+    """Make a purchase request.
 
     Parameters:
         order_number (str): Order number for the transaction.
