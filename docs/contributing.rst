@@ -133,6 +133,19 @@ access it at http://127.0.0.1:8000/::
 
     $ pipenv run python sandbox/manage.py runserver
 
+If needed, you can create a superuser account with the standard manager
+command::
+
+    $ pipenv run python sandbox/manage.py createsuperuser
+
+You can create regular user accounts by running the sandbox sever and
+creating it with the web form:: http://127.0.0.1:8000/accounts/login/.
+
+.. tip::
+
+    If you need to restart your site from scratch, delete the
+    ``db.sqlite3`` file and complete the above steps again.
+
 ----------------------
 Updating documentation
 ----------------------
