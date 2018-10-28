@@ -466,6 +466,9 @@ def test_redact_data_partial():
 def test_save_transaction():
     base = gateway.BaseRequest()
     base.response = {
+        'transaction_success': True,
+        'response_message': 'APPROVED',
+        'notice': '',
         'raw_request': 'cardHolderName=a&cardToken=b',
         'raw_response': (
             '<cardHolderName>a</cardHolderName><cardToken>b</cardToken>'

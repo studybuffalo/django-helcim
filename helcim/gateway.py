@@ -335,6 +335,66 @@ class BaseRequest():
 
         return datetime(year, month, day)
 
+    def create_model_arguments(self, transaction_type):
+        """Creates dictionary for use as transaction model arguments.
+
+            Takes the redacted_response data and creates a dictionary
+            that can be used as the keyword argumetns for the
+            HelcimTransaction model.
+
+            Parameters:
+                transaction_type (str): Transaction type for this
+                    transaction.
+
+            Returns:
+                dict: dictionary of the HelcimTransaction arguments.
+        """
+
+        response = self.redacted_response
+
+        # Format the transaction_date
+        if all([
+                response.get('transaction_date'),
+                response.get('transaction_time')
+        ]):
+            date_response = datetime.combine(
+                response.get('transaction_date'),
+                response.get('transaction_time')
+            )
+        else:
+            date_response = None
+
+        # Format the credit card expiry date
+        if 'cc_expiry' in response:
+            cc_expiry = self.convert_expiry_to_datetime(
+                response['cc_expiry']
+            )
+        else:
+            cc_expiry = None
+
+        return {
+            'raw_request': response.get('raw_request'),
+            'raw_response': response.get('raw_response'),
+            'transaction_success': response.get('transaction_success'),
+            'response_message': response.get('response_message'),
+            'notice': response.get('notice'),
+            'date_response': date_response,
+            'transaction_type': transaction_type,
+            'transaction_id': response.get('transaction_id'),
+            'amount': response.get('amount'),
+            'currency': response.get('currency'),
+            'card_name': response.get('cc_name'),
+            'card_number': response.get('cc_number'),
+            'card_expiry': cc_expiry,
+            'card_type': response.get('cc_type'),
+            'card_token': response.get('token'),
+            'avs_response': response.get('avs_response'),
+            'cvv_response': response.get('cvv_response'),
+            'approval_code': response.get('approval_code'),
+            'order_number': response.get('order_number'),
+            'customer_code': response.get('customer_code'),
+        }
+
     def post(self, post_data=None):
         """Makes POST to Helcim API and updates response attribute.
 
@@ -392,30 +452,10 @@ class BaseRequest():
         # TODO: Figure out less fragile way to build this object
         self.redact_data()
 
+        model_dictionary = self.create_model_arguments(transaction_type)
+
         saved_model = models.HelcimTransaction.objects.create(
-            raw_request=self.redacted_response['raw_request'],
-            raw_response=self.redacted_response['raw_response'],
-            transaction_status=self.redacted_response['response'],
-            notice_message=self.redacted_response['notice'],
-            date_response=datetime.combine(
-                self.redacted_response['transaction_date'],
-                self.redacted_response['transaction_time']
-            ),
-            transaction_type=transaction_type,
-            amount=self.redacted_response['amount'],
-            currency=self.redacted_response['currency'],
-            card_name=self.redacted_response['cc_name'],
-            card_number=self.redacted_response['cc_number'],
-            card_expiry=self.convert_expiry_to_datetime(
-                self.redacted_response['cc_expiry']
-            ),
-            card_type=self.redacted_response['cc_type'],
-            card_token=self.redacted_response['token'],
-            avs_response=self.redacted_response['avs_response'],
-            cvv_response=self.redacted_response['cvv_response'],
-            approval_code=self.redacted_response['approval_code'],
-            order_number=self.redacted_response['order_number'],
-            customer_code=self.redacted_response['customer_code'],
+            **model_dictionary
         )
 
         return saved_model
