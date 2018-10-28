@@ -134,16 +134,6 @@ def test_process_error_response_base():
     else:
         assert False
 
-def test_process_error_response_purchase():
-    purchase_request = gateway.Purchase()
-
-    try:
-        purchase_request.process_error_response('')
-    except helcim_exceptions.PaymentError:
-        assert True
-    else:
-        assert False
-
 def test_set_api_details_argument():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 

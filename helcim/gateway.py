@@ -465,9 +465,8 @@ class BaseRequest():
         """Validates Helcim API request fields and coerces values."""
         self.cleaned = conversions.validate_request_fields(self.details)
 
-class Purchase(BaseRequest):
-    """Makes a purchase request to Helcim API.
-    """
+class BasePurchase(BaseRequest):
+    """Base class for Purchase and Preauthorization classes."""
 
     def determine_payment_details(self):
         """Confirms valid payment details and updates self.cleaned.
@@ -539,6 +538,8 @@ class Purchase(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
+class Purchase(BasePurchase):
+    """Makes a purchase request to Helcim Commerce API."""
     def process(self):
         """Makes a purchase request."""
         self.validate_fields()
@@ -558,17 +559,14 @@ class Purchase(BaseRequest):
 
         return purchase
 
-class Preauthorize(BaseRequest):
-    """Makes a pre-authorization request.
-    """
+class Preauthorize(BasePurchase):
+    """Makes a pre-authorization request to Helcim Commerce API."""
 
 class Capture(BaseRequest):
-    """Makes a capture request (to complete a preauthorization).
-    """
+    """Makes a capture request (to complete a preauthorization)."""
 
 class Refund(BaseRequest):
-    """Makes a refund request.
-    """
+    """Makes a refund request."""
+
 class Verification(BaseRequest):
-    """Makes a verification request.
-    """
+    """Makes a verification request."""
