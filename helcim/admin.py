@@ -9,7 +9,7 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
     list_display = [
         'transaction_type',
         'date_response',
-        'transaction_status',
+        'transaction_success',
         'amount',
         'customer_code',
     ]
@@ -17,8 +17,9 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
     readonly_fields = [
         'raw_request',
         'raw_response',
-        'transaction_status',
-        'notice_message',
+        'transaction_success',
+        'response_message',
+        'notice',
         'date_response',
         'date_created',
         'transaction_type',

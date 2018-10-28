@@ -25,10 +25,16 @@ class HelcimTransaction(models.Model):
         max_length=1024,
         null=True,
     )
-    transaction_status = models.BooleanField(
-        help_text='Whether the transaction was approved or not',
+    transaction_success = models.BooleanField(
+        help_text='Whether the transaction was successful or not',
     )
-    notice_message = models.CharField(
+    response_message = models.CharField(
+        blank=True,
+        help_text='The response message with the API call',
+        max_length=256,
+        null=True,
+    )
+    notice = models.CharField(
         blank=True,
         help_text='Any error or warning messages from Helcim',
         max_length=128,
@@ -51,6 +57,11 @@ class HelcimTransaction(models.Model):
         choices=transaction_types,
         help_text='The type of transaction',
         max_length=1
+    )
+    transaction_id = models.PositiveIntegerField(
+        blank=True,
+        help_text='The Helcim Commerce transaction ID',
+        null=True,
     )
     amount = models.DecimalField(
         blank=True,
