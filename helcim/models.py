@@ -124,3 +124,6 @@ class HelcimTransaction(models.Model):
         max_length=16,
         null=True,
     )
+
+    class Meta:
+        ordering = ('-date_created',)
