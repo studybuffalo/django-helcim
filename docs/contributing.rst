@@ -166,4 +166,4 @@ The content for the Package reference is built using the
 deleted you will need to rebuild the file for the changes to populate
 on Read the Docs. You can do this with the following command::
 
-    $ pipenv run sphinx-apidoc -fTM -o docs helcim helcim/migrations helcim/urls.py
+    $ pipenv run sphinx-apidoc -fTM -o docs helcim helcim/migrations helcim/models.py helcim/urls.py
