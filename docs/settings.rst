@@ -19,7 +19,7 @@ Helcim Commerce API.
 
 **Default:** ``https://secure.myhelcim.com/api/``
 
-**Format:** ``str``
+**Format:** ``String``
 
 The URL to access the Helcim Commerce API. At this time there is only
 access to the API through the default URL, but this setting is
@@ -72,7 +72,7 @@ Commerce API will use the default terminal for the provided Account ID.
 **Format:** ``Boolean``
 
 A flag declaring whether transactions should be submitted in test mode
-or not. When set to `True` all transactions will have `test=true` added
+or not. When set to `True` all transactions will have ``test=true`` added
 to the POST data. This prevents the Helcim Commerce API from attempting
 to process the transaction.
 
@@ -96,7 +96,7 @@ risk and severity of a data breach.**
 
 **Format:** ``Boolean``
 
-If set to `True`, all references to the cardholder name, credit card
+If set to ``True``, all references to the cardholder name, credit card
 number, credit card expiry, credit card type, and Helcim Commerce
 token will be redacted. **This setting overrides any of the individual
 settings below.**
@@ -110,7 +110,7 @@ settings below.**
 
 **Format:** ``Boolean``
 
-If set to `True`, redacts all reference to the credit card cardholder
+If set to ``True``, redacts all reference to the credit card cardholder
 name.
 
 ``HELCIM_REDACT_CC_NUMBER``
@@ -122,7 +122,7 @@ name.
 
 **Format:** ``Boolean``
 
-If set to `True`, redacts all reference to the credit card number.
+If set to ``True``, redacts all reference to the credit card number.
 
 ``HELCIM_REDACT_CC_EXPIRY``
 ===========================
@@ -133,7 +133,7 @@ If set to `True`, redacts all reference to the credit card number.
 
 **Format:** ``Boolean``
 
-If set to `True`, redacts all reference to the credit card expiry date.
+If set to ``True``, redacts all reference to the credit card expiry date.
 
 ``HELCIM_REDACT_CC_TYPE``
 =========================
@@ -144,7 +144,7 @@ If set to `True`, redacts all reference to the credit card expiry date.
 
 **Format:** ``Boolean``
 
-If set to `True`, redacts all reference to the credit card type.
+If set to ``True``, redacts all reference to the credit card type.
 
 ``HELCIM_REDACT_TOKEN``
 =======================
@@ -155,5 +155,5 @@ If set to `True`, redacts all reference to the credit card type.
 
 **Format:** ``Boolean``
 
-If set to `True`, redacts all reference to the Helcim Commerce credit
+If set to ``True``, redacts all reference to the Helcim Commerce credit
 card token.
