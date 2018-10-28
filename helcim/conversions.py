@@ -118,7 +118,6 @@ def validate_request_fields(details):
     Raises:
         ValueError: Raised if data fails validation.
     """
-
     cleaned = {}
 
     for field_name, field_value in details.items():
