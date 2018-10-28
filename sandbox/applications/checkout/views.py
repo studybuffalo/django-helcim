@@ -75,10 +75,11 @@ class PaymentDetailsView(views.PaymentDetailsView):
         # Using authorization here (two-stage model).  You could use sale to
         # perform the auth and capture in one step.  The choice is dependent
         # on your business model.
-        print('test')
         bridge_oscar.purchase(
-            order_number, total.incl_tax,
-            kwargs['bankcard'], kwargs['billing_address']
+            order_number=order_number,
+            amount=total.incl_tax,
+            card=kwargs['bankcard'],
+            billing_address=kwargs['billing_address']
         )
 
         # Record payment source and event
