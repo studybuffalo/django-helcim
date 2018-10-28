@@ -192,7 +192,7 @@ def test_configure_test_transaction_in_data():
     base = gateway.BaseRequest(api_details=API_DETAILS)
     base.cleaned = {'test': True}
 
-    base._configure_test_transaction()
+    base.configure_test_transaction()
 
     assert 'test' in base.cleaned
     assert base.cleaned['test'] is True
@@ -202,7 +202,7 @@ def test_configure_test_transaction_data_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
     base.cleaned = {'test': True}
 
-    base._configure_test_transaction()
+    base.configure_test_transaction()
 
     assert base.cleaned['test'] is True
 
@@ -211,7 +211,7 @@ def test_configure_test_transaction_setting():
     print('run test')
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
-    base._configure_test_transaction()
+    base.configure_test_transaction()
 
     assert base.cleaned['test'] is True
 
@@ -219,7 +219,7 @@ def test_configure_test_transaction_setting():
 def test_configure_test_transaction_not_set():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
-    base._configure_test_transaction()
+    base.configure_test_transaction()
 
     assert 'test' not in base.cleaned
 
@@ -365,7 +365,7 @@ def test_redact_data_cc_name():
         'raw_response': '<cardHolderName>a</cardHolderName>',
         'cc_name': 'a',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'cardHolderName=REDACTED'
     assert base.redacted_response['raw_response'] == (
@@ -381,7 +381,7 @@ def test_redact_data_cc_number():
         'raw_response': '<cardNumber>a</cardNumber>',
         'cc_number': 'a',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'cardNumber=REDACTED'
     assert base.redacted_response['raw_response'] == (
@@ -397,7 +397,7 @@ def test_redact_data_cc_expiry():
         'raw_response': '<expiryDate>a</expiryDate>',
         'cc_expiry': 'a',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'expiryDate=REDACTED'
     assert base.redacted_response['raw_response'] == (
@@ -413,7 +413,7 @@ def test_redact_data_cc_type():
         'raw_response': '<cardType>a</cardType>',
         'cc_type': 'a',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'cardType=REDACTED'
     assert base.redacted_response['raw_response'] == (
@@ -429,7 +429,7 @@ def test_redact_data_token():
         'raw_response': '<cardToken>a</cardToken>',
         'token': 'a',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'cardToken=REDACTED'
     assert base.redacted_response['raw_response'] == (
@@ -448,7 +448,7 @@ def test_redact_data_partial():
         'cc_name': 'a',
         'token': 'b',
     }
-    base._redact_data()
+    base.redact_data()
 
     assert base.redacted_response['raw_request'] == (
         'cardHolderName=REDACTED&cardToken=b'

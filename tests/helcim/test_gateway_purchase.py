@@ -73,7 +73,7 @@ def test_determine_purchase_payment_details_token():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 3
     assert purchase.cleaned['token'] == details['token']
@@ -89,7 +89,7 @@ def test_determine_payment_details_token_with_f4l4_skip():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 3
     assert purchase.cleaned['token'] == details['token']
@@ -105,7 +105,7 @@ def test_determine_payment_details_token_f4l4_missing_error():
     try:
         purchase = gateway.Purchase(api_details=API_DETAILS, **details)
         purchase.validate_fields()
-        purchase._determine_payment_details()
+        purchase.determine_payment_details()
     except ValueError:
         assert True
     else:
@@ -118,7 +118,7 @@ def test_determine_payment_details_customer():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 1
     assert purchase.cleaned['customer_code'] == details['customer_code']
@@ -131,7 +131,7 @@ def test_determine_payment_details_cc():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 2
     assert purchase.cleaned['cc_number'] == details['cc_number']
@@ -149,7 +149,7 @@ def test_determine_payment_details_cc_with_details():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 6
     assert purchase.cleaned['cc_number'] == details['cc_number']
@@ -168,7 +168,7 @@ def test_determine_payment_details_mag_encrypted():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 2
     assert purchase.cleaned['mag_enc'] == details['mag_enc']
@@ -184,7 +184,7 @@ def test_determine_payment_details_mag():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 1
     assert purchase.cleaned['mag'] == details['mag']
@@ -195,7 +195,7 @@ def test_determine_payment_details_value_error():
     try:
         purchase = gateway.Purchase(api_details=API_DETAILS, **details)
         purchase.validate_fields()
-        purchase._determine_payment_details()
+        purchase.determine_payment_details()
     except ValueError:
         assert True
     else:
@@ -215,7 +215,7 @@ def test_determine_payment_details_token_priority():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 3
     assert 'token' in purchase.cleaned
@@ -232,7 +232,7 @@ def test_determine_payment_details_customer_priority():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 1
     assert 'customer_code' in purchase.cleaned
@@ -248,7 +248,7 @@ def test_determine_payment_details_cc_priority():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 2
     assert 'cc_number' in purchase.cleaned
@@ -262,7 +262,7 @@ def test_determine_payment_details_mag_encrypted_priority():
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
     purchase.validate_fields()
-    purchase._determine_payment_details()
+    purchase.determine_payment_details()
 
     assert len(purchase.cleaned) == 2
     assert 'mag_enc' in purchase.cleaned

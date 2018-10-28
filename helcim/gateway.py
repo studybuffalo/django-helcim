@@ -94,74 +94,11 @@ class BaseRequest():
     """
 
     def __init__(self, api_details=None, **kwargs):
-        self.api = self._set_api_details(api_details)
+        self.api = self.set_api_details(api_details)
         self.details = kwargs
         self.cleaned = {}
         self.response = {}
         self.redacted_response = {}
-
-    def _set_api_details(self, details):
-        """Sets the API details for this transaction.
-
-        Will either return a dictionary of the API details from the
-        provided details argument, or will look to the Django settings
-        file.
-
-        Parameters:
-            details (dict): A dictionary of the API details.
-
-        Returns:
-            dict: The proper API details from the provided data.
-
-        Raises:
-            ImproperlyConfigured: Raised if API details cannot be
-                resolved.
-        """
-        # Provided API details override ones in the settings
-        if details:
-            url = details['url']
-            account_id = details['account_id']
-            token = details['token']
-            terminal_id = details['terminal_id']
-        # Default uses details from the settings files
-        else:
-            setting_names = [
-                'HELCIM_API_URL',
-                'HELCIM_ACCOUNT_ID',
-                'HELCIM_API_TOKEN',
-                'HELCIM_TERMINAL_ID',
-            ]
-
-            # Confirm all required settings are entered
-            for setting_name in setting_names:
-                if not hasattr(settings, setting_name):
-                    raise django_exceptions.ImproperlyConfigured(
-                        'You must define a {} setting'.format(setting_name)
-                    )
-
-            url = settings.HELCIM_API_URL
-            account_id = settings.HELCIM_ACCOUNT_ID
-            token = settings.HELCIM_API_TOKEN
-            terminal_id = settings.HELCIM_TERMINAL_ID
-
-        return {
-            'url': url,
-            'account_id': account_id,
-            'token': token,
-            'terminal_id': terminal_id,
-        }
-
-    def _configure_test_transaction(self):
-        """Adds test flag to post data if HELCIM_API_TEST is True.
-
-        Method applies to the cleaned data (not the raw POST data).
-        If the test flag is declared in both the POST data and Django
-        settings file, the POST data takes precedence.
-        """
-
-        if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
-            print('add test from setting')
-            self.cleaned['test'] = settings.HELCIM_API_TEST
 
     def _identify_redact_fields(self):
         """Identifies which fields (if any) should be redacted.
@@ -266,7 +203,70 @@ class BaseRequest():
         if python_name in self.redacted_response:
             self.redacted_response[python_name] = None
 
-    def _redact_data(self):
+    def set_api_details(self, details):
+        """Sets the API details for this transaction.
+
+        Will either return a dictionary of the API details from the
+        provided details argument, or will look to the Django settings
+        file.
+
+        Parameters:
+            details (dict): A dictionary of the API details.
+
+        Returns:
+            dict: The proper API details from the provided data.
+
+        Raises:
+            ImproperlyConfigured: Raised if API details cannot be
+                resolved.
+        """
+        # Provided API details override ones in the settings
+        if details:
+            url = details['url']
+            account_id = details['account_id']
+            token = details['token']
+            terminal_id = details['terminal_id']
+        # Default uses details from the settings files
+        else:
+            setting_names = [
+                'HELCIM_API_URL',
+                'HELCIM_ACCOUNT_ID',
+                'HELCIM_API_TOKEN',
+                'HELCIM_TERMINAL_ID',
+            ]
+
+            # Confirm all required settings are entered
+            for setting_name in setting_names:
+                if not hasattr(settings, setting_name):
+                    raise django_exceptions.ImproperlyConfigured(
+                        'You must define a {} setting'.format(setting_name)
+                    )
+
+            url = settings.HELCIM_API_URL
+            account_id = settings.HELCIM_ACCOUNT_ID
+            token = settings.HELCIM_API_TOKEN
+            terminal_id = settings.HELCIM_TERMINAL_ID
+
+        return {
+            'url': url,
+            'account_id': account_id,
+            'token': token,
+            'terminal_id': terminal_id,
+        }
+
+    def configure_test_transaction(self):
+        """Adds test flag to post data if HELCIM_API_TEST is True.
+
+        Method applies to the cleaned data (not the raw POST data).
+        If the test flag is declared in both the POST data and Django
+        settings file, the POST data takes precedence.
+        """
+
+        if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
+            print('add test from setting')
+            self.cleaned['test'] = settings.HELCIM_API_TEST
+
+    def redact_data(self):
         """Removes sensitive and identifiable data.
 
         By default will redact API fields and populate
@@ -279,7 +279,7 @@ class BaseRequest():
         # Remove any API content
         self._redact_api_data()
 
-        # Remove any other redacted data (as needed)
+        # Identify and redact any other specified fields
         fields = self._identify_redact_fields()
 
         if fields['name']:
@@ -371,7 +371,7 @@ class BaseRequest():
             Returns:
                 obj: A Django model instance of the saved data.
         """
-        self._redact_data()
+        self.redact_data()
 
         saved_model = models.HelcimTransaction.objects.create(
             raw_request=self.redacted_response['raw_request'],
@@ -389,7 +389,7 @@ class Purchase(BaseRequest):
     """Makes a purchase request to Helcim API.
     """
 
-    def _determine_payment_details(self):
+    def determine_payment_details(self):
         """Confirms valid payment details and updates self.cleaned.
 
         Cycles through the provided details to determine the most
@@ -462,8 +462,8 @@ class Purchase(BaseRequest):
     def process(self):
         """Makes a purchase request."""
         self.validate_fields()
-        self._configure_test_transaction()
-        self._determine_payment_details()
+        self.configure_test_transaction()
+        self.determine_payment_details()
 
         purchase_data = conversions.process_request_fields(
             self.api,
