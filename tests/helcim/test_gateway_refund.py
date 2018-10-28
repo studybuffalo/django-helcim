@@ -69,7 +69,7 @@ def test_process_error_response_refund():
 
     try:
         refund_request.process_error_response('')
-    except helcim_exceptions.PaymentError:
+    except helcim_exceptions.RefundError:
         assert True
     else:
         assert False

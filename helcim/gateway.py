@@ -325,10 +325,10 @@ class BaseRequest():
             raise helcim_exceptions.PaymentError(exception_message)
 
         if isinstance(self, Refund):
-            raise helcim_exceptions.PaymentError(exception_message)
+            raise helcim_exceptions.RefundError(exception_message)
 
         if isinstance(self, Verification):
-            raise helcim_exceptions.PaymentError(exception_message)
+            raise helcim_exceptions.VerificationError(exception_message)
 
         raise helcim_exceptions.HelcimError(exception_message)
 
@@ -594,6 +594,36 @@ class Preauthorize(BasePurchase):
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""
+    def validate_preauth_transaction(self):
+        """Confirms that a preauth transaction ID was provided.
+
+            Raises:
+                PaymentError: Error when no transaction ID provided.
+        """
+
+        if 'transaction_id' not in self.details:
+            raise helcim_exceptions.PaymentError(
+                'Transaction ID must be provided with capture (force) request.'
+            )
+
+    def process(self):
+        """Completes a pre-authorization request."""
+        self.validate_fields()
+        self.validate_preauth_transaction()
+        self.configure_test_transaction()
+
+        capture_data = conversions.process_request_fields(
+            self.api,
+            self.cleaned,
+            {
+                'transactionType': 'pre-authorization',
+            }
+        )
+
+        self.post(capture_data)
+        capture = self.save_transaction('c')
+
+        return capture
 
 class Refund(BaseRequest):
     """Makes a refund request."""

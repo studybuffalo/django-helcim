@@ -69,7 +69,7 @@ def test_process_error_response_verification():
 
     try:
         verification_request.process_error_response('')
-    except helcim_exceptions.PaymentError:
+    except helcim_exceptions.VerificationError:
         assert True
     else:
         assert False

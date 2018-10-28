@@ -5,9 +5,17 @@ class HelcimError(Exception):
     pass
 
 class ProcessingError(HelcimError):
-    """Exceptions to handle system and API connection errors."""
+    """Exception to handle system and API connection errors."""
     pass
 
 class PaymentError(HelcimError):
-    """Exceptions to handle payment and refund errors."""
+    """Exception to handle payments, pre-auths, and captures."""
+    pass
+
+class RefundError(HelcimError):
+    """Exception to handle refund errors."""
+    pass
+
+class VerificationError(HelcimError):
+    """Exception to handle errors during credit care verification."""
     pass
