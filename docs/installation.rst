@@ -26,4 +26,16 @@ Edit your Django settings
 
     .. _setup instructions for Django Oscar: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html
 
-TODO: Build this section out once the settings have been sorted out.
+Once django-oscar-helcim has been installed, you will need to update
+your Django settings. At a bare minimum you will need to specify the
+following settings: `HELCIM_API_URL`, `HELCIM_ACCOUNT_ID`,
+`HELCIM_API_TOKEN`, and `HELCIM_TERMINAL_ID`. For example::
+
+    HELCIM_API_URL = https://secure.myhelcim.com/api/
+    HELCIM_ACCOUNT_ID = 123456
+    HELCIM_API_TOKEN = 123456789abcdefg
+    HELCIM_TERMINAL_ID = 123456
+
+A summary of all settings can be found in the `Settings page`_.
+
+.. _Settings page: https://django-oscar-helcim.readthedocs.io/en/latest/settings.html
