@@ -477,10 +477,10 @@ class BaseRequest():
         """Validates Helcim API request fields and coerces values."""
         self.cleaned = conversions.validate_request_fields(self.details)
 
-class BasePurchase(BaseRequest):
-    """Base class for Purchase and Preauthorization classes."""
+class BaseCardTransaction(BaseRequest):
+    """Base class for transactions involving credit card details."""
 
-    def determine_payment_details(self):
+    def determine_card_details(self):
         """Confirms valid payment details and updates self.cleaned.
 
         Cycles through the provided details to determine the most
@@ -550,13 +550,13 @@ class BasePurchase(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
-class Purchase(BasePurchase):
+class Purchase(BaseCardTransaction):
     """Makes a purchase request to Helcim Commerce API."""
     def process(self):
         """Makes a purchase request."""
         self.validate_fields()
         self.configure_test_transaction()
-        self.determine_payment_details()
+        self.determine_card_details()
 
         purchase_data = conversions.process_request_fields(
             self.api,
@@ -571,13 +571,13 @@ class Purchase(BasePurchase):
 
         return purchase
 
-class Preauthorize(BasePurchase):
+class Preauthorize(BaseCardTransaction):
     """Makes a pre-authorization request to Helcim Commerce API."""
     def process(self):
         """Makes a pre-authorization request."""
         self.validate_fields()
         self.configure_test_transaction()
-        self.determine_payment_details()
+        self.determine_card_details()
 
         preauth_data = conversions.process_request_fields(
             self.api,
@@ -591,6 +591,12 @@ class Preauthorize(BasePurchase):
         preauth = self.save_transaction('p')
 
         return preauth
+
+class Refund(BaseCardTransaction):
+    """Makes a refund request."""
+
+class Verification(BaseCardTransaction):
+    """Makes a verification request."""
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""
@@ -624,9 +630,3 @@ class Capture(BaseRequest):
         capture = self.save_transaction('c')
 
         return capture
-
-class Refund(BaseRequest):
-    """Makes a refund request."""
-
-class Verification(BaseRequest):
-    """Makes a verification request."""
