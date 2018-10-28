@@ -308,7 +308,7 @@ class BaseRequest():
 
             Raises:
                 PaymentError: Raised for any errors returned during a
-                    purchase transaction.
+                    purchase or refund transaction.
                 HelcimError: Raised for any other unhandled errors.
         """
         exception_message = 'Helcim API request failed: {}'.format(
@@ -316,6 +316,18 @@ class BaseRequest():
         )
 
         if isinstance(self, Purchase):
+            raise helcim_exceptions.PaymentError(exception_message)
+
+        if isinstance(self, Preauthorize):
+            raise helcim_exceptions.PaymentError(exception_message)
+
+        if isinstance(self, Capture):
+            raise helcim_exceptions.PaymentError(exception_message)
+
+        if isinstance(self, Refund):
+            raise helcim_exceptions.PaymentError(exception_message)
+
+        if isinstance(self, Verification):
             raise helcim_exceptions.PaymentError(exception_message)
 
         raise helcim_exceptions.HelcimError(exception_message)
@@ -561,6 +573,24 @@ class Purchase(BasePurchase):
 
 class Preauthorize(BasePurchase):
     """Makes a pre-authorization request to Helcim Commerce API."""
+    def process(self):
+        """Makes a pre-authorization request."""
+        self.validate_fields()
+        self.configure_test_transaction()
+        self.determine_payment_details()
+
+        preauth_data = conversions.process_request_fields(
+            self.api,
+            self.cleaned,
+            {
+                'transactionType': 'pre-authorization',
+            }
+        )
+
+        self.post(preauth_data)
+        preauth = self.save_transaction('p')
+
+        return preauth
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""

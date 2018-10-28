@@ -15,7 +15,7 @@ class MockPostResponse():
                 <notice></notice>
                 <transaction>
                     <transactionId>1111111</transactionId>
-                    <type>purchase</type>
+                    <type>preauth</type>
                     <date>2018-01-01</date>
                     <time>12:00:00</time>
                     <cardHolderName>Test Person</cardHolderName>
@@ -53,22 +53,22 @@ API_DETAILS = {
     'helcim.gateway.models.HelcimTransaction.objects.create',
     MockDjangoModel
 )
-def test_purchase_processing():
+def test_preauth_processing():
     details = {
         'amount': 100.00,
         'customer_code': 'CST1000',
     }
 
-    purchase = gateway.Purchase(api_details=API_DETAILS, **details)
-    response = purchase.process()
+    preauth = gateway.Preauthorize(api_details=API_DETAILS, **details)
+    response = preauth.process()
 
     assert isinstance(response, MockDjangoModel)
 
-def test_process_error_response_purchase():
-    purchase_request = gateway.Purchase()
+def test_process_error_response_preauth():
+    preauth_request = gateway.Preauthorize()
 
     try:
-        purchase_request.process_error_response('')
+        preauth_request.process_error_response('')
     except helcim_exceptions.PaymentError:
         assert True
     else:
