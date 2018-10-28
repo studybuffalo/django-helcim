@@ -151,28 +151,17 @@ class BaseRequest():
             'terminal_id': terminal_id,
         }
 
-    def _configure_test_transaction(self, post_data):
+    def _configure_test_transaction(self):
         """Adds test flag to post data if HELCIM_API_TEST is True.
 
-        Parameters:
-            post_data (dict): The post_data for the transaction.
-
-        Returns:
-            dict: post_data with the included test flag (if
-                appropriate)
+        Method applies to the cleaned data (not the raw POST data).
+        If the test flag is declared in both the POST data and Django
+        settings file, the POST data takes precedence.
         """
-        # Test flag in post_data takes precedence
-        if post_data:
-            if all([
-                    not 'test' in post_data,
-                    hasattr(settings, 'HELCIM_API_TEST')
-            ]):
-                post_data['test'] = settings.HELCIM_API_TEST
-        else:
-            if hasattr(settings, 'HELCIM_API_TEST'):
-                post_data = {'test': settings.HELCIM_API_TEST}
 
-        return post_data
+        if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
+            print('add test from setting')
+            self.cleaned['test'] = settings.HELCIM_API_TEST
 
     def _identify_redact_fields(self):
         """Identifies which fields (if any) should be redacted.
@@ -338,9 +327,6 @@ class BaseRequest():
             ProcessingError: An error occurred connecting or
                 communicating with Helcim API.
         """
-
-        post_data = self._configure_test_transaction(post_data)
-
         # Make the POST request
         try:
             response = requests.post(
@@ -476,6 +462,7 @@ class Purchase(BaseRequest):
     def process(self):
         """Makes a purchase request."""
         self.validate_fields()
+        self._configure_test_transaction()
         self._determine_payment_details()
 
         purchase_data = conversions.process_request_fields(
@@ -491,26 +478,17 @@ class Purchase(BaseRequest):
 
         return purchase
 
-def refund():
-    """Makes a refund request.
-    """
-
-    pass
-
-def verify():
-    """Makes a verification request.
-    """
-
-    pass
-
-def preauthorize():
+class Preauthorize(BaseRequest):
     """Makes a pre-authorization request.
     """
 
-    pass
-
-def capture():
+class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization).
     """
 
-    pass
+class Refund(BaseRequest):
+    """Makes a refund request.
+    """
+class Verification(BaseRequest):
+    """Makes a verification request.
+    """
