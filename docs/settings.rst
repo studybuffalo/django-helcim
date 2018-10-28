@@ -17,9 +17,7 @@ Helcim Commerce API.
 
 **Required:** ``False``
 
-**Default:** ``https://secure.myhelcim.com/api/``
-
-**Format:** ``String``
+**Default (string):** ``https://secure.myhelcim.com/api/``
 
 The URL to access the Helcim Commerce API. At this time there is only
 access to the API through the default URL, but this setting is
@@ -32,9 +30,7 @@ should the URL change before this package is updated.
 
 **Required:** ``True``
 
-**Default:** ``''``
-
-**Format:** ``String``
+**Default (string):** ``''``
 
 The account ID for your Helcim account.
 
@@ -43,9 +39,7 @@ The account ID for your Helcim account.
 
 **Required:** ``True``
 
-**Default:** ``''``
-
-**Format:** ``String``
+**Default (string):** ``''``
 
 The API token generated on your Helcim Commerce API dashboard to allow
 django-oscar-helcim to make transactions via the Helcim Commerce API.
@@ -55,9 +49,7 @@ django-oscar-helcim to make transactions via the Helcim Commerce API.
 
 **Required:** ``False``
 
-**Default:** ``''``
-
-**Format:** ``String``
+**Default (string):** ``''``
 
 The Helcim terminal ID you are using. If not provided the Helcim
 Commerce API will use the default terminal for the provided Account ID.
@@ -67,9 +59,7 @@ Commerce API will use the default terminal for the provided Account ID.
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 A flag declaring whether transactions should be submitted in test mode
 or not. When set to `True` all transactions will have ``test=true`` added
@@ -92,9 +82,7 @@ risk and severity of a data breach.**
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, all references to the cardholder name, credit card
 number, credit card expiry, credit card type, and Helcim Commerce
@@ -106,9 +94,7 @@ settings below.**
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the credit card cardholder
 name.
@@ -118,9 +104,7 @@ name.
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the credit card number.
 
@@ -129,9 +113,7 @@ If set to ``True``, redacts all reference to the credit card number.
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the credit card expiry date.
 
@@ -140,9 +122,7 @@ If set to ``True``, redacts all reference to the credit card expiry date.
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the credit card type.
 
@@ -151,9 +131,7 @@ If set to ``True``, redacts all reference to the credit card type.
 
 **Required:** ``False``
 
-**Default:** ``False``
-
-**Format:** ``Boolean``
+**Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the Helcim Commerce credit
 card token.
