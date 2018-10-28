@@ -20,15 +20,30 @@ def purchase(order_number, amount, card, billing_address=None):
         PaymentError: An Oscar error raised when there was an error
             processing the payment.
     """
-    purchase = gateway.Purchase(
+    # TODO: Need to streamline this for various types of fields.
+    # Can this be done by unpacking dictionaries or something like that?
+    # Will need some sort of conversion or re-mapping functions?
+    purchase_instance = gateway.Purchase(
         order_number=order_number,
         amount=amount,
-        cc=card,
-        billing_address=billing_address,
+        cc_name=card.name,
+        cc_number=card.number,
+        cc_expiry=card.expiry_date.strftime('%m%y'),
+        cc_cvv=card.ccv,
+        billing_contact_name=' '.join(
+            [billing_address['first_name'], billing_address['last_name']]
+        ),
+        billing_street_1=billing_address['line1'],
+        billing_street_2=billing_address['line2'],
+        billing_city=billing_address['line4'],
+        billing_province=billing_address['state'],
+        billing_postal_code=billing_address['postcode'],
+        billing_country=billing_address['country'],
+        billing_phone=billing_address['phone_number'],
     )
 
     try:
-        return purchase.process()
+        return purchase_instance.process()
     except helcim_exceptions.ProcessingError as error:
         raise oscar_exceptions.GatewayError(str(error))
     except helcim_exceptions.PaymentError as error:
