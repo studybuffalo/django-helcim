@@ -97,6 +97,8 @@ class BaseRequest():
         self.api = self._set_api_details(api_details)
         self.details = kwargs
         self.cleaned = {}
+        self.response = {}
+        self.redacted_response = {}
 
     def _set_api_details(self, details):
         """Sets the API details for this transaction.
@@ -230,106 +232,81 @@ class BaseRequest():
 
         return fields
 
-    def _redact_api_data(self, data):
-        """Redacts all API data.
-
-            Parameters:
-                data (dict): A dictionary of API response data.
-
-            Returns:
-                dict: The redacted response dictionary.
-        """
-        data['raw_request'] = re.sub(
-            r'(accountId=.+?)(?:&|$)',
-            r'\g<1>accountId=REDACTED',
-            data['raw_request']
+    def _redact_api_data(self):
+        """Redacts API data and updates redacted_response attribute."""
+        self.redacted_response['raw_request'] = re.sub(
+            r'(accountId=.+?)(&|$)',
+            r'accountId=REDACTED\g<2>',
+            self.redacted_response['raw_request']
         )
-        data['raw_request'] = re.sub(
-            r'(apiToken=.+?)(?:&|$)',
-            r'\g<1>apiToken=REDACTED',
-            data['raw_request']
+        self.redacted_response['raw_request'] = re.sub(
+            r'(apiToken=.+?)(&|$)',
+            r'apiToken=REDACTED\g<2>',
+            self.redacted_response['raw_request']
         )
-        data['raw_request'] = re.sub(
-            r'(terminalId=.+?)(?:&|$)',
-            r'\g<1>terminalId=REDACTED',
-            data['raw_request']
+        self.redacted_response['raw_request'] = re.sub(
+            r'(terminalId=.+?)(&|$)',
+            r'terminalId=REDACTED\g<2>',
+            self.redacted_response['raw_request']
         )
 
-        return data
-
-    def _redact_field(self, data, api_name, python_name):
+    def _redact_field(self, api_name, python_name):
         """Redacts all information for the provided field.
 
+            Method directly updates the redacted_response attribute.
+
             Parameters:
-                data (dict): The API response data.
                 api_name (str): The field name used by the Helcim API.
                 python_name (str): The field name used by this
                     application.
-
-            Returns:
-                dict: The API response data with the specified field
-                    redacted.
         """
         # Redacts the raw_request data
-        data['raw_request'] = re.sub(
-            r'({}=.+?)(?:&|$)'.format(api_name),
-            r'\g<1>{}=REDACTED'.format(api_name),
-            data['raw_request']
+        self.redacted_response['raw_request'] = re.sub(
+            r'({}=.+?)(&|$)'.format(api_name),
+            r'{}=REDACTED\g<2>'.format(api_name),
+            self.redacted_response['raw_request']
         )
 
         # Redacts the raw_response data
-        data['raw_response'] = re.sub(
+        self.redacted_response['raw_response'] = re.sub(
             r'<{}>.*</{}>'.format(api_name, api_name),
             r'<{}>REDACTED</{}>'.format(api_name, api_name),
-            data['raw_request']
+            self.redacted_response['raw_response']
         )
 
-        if python_name in data:
-            data[python_name] = None
+        if python_name in self.redacted_response:
+            self.redacted_response[python_name] = None
 
-        return data
-
-    def _redact_data(self, data):
+    def _redact_data(self):
         """Removes sensitive and identifiable data.
 
-            Parameters:
-                data (dict): The API response data.
-
-            Returns:
-                dict: The API response data with required fields
-                    redacted.
+        By default will redact API fields and populate
+        redacted_response attribute. Depending on Django settings, may
+        also redact other fields.
         """
-        # Remove any API content
-        redacted_data = self._redact_api_data(data)
+        # Copy the response data to the redacted file for updating
+        self.redacted_response = self.response
 
+        # Remove any API content
+        self._redact_api_data()
+
+        # Remove any other redacted data (as needed)
         fields = self._identify_redact_fields()
 
         if fields['name']:
-            redacted_data = self._redact_field(
-                data, 'cardHolderName', 'cc_name'
-            )
+            self._redact_field('cardHolderName', 'cc_name')
 
         if fields['number']:
-            redacted_data = self._redact_field(
-                data, 'cardNumber', 'cc_number'
-            )
+            self._redact_field('cardNumber', 'cc_number')
 
         if fields['expiry']:
-            redacted_data = self._redact_field(
-                data, 'expiryDate', 'cc_expiry'
-            )
+            self._redact_field('expiryDate', 'cc_expiry')
 
         if fields['type']:
-            redacted_data = self._redact_field(
-                data, 'cardType', 'cc_type'
-            )
+            self._redact_field('cardType', 'cc_type')
 
         if fields['token']:
-            redacted_data = self._redact_field(
-                data, 'cardToken', 'token'
-            )
-
-        return redacted_data
+            self._redact_field('cardToken', 'token')
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
@@ -352,13 +329,10 @@ class BaseRequest():
         raise helcim_exceptions.HelcimError(exception_message)
 
     def post(self, post_data=None):
-        """Makes POST to Helcim API and returns response.
+        """Makes POST to Helcim API and updates response attribute.
 
         Parameters:
             post_data (dict): The parameters to pass with the POST request.
-
-        Returns:
-            dict: Processed Helcim API response.
 
         Raises:
             ProcessingError: An error occurred connecting or
@@ -394,17 +368,16 @@ class BaseRequest():
             self.process_error_response(dict_response['responseMessage'])
 
         # Return the response
-        return conversions.process_api_response(
+        self.response = conversions.process_api_response(
             dict_response,
             post_data,
             response.content
         )
 
-    def save_transaction(self, data, transaction_type):
+    def save_transaction(self, transaction_type):
         """Saves provided transaction data as Django model instance.
 
             Parameters:
-                data (dict): The API response data.
                 transaction_type (str): The type of transaction (`s`
                     for purchase (sale), `p` for pre-authorization,
                     `c` for capture, and `r` for refund).
@@ -412,11 +385,11 @@ class BaseRequest():
             Returns:
                 obj: A Django model instance of the saved data.
         """
-        redacted_data = self._redact_data(data)
+        self._redact_data()
 
         saved_model = models.HelcimTransaction.objects.create(
-            raw_request=redacted_data['raw_request'],
-            raw_response=redacted_data['raw_response'],
+            raw_request=self.redacted_response['raw_request'],
+            raw_response=self.redacted_response['raw_response'],
             transaction_type=transaction_type
         )
 
@@ -513,8 +486,8 @@ class Purchase(BaseRequest):
             }
         )
 
-        response = self.post(purchase_data)
-        purchase = self.save_transaction(response, 's')
+        self.post(purchase_data)
+        purchase = self.save_transaction('s')
 
         return purchase
 
