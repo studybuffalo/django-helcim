@@ -43,7 +43,7 @@ Instructions on installing and configuration can be found on `Read The Docs`_.
 Support
 -------
 
-The `docs`_ provide examples for setup and common issues to be aware of. If the
+The docs provide examples for setup and common issues to be aware of. If the
 issue involves connecting this package to Django Oscar, this repository
 contains a `sandbox environment`_ you can review for a minimal working
 example. For any other issues, you can submit a `GitHub Issue`_.
