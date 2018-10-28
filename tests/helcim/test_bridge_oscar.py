@@ -89,3 +89,7 @@ def test_sale_payment_error():
         assert True
     else:
         assert False
+
+# TODO: Create tests for remap_oscar_billing_address
+
+# TODO: Create tests for remap_oscar_credit_card
