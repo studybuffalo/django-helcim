@@ -46,7 +46,7 @@ extensions = [
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = []
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -176,7 +176,7 @@ texinfo_documents = [
 # -- Options for Autodoc -----------------------------------------------------
 
 # Mocks import of this module to prevent errors during doc build
-autodoc_mock_imports = ['xmltodict', 'django', 'django-oscar']
+autodoc_mock_imports = ['xmltodict', 'django', 'django-oscar', 'oscar']
 
 # -- Options for napoleon ----------------------------------------------------
 napoleon_google_docstring = True
