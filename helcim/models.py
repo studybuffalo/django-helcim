@@ -75,30 +75,30 @@ class HelcimTransaction(models.Model):
         max_length=8,
         null=True,
     )
-    card_name = models.CharField(
+    cc_name = models.CharField(
         blank=True,
         help_text='The cardholder name',
         max_length=256,
         null=True,
     )
-    card_number = models.CharField(
+    cc_number = models.CharField(
         blank=True,
         help_text='The first four and last 4 digits of the credit card number',
         max_length=16,
         null=True,
     )
-    card_expiry = models.DateField(
+    cc_expiry = models.DateField(
         blank=True,
         help_text='The credit card expiry date',
         null=True,
     )
-    card_type = models.CharField(
+    cc_type = models.CharField(
         blank=True,
         help_text='The credit card type',
         max_length=32,
         null=True,
     )
-    card_token = models.CharField(
+    token = models.CharField(
         blank=True,
         help_text='The Helcim generated and stored credit card token',
         max_length=23,
