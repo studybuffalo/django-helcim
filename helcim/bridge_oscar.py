@@ -16,11 +16,14 @@ def remap_oscar_billing_address(address):
             dict: Billing address details formatted for
                 django-oscar-helcim.
     """
-    if address.get('first_name') or address.get('last_name'):
-        contact_name = ' '.join([
-            address.get('first_name'),
-            address.get('last_name')
-        ])
+    if address.get('first_name') and address.get('last_name'):
+        contact_name = '{} {}'.format(
+            address.get('first_name'), address.get('last_name')
+        )
+    elif address.get('first_name'):
+        contact_name = address.get('first_name')
+    elif address.get('last_name'):
+        contact_name = address.get('last_name')
     else:
         contact_name = None
 
@@ -71,9 +74,7 @@ def purchase(order_number, amount, card, billing_address=None):
         PaymentError: An Oscar error raised when there was an error
             processing the payment.
     """
-    # TODO: Need to streamline this for various types of fields.
-    # Can this be done by unpacking dictionaries or something like that?
-    # Will need some sort of conversion or re-mapping functions?
+
     purchase_details = {
         'order_number': order_number,
         'amount': amount,
