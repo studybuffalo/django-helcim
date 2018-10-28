@@ -3,4 +3,5 @@
 
    installation
    contributing
+   settings
    Package reference <helcim>
