@@ -227,7 +227,9 @@ def process_api_response(response, raw_request=None, raw_response=None):
     """Updates API field names/types, and adds additional audit data.
 
     Parameters:
-        Response (str): The API response (as an ``OrderedDict``).
+        response (str): The API response (as an ``OrderedDict``).
+        raw_request (str): Raw request (as string) submitted to API.
+        raw_response (str): Raw response (as string) returned by API.
 
     Returns:
         dict: The validated and convereted API response.
