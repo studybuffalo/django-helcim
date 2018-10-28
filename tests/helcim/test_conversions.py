@@ -246,8 +246,8 @@ def test_process_api_response_valid():
     )
 
     assert len(response) == 7
-    assert response['response'] == 1
-    assert response['message'] == 'Transaction successful.'
+    assert response['transaction_success'] is True
+    assert response['response_message'] == 'Transaction successful.'
     assert response['notice'] == 'API v2 being depreciated.'
     assert response['raw_request'] == (
         'field_1=Field value 1&field_2=Field value 2'

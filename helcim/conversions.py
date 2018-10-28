@@ -232,14 +232,16 @@ def process_api_response(response, raw_request=None, raw_response=None):
     Returns:
         dict: The validated and convereted API response.
     """
-    # Add the common response fields
+    # Add the standard API response details
     processed = {
-        'response': int(response['response']),
-        'message': str(response['responseMessage']),
+        'transaction_success': (
+            True if int(response['response']) == 1 else False
+        ),
+        'response_message': str(response['responseMessage']),
         'notice': str(response['notice']),
     }
 
-    # Convert the purchase fields
+    # Add and coerece any fields returned in the transaction field
     if 'transaction' in response:
         for field_name, field_value in response['transaction'].items():
 
@@ -279,7 +281,6 @@ def process_api_response(response, raw_request=None, raw_response=None):
                     'Response field not in FROM_API_FIELDS: %s', field_name
                 )
                 processed[field_name] = field_value
-
 
     # Add additional audit information
     processed['raw_request'] = create_raw_request(raw_request)
