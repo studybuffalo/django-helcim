@@ -59,6 +59,7 @@ TO_API_FIELDS = {
     'comments': Field('comments', 's'),
     'customer_code': Field('customerCode', 's'),
     'ecommerce': Field('ecommerce', 'b'),
+    'ip_address': Field('ipAddress', 's', 7, 45),
     'mag': Field('cardMag', 's'),
     'mag_enc': Field('cardMagEnc', 's'),
     'mag_enc_serial_number': Field('serialNumber', 's'),
@@ -81,6 +82,7 @@ TO_API_FIELDS = {
     'token': Field('cardToken', 's', 23, 23),
     'token_f4l4': Field('cardF4L4', 's', 8, 8),
     'token_f4l4_skip': Field('cardF4L4Skip', 'b'),
+    'transaction_id': Field('transactionId', 'i', 0),
 }
 
 FROM_API_FIELDS = {
