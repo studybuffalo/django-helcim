@@ -1,6 +1,6 @@
 """Tests for the gateway module."""
 # pylint: disable=missing-docstring, protected-access
-
+from datetime import datetime
 from unittest.mock import patch
 
 import requests
@@ -480,8 +480,106 @@ def test_save_transaction():
 
     assert isinstance(model_instance, MockDjangoModel)
 
-# TODO: Add tests for convert_expiry_to_datetime
+def test_convert_expiry_to_date():
+    base = gateway.BaseRequest()
 
-# TODO: Add tests for create_model_arguments
+    expiry = base.convert_expiry_to_date('0118')
 
-# TODO: Confirm tests for save_transaction still tests all functionality
+    assert expiry == datetime(18, 1, 31).date()
+
+def test_create_model_arguments_partial():
+    base = gateway.BaseRequest()
+    base.redacted_response = {}
+
+    arguments = base.create_model_arguments('z')
+
+    assert len(arguments) == 20
+    assert arguments['raw_request'] is None
+    assert arguments['raw_response'] is None
+    assert arguments['transaction_success'] is None
+    assert arguments['response_message'] is None
+    assert arguments['notice'] is None
+    assert arguments['date_response'] is None
+    assert arguments['transaction_id'] is None
+    assert arguments['amount'] is None
+    assert arguments['currency'] is None
+    assert arguments['cc_name'] is None
+    assert arguments['cc_number'] is None
+    assert arguments['cc_expiry'] is None
+    assert arguments['cc_type'] is None
+    assert arguments['token'] is None
+    assert arguments['avs_response'] is None
+    assert arguments['cvv_response'] is None
+    assert arguments['approval_code'] is None
+    assert arguments['order_number'] is None
+    assert arguments['customer_code'] is None
+    assert arguments['transaction_type'] == 'z'
+
+def test_create_model_arguments_full():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'a',
+        'raw_response': 'b',
+        'transaction_success': 'c',
+        'response_message': 'd',
+        'notice': 'e',
+        'transaction_date': datetime(2018, 1, 1).date(),
+        'transaction_time': datetime(2018, 1, 1, 12, 0).time(),
+        'transaction_id': 'f',
+        'amount': 'g',
+        'currency': 'h',
+        'cc_name': 'i',
+        'cc_number': 'j',
+        'cc_expiry': '0620',
+        'cc_type': 'k',
+        'token': 'l',
+        'avs_response': 'm',
+        'cvv_response': 'n',
+        'approval_code': 'o',
+        'order_number': 'p',
+        'customer_code': 'q',
+    }
+
+    arguments = base.create_model_arguments('z')
+
+    assert len(arguments) == 20
+    assert arguments['raw_request'] == 'a'
+    assert arguments['raw_response'] == 'b'
+    assert arguments['transaction_success'] == 'c'
+    assert arguments['response_message'] == 'd'
+    assert arguments['notice'] == 'e'
+    assert arguments['date_response'] == datetime(2018, 1, 1, 12, 0)
+    assert arguments['transaction_id'] == 'f'
+    assert arguments['amount'] == 'g'
+    assert arguments['currency'] == 'h'
+    assert arguments['cc_name'] == 'i'
+    assert arguments['cc_number'] == 'j'
+    assert arguments['cc_expiry'] == datetime(20, 6, 30).date()
+    assert arguments['cc_type'] == 'k'
+    assert arguments['token'] == 'l'
+    assert arguments['avs_response'] == 'm'
+    assert arguments['cvv_response'] == 'n'
+    assert arguments['approval_code'] == 'o'
+    assert arguments['order_number'] == 'p'
+    assert arguments['customer_code'] == 'q'
+    assert arguments['transaction_type'] == 'z'
+
+def test_create_model_arguments_missing_time():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'transaction_date': datetime(2018, 1, 1).date(),
+    }
+
+    arguments = base.create_model_arguments('z')
+
+    assert arguments['date_response'] is None
+
+def test_create_model_arguments_missing_date():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'transaction_time': datetime(2018, 1, 1, 12, 0).time(),
+    }
+
+    arguments = base.create_model_arguments('z')
+
+    assert arguments['date_response'] is None

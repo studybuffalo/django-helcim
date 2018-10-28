@@ -6,6 +6,8 @@ API and should work in any application (i.e. not just django-oscar).
 from calendar import monthrange
 from datetime import datetime
 import re
+
+import pytz
 import requests
 import xmltodict
 
@@ -318,22 +320,22 @@ class BaseRequest():
 
         raise helcim_exceptions.HelcimError(exception_message)
 
-    def convert_expiry_to_datetime(self, expiry):
+    def convert_expiry_to_date(self, expiry):
         """Converts a 4 digit expiry to a datetime object.
 
             Parameters:
-                expiry (str): the four digit representaiton of the
+                expiry (str): the four digit representation of the
                     credit card expiry
 
             Returns:
                 obj: the expiry as a datetime object.
         """
-        # TODO: Add timezone support for this operation
+
         year = int(expiry[2:])
         month = int(expiry[:2])
         day = monthrange(year, month)[1]
 
-        return datetime(year, month, day)
+        return datetime(year, month, day, tzinfo=pytz.timezone('UTC')).date()
 
     def create_model_arguments(self, transaction_type):
         """Creates dictionary for use as transaction model arguments.
@@ -366,7 +368,7 @@ class BaseRequest():
 
         # Format the credit card expiry date
         if 'cc_expiry' in response:
-            cc_expiry = self.convert_expiry_to_datetime(
+            cc_expiry = self.convert_expiry_to_date(
                 response['cc_expiry']
             )
         else:
@@ -383,11 +385,11 @@ class BaseRequest():
             'transaction_id': response.get('transaction_id'),
             'amount': response.get('amount'),
             'currency': response.get('currency'),
-            'card_name': response.get('cc_name'),
-            'card_number': response.get('cc_number'),
-            'card_expiry': cc_expiry,
-            'card_type': response.get('cc_type'),
-            'card_token': response.get('token'),
+            'cc_name': response.get('cc_name'),
+            'cc_number': response.get('cc_number'),
+            'cc_expiry': cc_expiry,
+            'cc_type': response.get('cc_type'),
+            'token': response.get('token'),
             'avs_response': response.get('avs_response'),
             'cvv_response': response.get('cvv_response'),
             'approval_code': response.get('approval_code'),
@@ -442,14 +444,13 @@ class BaseRequest():
         """Saves provided transaction data as Django model instance.
 
             Parameters:
-                transaction_type (str): The type of transaction (`s`
-                    for purchase (sale), `p` for pre-authorization,
-                    `c` for capture, and `r` for refund).
+                transaction_type (str): The type of transaction (``s``
+                    for purchase (sale), ``p`` for pre-authorization,
+                    ``c`` for capture, and ``r`` for refund).
 
             Returns:
                 obj: A Django model instance of the saved data.
         """
-        # TODO: Figure out less fragile way to build this object
         self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
