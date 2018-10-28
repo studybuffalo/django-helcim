@@ -6,7 +6,6 @@ from django.db import models
 
 class HelcimTransaction(models.Model):
     """Details of a single Helcim transaction."""
-    # TODO: Figure out good length for response and notice messages
     uuid = models.UUIDField(
         default=uuid4,
         editable=False,
