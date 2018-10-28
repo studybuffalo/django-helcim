@@ -104,13 +104,19 @@ FROM_API_FIELDS = {
 }
 
 def validate_request_fields(details):
-    """Validates the request fields prior to submission.
+    """Validates and coerces request field data prior to submission.
+
+    Uses the TO_API_FIELDS dictionary to determine type and required
+    validation to apply.
 
     Parameters:
+        details (dict): The values to validated and coerce.
 
     Returns:
+        dict: The cleaned data (with the same keys as ``details``).
 
     Raises:
+        ValueError: Raised if data fails validation.
     """
 
     cleaned = {}
@@ -172,11 +178,15 @@ def validate_request_fields(details):
 
 def process_request_fields(api, cleaned, additional=None):
     """Converts all data to proper Helcim API request fields.
+
     Parameters:
+        api (dict): The API setting fields.
+        cleaned(dict): The cleaned POST data.
+        additional: Any additional POST data to directly add (skips
+            any conversion steps).
 
     Returns:
-
-    Raises:
+        dict: The data ready for a POST request.
     """
     request_data = {}
 
@@ -196,7 +206,14 @@ def process_request_fields(api, cleaned, additional=None):
     return request_data
 
 def create_raw_request(data):
-    """Converts the raw request into a POST string."""
+    """Converts the raw request into a POST string.
+
+    Parameters:
+        data (dict): The POST request data dictionary.
+
+    Returns:
+        str: The POST request data as a formatted string.
+    """
     if data:
         raw_strings = []
 
