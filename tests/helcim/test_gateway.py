@@ -81,11 +81,10 @@ API_DETAILS = {
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
 def test_post_returns_dictionary():
-    base_request = gateway.BaseRequest(api_details=API_DETAILS)
-    dictionary = base_request.post()
+    base = gateway.BaseRequest(api_details=API_DETAILS)
+    base.post()
 
-    assert isinstance(dictionary, dict)
-
+    assert isinstance(base.response, dict)
 
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
@@ -377,10 +376,10 @@ def test_set_api_details_argument():
     assert 'terminal_id' in base.api
     assert base.api['terminal_id'] == '98765432'
 
-@patch('helcim.gateway.settings.HELCIM_API_URL', '1')
-@patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2')
-@patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3')
-@patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4')
+@patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
+@patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2', create=True)
+@patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3', create=True)
+@patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4', create=True)
 def test_set_api_details_settings():
     base = gateway.BaseRequest()
 
@@ -418,7 +417,7 @@ def test_configure_test_transaction_in_data():
 
     assert post_data == returned_post_data
 
-@patch('helcim.gateway.settings.HELCIM_API_TEST', False)
+@patch('helcim.gateway.settings.HELCIM_API_TEST', False, create=True)
 def test_configure_test_transaction_data_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
@@ -428,7 +427,7 @@ def test_configure_test_transaction_data_overrides_settings():
 
     assert returned_post_data['test'] is True
 
-@patch('helcim.gateway.settings.HELCIM_API_TEST', True)
+@patch('helcim.gateway.settings.HELCIM_API_TEST', True, create=True)
 def test_configure_test_transaction_setting():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
@@ -444,12 +443,256 @@ def test_configure_test_transaction_not_set():
 
     assert 'test' not in returned_post_data
 
-# TODO: Tests for _identify_redact_fields
+@patch('helcim.gateway.settings.HELCIM_REDACT_ALL', True, create=True)
+def test_identify_redact_fields_redact_all():
+    base = gateway.BaseRequest()
 
-# TODO: tests for _redact_api_data
+    fields = base._identify_redact_fields()
 
-# TODO: tests for _redact_field
+    assert fields['name'] is True
+    assert fields['number'] is True
+    assert fields['expiry'] is True
+    assert fields['type'] is True
+    assert fields['token'] is True
 
-# TODO: tests for _redact_data
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+def test_identify_redact_fields_redact_name():
+    base = gateway.BaseRequest()
 
-# TODO: tests for saving model
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is True
+    assert fields['number'] is False
+    assert fields['expiry'] is False
+    assert fields['type'] is False
+    assert fields['token'] is False
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NUMBER', True, create=True)
+def test_identify_redact_fields_redact_number():
+    base = gateway.BaseRequest()
+
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is False
+    assert fields['number'] is True
+    assert fields['expiry'] is False
+    assert fields['type'] is False
+    assert fields['token'] is False
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_EXPIRY', True, create=True)
+def test_identify_redact_fields_redact_expiry():
+    base = gateway.BaseRequest()
+
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is False
+    assert fields['number'] is False
+    assert fields['expiry'] is True
+    assert fields['type'] is False
+    assert fields['token'] is False
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_TYPE', True, create=True)
+def test_identify_redact_fields_redact_type():
+    base = gateway.BaseRequest()
+
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is False
+    assert fields['number'] is False
+    assert fields['expiry'] is False
+    assert fields['type'] is True
+    assert fields['token'] is False
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_TOKEN', True, create=True)
+def test_identify_redact_fields_redact_token():
+    base = gateway.BaseRequest()
+
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is False
+    assert fields['number'] is False
+    assert fields['expiry'] is False
+    assert fields['type'] is False
+    assert fields['token'] is True
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_ALL', True, create=True)
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', False, create=True)
+def test_identify_redact_fields_redact_all_with_individual():
+    base = gateway.BaseRequest()
+
+    fields = base._identify_redact_fields()
+
+    assert fields['name'] is True
+
+def test_redact_api_data_account_id():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'accountId=1',
+    }
+    base._redact_api_data()
+
+    assert base.redacted_response['raw_request'] == 'accountId=REDACTED'
+
+def test_redact_api_data_api_token():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'apiToken=1',
+    }
+    base._redact_api_data()
+
+    assert base.redacted_response['raw_request'] == 'apiToken=REDACTED'
+
+def test_redact_api_data_terminal_id():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'terminalId=1',
+    }
+    base._redact_api_data()
+
+    assert base.redacted_response['raw_request'] == 'terminalId=REDACTED'
+
+def test_redact_api_data_all_fields():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'accountId=1&apiToken=2&terminalId=3',
+    }
+    base._redact_api_data()
+
+    assert base.redacted_response['raw_request'] == (
+        'accountId=REDACTED&apiToken=REDACTED&terminalId=REDACTED'
+    )
+
+def test_redact_field():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'cardHolderName=a',
+        'raw_response': '<cardHolderName>a</cardHolderName>',
+        'cc_name': 'a',
+    }
+    base._redact_field('cardHolderName', 'cc_name')
+
+    assert base.redacted_response['raw_request'] == 'cardHolderName=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<cardHolderName>REDACTED</cardHolderName>'
+    )
+    assert base.redacted_response['cc_name'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+def test_redact_data_cc_name():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardHolderName=a',
+        'raw_response': '<cardHolderName>a</cardHolderName>',
+        'cc_name': 'a',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == 'cardHolderName=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<cardHolderName>REDACTED</cardHolderName>'
+    )
+    assert base.redacted_response['cc_name'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NUMBER', True, create=True)
+def test_redact_data_cc_number():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardNumber=a',
+        'raw_response': '<cardNumber>a</cardNumber>',
+        'cc_number': 'a',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == 'cardNumber=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<cardNumber>REDACTED</cardNumber>'
+    )
+    assert base.redacted_response['cc_number'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_EXPIRY', True, create=True)
+def test_redact_data_cc_expiry():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'expiryDate=a',
+        'raw_response': '<expiryDate>a</expiryDate>',
+        'cc_expiry': 'a',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == 'expiryDate=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<expiryDate>REDACTED</expiryDate>'
+    )
+    assert base.redacted_response['cc_expiry'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_TYPE', True, create=True)
+def test_redact_data_cc_type():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardType=a',
+        'raw_response': '<cardType>a</cardType>',
+        'cc_type': 'a',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == 'cardType=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<cardType>REDACTED</cardType>'
+    )
+    assert base.redacted_response['cc_type'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_TOKEN', True, create=True)
+def test_redact_data_token():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardToken=a',
+        'raw_response': '<cardToken>a</cardToken>',
+        'token': 'a',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == 'cardToken=REDACTED'
+    assert base.redacted_response['raw_response'] == (
+        '<cardToken>REDACTED</cardToken>'
+    )
+    assert base.redacted_response['token'] is None
+
+@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+def test_redact_data_partial():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardHolderName=a&cardToken=b',
+        'raw_response': (
+            '<cardHolderName>a</cardHolderName><cardToken>b</cardToken>'
+        ),
+        'cc_name': 'a',
+        'token': 'b',
+    }
+    base._redact_data()
+
+    assert base.redacted_response['raw_request'] == (
+        'cardHolderName=REDACTED&cardToken=b'
+    )
+    assert base.redacted_response['raw_response'] == (
+        '<cardHolderName>REDACTED</cardHolderName><cardToken>b</cardToken>'
+    )
+    assert base.redacted_response['cc_name'] is None
+    assert base.redacted_response['token'] == 'b'
+
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+def test_save_transaction():
+    base = gateway.BaseRequest()
+    base.response = {
+        'raw_request': 'cardHolderName=a&cardToken=b',
+        'raw_response': (
+            '<cardHolderName>a</cardHolderName><cardToken>b</cardToken>'
+        ),
+        'cc_name': 'a',
+        'token': 'b',
+    }
+    model_instance = base.save_transaction('s')
+
+    assert isinstance(model_instance, MockDjangoModel)

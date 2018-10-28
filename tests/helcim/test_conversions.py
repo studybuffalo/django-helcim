@@ -384,6 +384,21 @@ def test_process_api_response_missing_required_field():
     else:
         assert False
 
-def test_create_raw_response():
-    # TODO: Builds tests to explicity test create_raw_response
-    pass
+def test_create_raw_response_with_data():
+    response_data = {
+        'accountId': '123456789',
+        'token': '987654321',
+    }
+
+    request_string = conversions.create_raw_request(response_data)
+
+    assert isinstance(request_string, str)
+    assert 'accountId=123456789&' in request_string
+    assert 'token=987654321' in request_string
+
+def test_create_raw_response_without_data():
+    response_data = None
+
+    request_string = conversions.create_raw_request(response_data)
+
+    assert request_string is None
