@@ -43,7 +43,7 @@ Instructions on installing and configuration can be found on `Read The Docs`_.
 Support
 -------
 
-The `docs`_ provide examples for setup and common issues to be aware of. If the
+The docs_ provide examples for setup and common issues to be aware of. If the
 issue involves connecting this package to Django Oscar, this repository
 contains a `sandbox environment`_ you can review for a minimal working
 example. For any other issues, you can submit a `GitHub Issue`_.
@@ -59,7 +59,7 @@ Contributing
 ------------
 
 Contributions are welcome, especially to address bugs and extend
-functionality. Full details on contributing can be found in the `docs`_.
+functionality. Full details on contributing can be found in the docs_.
 
 .. _docs: https://django-oscar-helcim.readthedocs.io/en/latest/contributing.html
 
