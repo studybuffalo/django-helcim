@@ -5,6 +5,57 @@ from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
 
+def remap_oscar_billing_address(address):
+    """Remaps Oscar billing address dictionary to Helcim dictionary.
+
+        Parameters:
+            address (dict): A dictionary of the billing address details
+                provided by Django Oscar.
+
+        Returns:
+            dict: Billing address details formatted for
+                django-oscar-helcim.
+    """
+    if address.get('first_name') or address.get('last_name'):
+        contact_name = ' '.join([
+            address.get('first_name'),
+            address.get('last_name')
+        ])
+    else:
+        contact_name = None
+
+    return {
+        'billing_contact_name': contact_name,
+        'billing_street_1': address.get('line1'),
+        'billing_street_2': address.get('line2'),
+        'billing_city': address.get('line4'),
+        'billing_province': address.get('state'),
+        'billing_postal_code': address.get('postcode'),
+        'billing_country': address.get('country'),
+        'billing_phone': address.get('phone_number'),
+    }
+
+def remap_oscar_credit_card(card):
+    """Remaps Oscar credit card object as Helcim dictionary.
+
+        Parameters:
+            card (obj): A credit card object provided by Django Oscar.
+
+        Returns:
+            dict: Credit card details formatted for django-oscar-helcim.
+    """
+    if card.expiry_date:
+        cc_expiry = card.expiry_date.strftime('%m%y')
+    else:
+        cc_expiry = None
+
+    return {
+        'cc_name': card.name,
+        'cc_number': card.number,
+        'cc_expiry': cc_expiry,
+        'cc_cvv': card.ccv,
+    }
+
 def purchase(order_number, amount, card, billing_address=None):
     """Make a purchase request.
 
@@ -23,24 +74,17 @@ def purchase(order_number, amount, card, billing_address=None):
     # TODO: Need to streamline this for various types of fields.
     # Can this be done by unpacking dictionaries or something like that?
     # Will need some sort of conversion or re-mapping functions?
-    purchase_instance = gateway.Purchase(
-        order_number=order_number,
-        amount=amount,
-        cc_name=card.name,
-        cc_number=card.number,
-        cc_expiry=card.expiry_date.strftime('%m%y'),
-        cc_cvv=card.ccv,
-        billing_contact_name=' '.join(
-            [billing_address['first_name'], billing_address['last_name']]
-        ),
-        billing_street_1=billing_address['line1'],
-        billing_street_2=billing_address['line2'],
-        billing_city=billing_address['line4'],
-        billing_province=billing_address['state'],
-        billing_postal_code=billing_address['postcode'],
-        billing_country=billing_address['country'],
-        billing_phone=billing_address['phone_number'],
-    )
+    purchase_details = {
+        'order_number': order_number,
+        'amount': amount,
+    }
+
+    if billing_address:
+        purchase_details.update(remap_oscar_billing_address(billing_address))
+
+    purchase_details.update(remap_oscar_credit_card(card))
+
+    purchase_instance = gateway.Purchase(**purchase_details)
 
     try:
         return purchase_instance.process()

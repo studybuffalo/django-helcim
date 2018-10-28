@@ -1,6 +1,6 @@
 """Tests for the bridge_oscar module."""
 # pylint: disable=missing-docstring
-
+from datetime import datetime
 from unittest.mock import patch
 
 from oscar.apps.payment import exceptions as oscar_exceptions
@@ -36,12 +36,19 @@ class MockPurchaseProcessPaymentError():
     def __init__(self, *args, **kwargs):
         pass
 
+class MockCreditCard():
+    def __init__(self, name=None, number=None, expiry=None, ccv=None):
+        self.name = name
+        self.number = number
+        self.expiry_date = expiry if expiry else datetime.utcnow()
+        self.ccv = ccv
+
 @patch(
     'helcim.bridge_oscar.gateway.Purchase', MockPurchaseProcessValid
 )
 def test_sale_valid():
     try:
-        bridge_oscar.purchase('1', 2, '1')
+        bridge_oscar.purchase('1', '2', MockCreditCard())
     except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
         assert False
     else:
@@ -53,7 +60,7 @@ def test_sale_valid():
 )
 def test_sale_helcim_error():
     try:
-        bridge_oscar.purchase('1', 2, '1')
+        bridge_oscar.purchase('1', '2', MockCreditCard())
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -65,7 +72,7 @@ def test_sale_helcim_error():
 )
 def test_sale_processing_error():
     try:
-        bridge_oscar.purchase('1', 2, '1')
+        bridge_oscar.purchase('1', '2', MockCreditCard())
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -77,7 +84,7 @@ def test_sale_processing_error():
 )
 def test_sale_payment_error():
     try:
-        bridge_oscar.purchase('1', 2, '1')
+        bridge_oscar.purchase('1', '2', MockCreditCard())
     except oscar_exceptions.PaymentError:
         assert True
     else:
