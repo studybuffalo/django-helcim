@@ -56,17 +56,21 @@ it sets a good minimum baseline for test construction.
 Testing format
 ==============
 
-All tests are built with the `pytest framework`_. Tests should be
-constructed to test a single function or aspect wherever possible. It
-may be appropriate at times to constructer larg tests approaching full
-integration testing, but unit tests are still required.
+All tests are built with the `pytest framework`_
+(and `pytest-django`_ for Django-specific components). There are no
+specific requirements on number or scope of tests, but at a bare
+minimum there should be tests to cover all common use cases. Wherever
+possible, try to test the smallest component possible.
 
 .. _pytest framework: https://docs.pytest.org/en/latest/
 
-Testing with pytest
-===================
+.. _pytest-django: https://pytest-django.readthedocs.io/en/latest/
 
-Tests can be run locally with the following command::
+Testing base components
+=======================
+
+The majority of the django-oscar-helcim can be tested through the
+standard pytest command::
 
     $ pipenv run py.test
 
@@ -76,6 +80,15 @@ To check test coverage, you can use the following::
 
 You may specify the output of the coverage report by changing the
 ``--cov-report`` option to ``html`` or ``xml``.
+
+Testing Django components
+=========================
+
+There are additional tests for the Django-specific components. To run
+these tests without setting up a full Django project, you can use the
+following helper script::
+
+    $ pipenv run python tests/django/run.py
 
 Testing with tox
 ================
