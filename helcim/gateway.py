@@ -583,7 +583,7 @@ class Preauthorize(BaseCardTransaction):
             self.api,
             self.cleaned,
             {
-                'transactionType': 'pre-authorization',
+                'transactionType': 'preauth',
             }
         )
 
@@ -594,9 +594,45 @@ class Preauthorize(BaseCardTransaction):
 
 class Refund(BaseCardTransaction):
     """Makes a refund request."""
+    def process(self):
+        """Makes a refund request to Helcim Commerce API."""
+        self.validate_fields()
+        self.configure_test_transaction()
+        self.determine_card_details()
+
+        refund_data = conversions.process_request_fields(
+            self.api,
+            self.cleaned,
+            {
+                'transactionType': 'refund',
+            }
+        )
+
+        self.post(refund_data)
+        refund = self.save_transaction('r')
+
+        return refund
 
 class Verification(BaseCardTransaction):
-    """Makes a verification request."""
+    """Makes a verification request to Helcim Commerce API."""
+    def process(self):
+        """Makes a verification request to Helcim Commerce API."""
+        self.validate_fields()
+        self.configure_test_transaction()
+        self.determine_card_details()
+
+        verification_data = conversions.process_request_fields(
+            self.api,
+            self.cleaned,
+            {
+                'transactionType': 'verify',
+            }
+        )
+
+        self.post(verification_data)
+        verification = self.save_transaction('v')
+
+        return verification
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""
@@ -613,7 +649,7 @@ class Capture(BaseRequest):
             )
 
     def process(self):
-        """Completes a pre-authorization request."""
+        """Completes a capture request."""
         self.validate_fields()
         self.validate_preauth_transaction()
         self.configure_test_transaction()
@@ -622,7 +658,7 @@ class Capture(BaseRequest):
             self.api,
             self.cleaned,
             {
-                'transactionType': 'pre-authorization',
+                'transactionType': 'capture',
             }
         )
 

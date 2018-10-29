@@ -48,21 +48,21 @@ API_DETAILS = {
     'terminal_id': '98765432',
 }
 
-# @patch('helcim.gateway.requests.post', MockPostResponse)
-# @patch(
-#     'helcim.gateway.models.HelcimTransaction.objects.create',
-#     MockDjangoModel
-# )
-# def test_preauth_processing():
-#     details = {
-#         'amount': 100.00,
-#         'customer_code': 'CST1000',
-#     }
+@patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+def test_verification_processing():
+    details = {
+        'amount': 100.00,
+        'customer_code': 'CST1000',
+    }
 
-#     preauth = gateway.Preauthorize(api_details=API_DETAILS, **details)
-#     response = preauth.process()
+    verification = gateway.Verification(api_details=API_DETAILS, **details)
+    response = verification.process()
 
-#     assert isinstance(response, MockDjangoModel)
+    assert isinstance(response, MockDjangoModel)
 
 def test_process_error_response_verification():
     verification_request = gateway.Verification()
