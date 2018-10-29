@@ -48,7 +48,10 @@ class MockCreditCard():
 )
 def test_purchase_valid():
     try:
-        bridge_oscar.purchase('1', '2', MockCreditCard(), {'first_name': '3'})
+        purchase = bridge_oscar.PurchaseBridge(
+            '1', '2', MockCreditCard(), {'first_name': '3'}
+        )
+        purchase.process()
     except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
         assert False
     else:
@@ -60,7 +63,10 @@ def test_purchase_valid():
 )
 def test_purchase_helcim_error():
     try:
-        bridge_oscar.purchase('1', '2', MockCreditCard())
+        purchase = bridge_oscar.PurchaseBridge(
+            '1', '2', MockCreditCard()
+        )
+        purchase.process()
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -72,7 +78,10 @@ def test_purchase_helcim_error():
 )
 def test_purchase_processing_error():
     try:
-        bridge_oscar.purchase('1', '2', MockCreditCard())
+        purchase = bridge_oscar.PurchaseBridge(
+            '1', '2', MockCreditCard()
+        )
+        purchase.process()
     except oscar_exceptions.GatewayError:
         assert True
     else:
@@ -84,7 +93,10 @@ def test_purchase_processing_error():
 )
 def test_purchase_payment_error():
     try:
-        bridge_oscar.purchase('1', '2', MockCreditCard())
+        purchase = bridge_oscar.PurchaseBridge(
+            '1', '2', MockCreditCard()
+        )
+        purchase.process()
     except oscar_exceptions.PaymentError:
         assert True
     else:

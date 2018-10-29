@@ -5,6 +5,7 @@ from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
 
+
 def remap_oscar_billing_address(address):
     """Remaps Oscar billing address dictionary to Helcim dictionary.
 
@@ -59,39 +60,157 @@ def remap_oscar_credit_card(card):
         'cc_cvv': card.ccv,
     }
 
-def purchase(order_number, amount, card, billing_address=None):
-    """Make a purchase request.
+class BaseCardTransactionBridge():
+    """Base class to bridge Oscar and Helcim transactions.
 
-    Parameters:
-        order_number (str): Order number for the transaction.
-        amount (dec): The transaction total.
-        card (obj): Instance of the Oscar bankcard class.
-        billing_address (dict): The billing address information.
-
-    Raises:
-        GatewayError: An Oscar error raised when there was an error
-            with the payment API.
-        PaymentError: An Oscar error raised when there was an error
-            processing the payment.
+        Parameters:
+            order_number (str): Order number for the transaction.
+            amount (dec): The transaction total.
+            card (obj): Instance of the Oscar bankcard class.
+            billing_address (dict): The billing address information.
     """
+    def __init__(self, order_number, amount, card, billing_address=None):
+        transaction_details = {
+            'order_number': order_number,
+            'amount': amount,
+        }
 
-    purchase_details = {
-        'order_number': order_number,
-        'amount': amount,
-    }
+        if billing_address:
+            transaction_details.update(
+                remap_oscar_billing_address(billing_address)
+            )
 
-    if billing_address:
-        purchase_details.update(remap_oscar_billing_address(billing_address))
+        transaction_details.update(remap_oscar_credit_card(card))
 
-    purchase_details.update(remap_oscar_credit_card(card))
+        self.transaction_details = transaction_details
 
-    purchase_instance = gateway.Purchase(**purchase_details)
+class PurchaseBridge(BaseCardTransactionBridge):
+    """Class to bridge Oscar and Helcim purchase transactions."""
+    def process(self):
+        """Attempts to process Purchase with transaction details.
 
-    try:
-        return purchase_instance.process()
-    except helcim_exceptions.ProcessingError as error:
-        raise oscar_exceptions.GatewayError(str(error))
-    except helcim_exceptions.PaymentError as error:
-        raise oscar_exceptions.PaymentError(str(error))
-    except helcim_exceptions.HelcimError as error:
-        raise oscar_exceptions.GatewayError(str(error))
+            Raises:
+                GatewayError: An Oscar error raised when there was an
+                    error with the payment API.
+                PaymentError: An Oscar error raised when there was an
+                    error processing the payment.
+        """
+
+        purchase_instance = gateway.Purchase(**self.transaction_details)
+
+        try:
+            return purchase_instance.process()
+        except helcim_exceptions.ProcessingError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+        except helcim_exceptions.PaymentError as error:
+            raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.HelcimError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+
+class PreauthorizeBridge(BaseCardTransactionBridge):
+    """Class to bridge Oscar and Helcim preauthorization transactions."""
+    def process(self):
+        """Attempts to process Preauthorize with transaction details.
+
+            Raises:
+                GatewayError: An Oscar error raised when there was an
+                    error with the payment API.
+                PaymentError: An Oscar error raised when there was an
+                    error processing the payment.
+        """
+
+        preauth_instance = gateway.Preauthorize(**self.transaction_details)
+
+        try:
+            return preauth_instance.process()
+        except helcim_exceptions.ProcessingError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+        except helcim_exceptions.PaymentError as error:
+            raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.HelcimError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+
+class RefundBridge(BaseCardTransactionBridge):
+    """Class to bridge Oscar and Helcim refund transactions."""
+    def process(self):
+        """Attempts to process Refund with transaction details.
+
+            Raises:
+                GatewayError: An Oscar error raised when there was an
+                    error with the payment API.
+                PaymentError: An Oscar error raised when there was an
+                    error processing the payment.
+        """
+
+        refund_instance = gateway.Refund(**self.transaction_details)
+
+        try:
+            return refund_instance.process()
+        except helcim_exceptions.ProcessingError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+        except helcim_exceptions.PaymentError as error:
+            raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.HelcimError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+
+class VerificationBridge(BaseCardTransactionBridge):
+    """Class to bridge Oscar and Helcim Verification transactions."""
+    def process(self):
+        """Attempts to process Verification with transaction details.
+
+            Raises:
+                GatewayError: An Oscar error raised when there was an
+                    error with the payment API.
+                PaymentError: An Oscar error raised when there was an
+                    error processing the payment.
+        """
+
+        verification_instance = gateway.Verification(
+            **self.transaction_details
+        )
+
+        try:
+            return verification_instance.process()
+        except helcim_exceptions.ProcessingError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+        except helcim_exceptions.PaymentError as error:
+            raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.HelcimError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+
+class CaptureBridge():
+    """Class to bridge Oscar and Helcim Capture transactions.
+
+        Parameters:
+            transaction_id (int): the Helcim preauthorization
+                 transaction ID to capture.
+    """
+    def __init__(self, transaction_id):
+        transaction_details = {
+            'transaction_id': transaction_id,
+        }
+
+        self.transaction_details = transaction_details
+
+    def process(self):
+        """Attempts to process Capture with transaction details.
+
+            Raises:
+                GatewayError: An Oscar error raised when there was an
+                    error with the payment API.
+                PaymentError: An Oscar error raised when there was an
+                    error processing the payment.
+        """
+
+        capture_instance = gateway.Capture(
+            **self.transaction_details
+        )
+
+        try:
+            return capture_instance.process()
+        except helcim_exceptions.ProcessingError as error:
+            raise oscar_exceptions.GatewayError(str(error))
+        except helcim_exceptions.PaymentError as error:
+            raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.HelcimError as error:
+            raise oscar_exceptions.GatewayError(str(error))

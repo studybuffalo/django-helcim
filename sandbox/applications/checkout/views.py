@@ -83,12 +83,13 @@ class PaymentDetailsView(views.PaymentDetailsView):
     def handle_payment(self, order_number, total, **kwargs):
         """Submit payment details to the Helcim Commerce API."""
         # Make a purchase request to the Helcim Commerce API
-        bridge_oscar.purchase(
+        purchase = bridge_oscar.PurchaseBridge(
             order_number=order_number,
             amount=total.incl_tax,
             card=kwargs['bankcard'],
             billing_address=kwargs['billing_address']
         )
+        purchase.process()
 
         # Record payment source and event
         source_type, _ = models.SourceType.objects.get_or_create(
