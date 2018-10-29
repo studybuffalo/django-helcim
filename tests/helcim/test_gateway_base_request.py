@@ -146,37 +146,47 @@ def test_set_api_details_argument():
     assert 'terminal_id' in base.api
     assert base.api['terminal_id'] == '98765432'
 
-@patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
-@patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2', create=True)
-@patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3', create=True)
-@patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4', create=True)
-def test_set_api_details_settings():
-    base = gateway.BaseRequest()
+# @patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
+# @patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2', create=True)
+# @patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3', create=True)
+# @patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4', create=True)
+# def test_set_api_details_settings():
+#     base = gateway.BaseRequest()
 
-    assert 'url' in base.api
-    assert base.api['url'] == '1'
-    assert 'account_id' in base.api
-    assert base.api['account_id'] == '2'
-    assert 'token' in base.api
-    assert base.api['token'] == '3'
-    assert 'terminal_id' in base.api
-    assert base.api['terminal_id'] == '4'
+#     assert 'url' in base.api
+#     assert base.api['url'] == '1'
+#     assert 'account_id' in base.api
+#     assert base.api['account_id'] == '2'
+#     assert 'token' in base.api
+#     assert base.api['token'] == '3'
+#     assert 'terminal_id' in base.api
+#     assert base.api['terminal_id'] == '4'
 
-@patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
-def test_set_api_details_argument_overrides_settings():
-    base = gateway.BaseRequest(api_details=API_DETAILS)
+# @patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
+# def test_set_api_details_argument_overrides_settings():
+#     base = gateway.BaseRequest(api_details=API_DETAILS)
 
-    assert 'url' in base.api
-    assert base.api['url'] == 'https://www.test.com'
+#     assert 'url' in base.api
+#     assert base.api['url'] == 'https://www.test.com'
 
-@patch('helcim.gateway.settings', None)
-def test_set_api_details_none():
-    try:
-        gateway.BaseRequest()
-    except django_exceptions.ImproperlyConfigured:
-        assert True
-    else:
-        assert False
+# @patch('helcim.gateway.settings.HELCIM_API_TOKEN', 'a', create=True)
+# def test_set_api_details_no_account_id():
+#     try:
+#         gateway.BaseRequest()
+#     except django_exceptions.ImproperlyConfigured as error:
+#         assert True
+#         assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
+#     else:
+#         assert False
+
+# @patch('helcim.gateway.settings', None)
+# def test_set_api_details_none():
+#     try:
+#         gateway.BaseRequest()
+#     except django_exceptions.ImproperlyConfigured:
+#         assert True
+#     else:
+#         assert False
 
 def test_configure_test_transaction_in_data():
     base = gateway.BaseRequest(api_details=API_DETAILS)
@@ -198,7 +208,6 @@ def test_configure_test_transaction_data_overrides_settings():
 
 @patch('helcim.gateway.settings.HELCIM_API_TEST', True, create=True)
 def test_configure_test_transaction_setting():
-    print('run test')
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
     base.configure_test_transaction()
