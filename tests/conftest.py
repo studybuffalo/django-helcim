@@ -1,11 +1,26 @@
 """Configuration file for pytest."""
-import os
-
 import django
+from django.conf import settings
 
 
 def pytest_configure():
     """Setups initial testing configuration."""
-    # Setting up a Django instance for testing
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings')
+    # Setup the bare minimum Django settings
+    django_settings = {
+        'DATABASES': {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': ':memory:',
+            }
+        },
+        'INSTALLED_APPS': {
+            'helcim',
+        },
+        'HELCIM_ACCOUNT_ID': '1234567890',
+        'HELCIM_API_TOKEN': 'abcdefghijklmno1234567890',
+    }
+
+    settings.configure(**django_settings)
+
+    # Initiate Django
     django.setup()
