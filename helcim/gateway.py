@@ -221,42 +221,53 @@ class BaseRequest():
             dict: The proper API details from the provided data.
 
         Raises:
-            ImproperlyConfigured: Raised if API details cannot be
-                resolved.
+            ImproperlyConfigured: A required API setting is not found.
         """
-        # Provided API details override ones in the settings
-        if details:
-            url = details['url']
-            account_id = details['account_id']
-            token = details['token']
-            terminal_id = details['terminal_id']
-        # Default uses details from the settings files
-        else:
-            setting_names = [
-                'HELCIM_API_URL',
-                'HELCIM_ACCOUNT_ID',
-                'HELCIM_API_TOKEN',
-                'HELCIM_TERMINAL_ID',
-            ]
-
-            # Confirm all required settings are entered
-            for setting_name in setting_names:
-                if not hasattr(settings, setting_name):
-                    raise django_exceptions.ImproperlyConfigured(
-                        'You must define a {} setting'.format(setting_name)
-                    )
-
-            url = settings.HELCIM_API_URL
-            account_id = settings.HELCIM_ACCOUNT_ID
-            token = settings.HELCIM_API_TOKEN
-            terminal_id = settings.HELCIM_TERMINAL_ID
-
-        return {
-            'url': url,
-            'account_id': account_id,
-            'token': token,
-            'terminal_id': terminal_id,
+        api_details = {
+            'url': None,
+            'account_id': None,
+            'token': None,
+            'terminal_id': None,
         }
+
+        # Tries and retrieves settings form API details
+        if details:
+            api_details['url'] = details.get('url')
+            api_details['account_id'] = details.get('account_id')
+            api_details['token'] = details.get('token')
+            api_details['terminal_id'] = details.get('terminal_id')
+
+        # Checks for URL in settings; if not found uses default
+        if api_details['url'] is None:
+            if hasattr(settings, 'HELCIM_API_URL'):
+                api_details['url'] = settings.HELCIM_API_URL
+            else:
+                api_details['url'] = 'https://secure.myhelcim.com/api/'
+
+        # Checks for account ID in settings; raises error if not found
+        if api_details['account_id'] is None:
+            if hasattr(settings, 'HELCIM_ACCOUNT_ID'):
+                api_details['account_id'] = settings.HELCIM_ACCOUNT_ID
+            else:
+                raise django_exceptions.ImproperlyConfigured(
+                    'You must define a HELCIM_ACCOUNT_ID setting'
+                )
+
+        # Check for API token; raises error if not found
+        if api_details['token'] is None:
+            if hasattr(settings, 'HELCIM_API_TOKEN'):
+                api_details['token'] = settings.HELCIM_API_TOKEN
+            else:
+                raise django_exceptions.ImproperlyConfigured(
+                    'You must define a HELCIM_API_TOKEN setting'
+                )
+
+        # Check for terminal ID (optional)
+        if api_details['terminal_id'] is None:
+            if hasattr(settings, 'HELCIM_TERMINAL_ID'):
+                api_details['terminal_id'] = settings.HELCIM_TERMINAL_ID
+
+        return api_details
 
     def configure_test_transaction(self):
         """Adds test flag to post data if HELCIM_API_TEST is True.
