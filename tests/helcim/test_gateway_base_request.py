@@ -186,6 +186,18 @@ def test_set_api_details_no_account_id():
         assert False
 
 @override_settings()
+def test_set_api_details_no_api_token():
+    del settings.HELCIM_API_TOKEN
+
+    try:
+        gateway.BaseRequest()
+    except django_exceptions.ImproperlyConfigured as error:
+        assert True
+        assert str(error) == 'You must define a HELCIM_API_TOKEN setting'
+    else:
+        assert False
+
+@override_settings()
 def test_set_api_details_none():
     del settings.HELCIM_API_URL
     del settings.HELCIM_ACCOUNT_ID
