@@ -5,7 +5,9 @@ from unittest.mock import patch
 
 import requests
 
+from django.conf import settings
 from django.core import exceptions as django_exceptions
+from django.test import override_settings
 
 from helcim import exceptions as helcim_exceptions, gateway
 
@@ -146,47 +148,56 @@ def test_set_api_details_argument():
     assert 'terminal_id' in base.api
     assert base.api['terminal_id'] == '98765432'
 
-# @patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
-# @patch('helcim.gateway.settings.HELCIM_ACCOUNT_ID', '2', create=True)
-# @patch('helcim.gateway.settings.HELCIM_API_TOKEN', '3', create=True)
-# @patch('helcim.gateway.settings.HELCIM_TERMINAL_ID', '4', create=True)
-# def test_set_api_details_settings():
-#     base = gateway.BaseRequest()
+@override_settings(
+    HELCIM_API_URL='1',
+    HELCIM_ACCOUNT_ID='2',
+    HELCIM_API_TOKEN='3',
+    HELCIM_TERMINAL_ID='4'
+)
+def test_set_api_details_settings():
+    base = gateway.BaseRequest()
 
-#     assert 'url' in base.api
-#     assert base.api['url'] == '1'
-#     assert 'account_id' in base.api
-#     assert base.api['account_id'] == '2'
-#     assert 'token' in base.api
-#     assert base.api['token'] == '3'
-#     assert 'terminal_id' in base.api
-#     assert base.api['terminal_id'] == '4'
+    assert 'url' in base.api
+    assert base.api['url'] == '1'
+    assert 'account_id' in base.api
+    assert base.api['account_id'] == '2'
+    assert 'token' in base.api
+    assert base.api['token'] == '3'
+    assert 'terminal_id' in base.api
+    assert base.api['terminal_id'] == '4'
 
-# @patch('helcim.gateway.settings.HELCIM_API_URL', '1', create=True)
-# def test_set_api_details_argument_overrides_settings():
-#     base = gateway.BaseRequest(api_details=API_DETAILS)
+@override_settings(HELCIM_API_URL=1)
+def test_set_api_details_argument_overrides_settings():
+    base = gateway.BaseRequest(api_details=API_DETAILS)
 
-#     assert 'url' in base.api
-#     assert base.api['url'] == 'https://www.test.com'
+    assert 'url' in base.api
+    assert base.api['url'] == 'https://www.test.com'
 
-# @patch('helcim.gateway.settings.HELCIM_API_TOKEN', 'a', create=True)
-# def test_set_api_details_no_account_id():
-#     try:
-#         gateway.BaseRequest()
-#     except django_exceptions.ImproperlyConfigured as error:
-#         assert True
-#         assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
-#     else:
-#         assert False
+@override_settings()
+def test_set_api_details_no_account_id():
+    del settings.HELCIM_ACCOUNT_ID
 
-# @patch('helcim.gateway.settings', None)
-# def test_set_api_details_none():
-#     try:
-#         gateway.BaseRequest()
-#     except django_exceptions.ImproperlyConfigured:
-#         assert True
-#     else:
-#         assert False
+    try:
+        gateway.BaseRequest()
+    except django_exceptions.ImproperlyConfigured as error:
+        assert True
+        assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
+    else:
+        assert False
+
+@override_settings()
+def test_set_api_details_none():
+    del settings.HELCIM_API_URL
+    del settings.HELCIM_ACCOUNT_ID
+    del settings.HELCIM_API_TOKEN
+    del settings.HELCIM_TERMINAL_ID
+
+    try:
+        gateway.BaseRequest()
+    except django_exceptions.ImproperlyConfigured:
+        assert True
+    else:
+        assert False
 
 def test_configure_test_transaction_in_data():
     base = gateway.BaseRequest(api_details=API_DETAILS)
@@ -197,7 +208,7 @@ def test_configure_test_transaction_in_data():
     assert 'test' in base.cleaned
     assert base.cleaned['test'] is True
 
-@patch('helcim.gateway.settings.HELCIM_API_TEST', False, create=True)
+@override_settings(HELCIM_API_TEST=False)
 def test_configure_test_transaction_data_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
     base.cleaned = {'test': True}
@@ -206,7 +217,7 @@ def test_configure_test_transaction_data_overrides_settings():
 
     assert base.cleaned['test'] is True
 
-@patch('helcim.gateway.settings.HELCIM_API_TEST', True, create=True)
+@override_settings(HELCIM_API_TEST=True)
 def test_configure_test_transaction_setting():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
@@ -214,15 +225,16 @@ def test_configure_test_transaction_setting():
 
     assert base.cleaned['test'] is True
 
-@patch('helcim.gateway.settings', None)
+@override_settings()
 def test_configure_test_transaction_not_set():
+    del settings.HELCIM_API_TEST
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
     base.configure_test_transaction()
 
     assert 'test' not in base.cleaned
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_ALL', True, create=True)
+@override_settings(HELCIM_REDACT_ALL=True)
 def test_identify_redact_fields_redact_all():
     base = gateway.BaseRequest()
 
@@ -234,7 +246,7 @@ def test_identify_redact_fields_redact_all():
     assert fields['type'] is True
     assert fields['token'] is True
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+@override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_identify_redact_fields_redact_name():
     base = gateway.BaseRequest()
 
@@ -246,7 +258,7 @@ def test_identify_redact_fields_redact_name():
     assert fields['type'] is False
     assert fields['token'] is False
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NUMBER', True, create=True)
+@override_settings(HELCIM_REDACT_CC_NUMBER=True)
 def test_identify_redact_fields_redact_number():
     base = gateway.BaseRequest()
 
@@ -258,7 +270,7 @@ def test_identify_redact_fields_redact_number():
     assert fields['type'] is False
     assert fields['token'] is False
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_EXPIRY', True, create=True)
+@override_settings(HELCIM_REDACT_CC_EXPIRY=True)
 def test_identify_redact_fields_redact_expiry():
     base = gateway.BaseRequest()
 
@@ -270,7 +282,7 @@ def test_identify_redact_fields_redact_expiry():
     assert fields['type'] is False
     assert fields['token'] is False
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_TYPE', True, create=True)
+@override_settings(HELCIM_REDACT_CC_TYPE=True)
 def test_identify_redact_fields_redact_type():
     base = gateway.BaseRequest()
 
@@ -282,7 +294,7 @@ def test_identify_redact_fields_redact_type():
     assert fields['type'] is True
     assert fields['token'] is False
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_TOKEN', True, create=True)
+@override_settings(HELCIM_REDACT_TOKEN=True)
 def test_identify_redact_fields_redact_token():
     base = gateway.BaseRequest()
 
@@ -294,8 +306,7 @@ def test_identify_redact_fields_redact_token():
     assert fields['type'] is False
     assert fields['token'] is True
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_ALL', True, create=True)
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', False, create=True)
+@override_settings(HELCIM_REDACT_ALL=True, HELCIM_REDACT_CC_NAME=False)
 def test_identify_redact_fields_redact_all_with_individual():
     base = gateway.BaseRequest()
 
@@ -356,7 +367,7 @@ def test_redact_field():
     )
     assert base.redacted_response['cc_name'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+@override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_redact_data_cc_name():
     base = gateway.BaseRequest()
     base.response = {
@@ -372,7 +383,7 @@ def test_redact_data_cc_name():
     )
     assert base.redacted_response['cc_name'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NUMBER', True, create=True)
+@override_settings(HELCIM_REDACT_CC_NUMBER=True)
 def test_redact_data_cc_number():
     base = gateway.BaseRequest()
     base.response = {
@@ -388,7 +399,7 @@ def test_redact_data_cc_number():
     )
     assert base.redacted_response['cc_number'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_EXPIRY', True, create=True)
+@override_settings(HELCIM_REDACT_CC_EXPIRY=True)
 def test_redact_data_cc_expiry():
     base = gateway.BaseRequest()
     base.response = {
@@ -404,7 +415,7 @@ def test_redact_data_cc_expiry():
     )
     assert base.redacted_response['cc_expiry'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_TYPE', True, create=True)
+@override_settings(HELCIM_REDACT_CC_TYPE=True)
 def test_redact_data_cc_type():
     base = gateway.BaseRequest()
     base.response = {
@@ -420,7 +431,7 @@ def test_redact_data_cc_type():
     )
     assert base.redacted_response['cc_type'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_TOKEN', True, create=True)
+@override_settings(HELCIM_REDACT_TOKEN=True)
 def test_redact_data_token():
     base = gateway.BaseRequest()
     base.response = {
@@ -436,7 +447,7 @@ def test_redact_data_token():
     )
     assert base.redacted_response['token'] is None
 
-@patch('helcim.gateway.settings.HELCIM_REDACT_CC_NAME', True, create=True)
+@override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_redact_data_partial():
     base = gateway.BaseRequest()
     base.response = {
