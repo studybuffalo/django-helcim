@@ -364,6 +364,13 @@ def test_redact_api_data_all_fields():
         'accountId=REDACTED&apiToken=REDACTED&terminalId=REDACTED'
     )
 
+def test_redact_api_data_no_raw_request():
+    base = gateway.BaseRequest()
+    base.redacted_response = {}
+    base._redact_api_data()
+
+    assert base.redacted_response['raw_request'] is None
+
 def test_redact_field():
     base = gateway.BaseRequest()
     base.redacted_response = {

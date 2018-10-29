@@ -164,21 +164,24 @@ class BaseRequest():
 
     def _redact_api_data(self):
         """Redacts API data and updates redacted_response attribute."""
-        self.redacted_response['raw_request'] = re.sub(
-            r'(accountId=.+?)(&|$)',
-            r'accountId=REDACTED\g<2>',
-            self.redacted_response['raw_request']
-        )
-        self.redacted_response['raw_request'] = re.sub(
-            r'(apiToken=.+?)(&|$)',
-            r'apiToken=REDACTED\g<2>',
-            self.redacted_response['raw_request']
-        )
-        self.redacted_response['raw_request'] = re.sub(
-            r'(terminalId=.+?)(&|$)',
-            r'terminalId=REDACTED\g<2>',
-            self.redacted_response['raw_request']
-        )
+        if 'raw_request' in self.redacted_response:
+            self.redacted_response['raw_request'] = re.sub(
+                r'(accountId=.+?)(&|$)',
+                r'accountId=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+            self.redacted_response['raw_request'] = re.sub(
+                r'(apiToken=.+?)(&|$)',
+                r'apiToken=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+            self.redacted_response['raw_request'] = re.sub(
+                r'(terminalId=.+?)(&|$)',
+                r'terminalId=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+        else:
+            self.redacted_response['raw_request'] = None
 
     def _redact_field(self, api_name, python_name):
         """Redacts all information for the provided field.
