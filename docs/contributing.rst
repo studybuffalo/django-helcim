@@ -66,11 +66,10 @@ possible, try to test the smallest component possible.
 
 .. _pytest-django: https://pytest-django.readthedocs.io/en/latest/
 
-Testing base components
-=======================
+Running Tests
+=============
 
-The majority of the django-oscar-helcim can be tested through the
-standard pytest command::
+You can run all tests with the standard pytest command::
 
     $ pipenv run py.test
 
@@ -80,15 +79,6 @@ To check test coverage, you can use the following::
 
 You may specify the output of the coverage report by changing the
 ``--cov-report`` option to ``html`` or ``xml``.
-
-Testing Django components
-=========================
-
-There are additional tests for the Django-specific components. To run
-these tests without setting up a full Django project, you can use the
-following helper script::
-
-    $ pipenv run python tests/django/run.py
 
 Testing with tox
 ================
