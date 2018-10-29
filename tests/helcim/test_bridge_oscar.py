@@ -8,28 +8,28 @@ from oscar.apps.payment import exceptions as oscar_exceptions
 from helcim import bridge_oscar, exceptions as helcim_exceptions
 
 
-class MockPurchaseProcessValid():
+class MockProcessValid():
     def process(self):
         return True
 
     def __init__(self, *args, **kwargs):
         pass
 
-class MockPurchaseProcessHelcimError():
+class MockProcessHelcimError():
     def process(self):
         raise helcim_exceptions.HelcimError
 
     def __init__(self, *args, **kwargs):
         pass
 
-class MockPurchaseProcessProcessingError():
+class MockProcessProcessingError():
     def process(self):
         raise helcim_exceptions.ProcessingError
 
     def __init__(self, *args, **kwargs):
         pass
 
-class MockPurchaseProcessPaymentError():
+class MockProcessPaymentError():
     def process(self):
         raise helcim_exceptions.PaymentError
 
@@ -42,65 +42,6 @@ class MockCreditCard():
         self.number = number
         self.expiry_date = expiry
         self.ccv = ccv
-
-@patch(
-    'helcim.bridge_oscar.gateway.Purchase', MockPurchaseProcessValid
-)
-def test_purchase_valid():
-    try:
-        purchase = bridge_oscar.PurchaseBridge(
-            '1', '2', MockCreditCard(), {'first_name': '3'}
-        )
-        purchase.process()
-    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
-        assert False
-    else:
-        assert True
-
-@patch(
-    'helcim.bridge_oscar.gateway.Purchase',
-    MockPurchaseProcessHelcimError
-)
-def test_purchase_helcim_error():
-    try:
-        purchase = bridge_oscar.PurchaseBridge(
-            '1', '2', MockCreditCard()
-        )
-        purchase.process()
-    except oscar_exceptions.GatewayError:
-        assert True
-    else:
-        assert False
-
-@patch(
-    'helcim.bridge_oscar.gateway.Purchase',
-    MockPurchaseProcessProcessingError
-)
-def test_purchase_processing_error():
-    try:
-        purchase = bridge_oscar.PurchaseBridge(
-            '1', '2', MockCreditCard()
-        )
-        purchase.process()
-    except oscar_exceptions.GatewayError:
-        assert True
-    else:
-        assert False
-
-@patch(
-    'helcim.bridge_oscar.gateway.Purchase',
-    MockPurchaseProcessPaymentError
-)
-def test_purchase_payment_error():
-    try:
-        purchase = bridge_oscar.PurchaseBridge(
-            '1', '2', MockCreditCard()
-        )
-        purchase.process()
-    except oscar_exceptions.PaymentError:
-        assert True
-    else:
-        assert False
 
 def test_remap_oscar_billing_address_patial():
     address = {
@@ -189,3 +130,293 @@ def test_remap_oscar_credit_card_full():
     assert remapped['cc_number'] == '1234'
     assert remapped['cc_expiry'] == '0118'
     assert remapped['cc_cvv'] == 100
+
+def test_base_card_bridge_formats_details():
+    transaction = bridge_oscar.BaseCardTransactionBridge(
+        '1', '2', MockCreditCard(), {'first_name': '3'}
+    )
+
+    assert 'order_number' in transaction.transaction_details
+    assert transaction.transaction_details['order_number'] == '1'
+    assert 'amount' in transaction.transaction_details
+    assert transaction.transaction_details['amount'] == '2'
+    assert 'cc_name' in transaction.transaction_details
+    assert 'cc_number' in transaction.transaction_details
+    assert 'cc_expiry' in transaction.transaction_details
+    assert 'cc_cvv' in transaction.transaction_details
+    assert 'billing_contact_name' in transaction.transaction_details
+    assert transaction.transaction_details['billing_contact_name'] == '3'
+    assert 'billing_street_1' in transaction.transaction_details
+    assert 'billing_street_2' in transaction.transaction_details
+    assert 'billing_city' in transaction.transaction_details
+    assert 'billing_province' in transaction.transaction_details
+    assert 'billing_postal_code' in transaction.transaction_details
+    assert 'billing_country' in transaction.transaction_details
+    assert 'billing_phone' in transaction.transaction_details
+
+def test_base_card_bridge_formats_details_without_billing_address():
+    transaction = bridge_oscar.BaseCardTransactionBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    assert len(transaction.transaction_details) == 6
+    assert 'order_number' in transaction.transaction_details
+    assert transaction.transaction_details['order_number'] == '1'
+    assert 'amount' in transaction.transaction_details
+    assert transaction.transaction_details['amount'] == '2'
+    assert 'cc_name' in transaction.transaction_details
+    assert 'cc_number' in transaction.transaction_details
+    assert 'cc_expiry' in transaction.transaction_details
+    assert 'cc_cvv' in transaction.transaction_details
+
+@patch('helcim.bridge_oscar.gateway.Purchase', MockProcessValid)
+def test_purchase_bridge_valid():
+    purchase = bridge_oscar.PurchaseBridge(
+        '1', '2', MockCreditCard(), {'first_name': '3'}
+    )
+
+    try:
+        purchase.process()
+    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
+        assert False
+    else:
+        assert True
+
+@patch('helcim.bridge_oscar.gateway.Purchase', MockProcessHelcimError)
+def test_purchase_bridge_helcim_error():
+    purchase = bridge_oscar.PurchaseBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        purchase.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Purchase', MockProcessProcessingError)
+def test_purchase_bridge_processing_error():
+    purchase = bridge_oscar.PurchaseBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        purchase.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Purchase', MockProcessPaymentError)
+def test_purchase_bridge_payment_error():
+    purchase = bridge_oscar.PurchaseBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        purchase.process()
+    except oscar_exceptions.PaymentError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessValid)
+def test_preauthorize_bridge_valid():
+    preauth = bridge_oscar.PreauthorizeBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        preauth.process()
+    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
+        assert False
+    else:
+        assert True
+
+@patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessHelcimError)
+def test_preauthorize_bridge_helcim_error():
+    preauth = bridge_oscar.PreauthorizeBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        preauth.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessProcessingError)
+def test_preauthorize_bridge_processing_error():
+    preauth = bridge_oscar.PreauthorizeBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        preauth.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessPaymentError)
+def test_preauthorize_bridge_payment_error():
+    preauth = bridge_oscar.PreauthorizeBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        preauth.process()
+    except oscar_exceptions.PaymentError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Refund', MockProcessValid)
+def test_refund_bridge_valid():
+    refund = bridge_oscar.RefundBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        refund.process()
+    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
+        assert False
+    else:
+        assert True
+
+@patch('helcim.bridge_oscar.gateway.Refund', MockProcessHelcimError)
+def test_refund_bridge_helcim_error():
+    refund = bridge_oscar.RefundBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        refund.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Refund', MockProcessProcessingError)
+def test_refund_bridge_processing_error():
+    refund = bridge_oscar.RefundBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        refund.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Refund', MockProcessPaymentError)
+def test_refund_bridge_payment_error():
+    refund = bridge_oscar.RefundBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        refund.process()
+    except oscar_exceptions.PaymentError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Verification', MockProcessValid)
+def test_verification_bridge_valid():
+    verification = bridge_oscar.VerificationBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        verification.process()
+    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
+        assert False
+    else:
+        assert True
+
+@patch('helcim.bridge_oscar.gateway.Verification', MockProcessHelcimError)
+def test_verification_bridge_helcim_error():
+    verification = bridge_oscar.VerificationBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        verification.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Verification', MockProcessProcessingError)
+def test_verification_bridge_processing_error():
+    verification = bridge_oscar.VerificationBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        verification.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Verification', MockProcessPaymentError)
+def test_verification_bridge_payment_error():
+    verification = bridge_oscar.VerificationBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    try:
+        verification.process()
+    except oscar_exceptions.PaymentError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Capture', MockProcessValid)
+def test_capture_bridge_valid():
+    capture = bridge_oscar.CaptureBridge(1)
+
+    try:
+        capture.process()
+    except (oscar_exceptions.GatewayError, oscar_exceptions.PaymentError):
+        assert False
+    else:
+        assert True
+
+@patch('helcim.bridge_oscar.gateway.Capture', MockProcessHelcimError)
+def test_capture_bridge_helcim_error():
+    capture = bridge_oscar.CaptureBridge(1)
+
+    try:
+        capture.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Capture', MockProcessProcessingError)
+def test_capture_bridge_processing_error():
+    capture = bridge_oscar.CaptureBridge(1)
+
+    try:
+        capture.process()
+    except oscar_exceptions.GatewayError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.bridge_oscar.gateway.Capture', MockProcessPaymentError)
+def test_capture_bridge_payment_error():
+    capture = bridge_oscar.CaptureBridge(1)
+
+    try:
+        capture.process()
+    except oscar_exceptions.PaymentError:
+        assert True
+    else:
+        assert False
