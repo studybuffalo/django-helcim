@@ -1,6 +1,6 @@
 [run]
 data_file = reports/coverage_report
-omit = helcim/migrations/*,tests/*,helcim/urls.py
+omit = helcim/migrations/*,tests/*,helcim/urls.py,helcim/admin.py
 
 [html]
 directory = reports/htmlcov
