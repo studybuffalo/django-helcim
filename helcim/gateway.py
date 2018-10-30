@@ -490,8 +490,14 @@ class BaseRequest():
             saved_model = models.HelcimTransaction.objects.create(
                 **model_dictionary
             )
-        except IntegrityError:
-            raise helcim_exceptions.DjangoError
+        except IntegrityError as error:
+            raise helcim_exceptions.DjangoError(
+                'Unable to save transaction record: {}'.format(error)
+            )
+        except ValueError as error:
+            raise helcim_exceptions.DjangoError(
+                'Unable to save transaction record: {}'.format(error)
+            )
 
         return saved_model
 

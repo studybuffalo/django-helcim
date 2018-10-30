@@ -55,7 +55,7 @@ class HelcimTransaction(models.Model):
     transaction_type = models.CharField(
         choices=transaction_types,
         help_text='The type of transaction',
-        max_length=1
+        max_length=1,
     )
     transaction_id = models.PositiveIntegerField(
         blank=True,
