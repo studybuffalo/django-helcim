@@ -6,15 +6,7 @@ from helcim import models
 @admin.register(models.HelcimTransaction)
 class HelcimTransactionAdmin(admin.ModelAdmin):
     """Admin class for the HelcimTransaction model."""
-    list_display = [
-        'transaction_type',
-        'date_response',
-        'transaction_success',
-        'amount',
-        'customer_code',
-    ]
-
-    readonly_fields = [
+    MODEL_FIELDS = [
         'raw_request',
         'raw_response',
         'transaction_success',
@@ -35,5 +27,17 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'cvv_response',
         'approval_code',
         'order_number',
+        'customer_code',
+    ]
+
+    fields = MODEL_FIELDS
+
+    readonly_fields = MODEL_FIELDS
+
+    list_display = [
+        'transaction_type',
+        'date_response',
+        'transaction_success',
+        'amount',
         'customer_code',
     ]
