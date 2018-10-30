@@ -1,10 +1,11 @@
 """Bridging module between Django Oscar and gateway module."""
-from __future__ import unicode_literals
+import logging
 
 from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
 
+LOG = logging.getLogger(__name__)
 
 def remap_oscar_billing_address(address):
     """Remaps Oscar billing address dictionary to Helcim dictionary.
@@ -104,6 +105,11 @@ class PurchaseBridge(BaseCardTransactionBridge):
             raise oscar_exceptions.GatewayError(str(error))
         except helcim_exceptions.PaymentError as error:
             raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.DjangoError:
+            LOG.exception(
+                'Purchase complete, but errors occured while saving '
+                'transaction to database'
+            )
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
 
@@ -127,6 +133,11 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
             raise oscar_exceptions.GatewayError(str(error))
         except helcim_exceptions.PaymentError as error:
             raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.DjangoError:
+            LOG.exception(
+                'Preauthorization complete, but errors occured while saving '
+                'transaction to database'
+            )
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
 
@@ -150,6 +161,11 @@ class RefundBridge(BaseCardTransactionBridge):
             raise oscar_exceptions.GatewayError(str(error))
         except helcim_exceptions.PaymentError as error:
             raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.DjangoError:
+            LOG.exception(
+                'Refund complete, but errors occured while saving '
+                'transaction to database'
+            )
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
 
@@ -175,6 +191,11 @@ class VerificationBridge(BaseCardTransactionBridge):
             raise oscar_exceptions.GatewayError(str(error))
         except helcim_exceptions.PaymentError as error:
             raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.DjangoError:
+            LOG.exception(
+                'Verification complete, but errors occured while saving '
+                'transaction to database'
+            )
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
 
@@ -212,5 +233,11 @@ class CaptureBridge():
             raise oscar_exceptions.GatewayError(str(error))
         except helcim_exceptions.PaymentError as error:
             raise oscar_exceptions.PaymentError(str(error))
+        except helcim_exceptions.DjangoError:
+            LOG.exception(
+                'Capture complete, but errors occured while saving '
+                'transaction to database'
+            )
+            return None
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))

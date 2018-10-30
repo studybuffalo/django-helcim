@@ -36,6 +36,13 @@ class MockProcessPaymentError():
     def __init__(self, *args, **kwargs):
         pass
 
+class MockProcessDjangoError():
+    def process(self):
+        raise helcim_exceptions.DjangoError
+
+    def __init__(self, *args, **kwargs):
+        pass
+
 class MockCreditCard():
     def __init__(self, name=None, number=None, expiry=None, ccv=None):
         self.name = name
@@ -221,6 +228,16 @@ def test_purchase_bridge_payment_error():
     else:
         assert False
 
+@patch('helcim.bridge_oscar.gateway.Purchase', MockProcessDjangoError)
+def test_purchase_bridge_django_error():
+    purchase = bridge_oscar.PurchaseBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    purchase_instance = purchase.process()
+
+    assert purchase_instance is None
+
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessValid)
 def test_preauthorize_bridge_valid():
     preauth = bridge_oscar.PreauthorizeBridge(
@@ -272,6 +289,16 @@ def test_preauthorize_bridge_payment_error():
         assert True
     else:
         assert False
+
+@patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessDjangoError)
+def test_preauthorize_bridge_django_error():
+    preauthorize = bridge_oscar.PreauthorizeBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    preauthorize_instance = preauthorize.process()
+
+    assert preauthorize_instance is None
 
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessValid)
 def test_refund_bridge_valid():
@@ -325,6 +352,16 @@ def test_refund_bridge_payment_error():
     else:
         assert False
 
+@patch('helcim.bridge_oscar.gateway.Refund', MockProcessDjangoError)
+def test_refund_bridge_django_error():
+    refund = bridge_oscar.RefundBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    refund_instance = refund.process()
+
+    assert refund_instance is None
+
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessValid)
 def test_verification_bridge_valid():
     verification = bridge_oscar.VerificationBridge(
@@ -377,6 +414,16 @@ def test_verification_bridge_payment_error():
     else:
         assert False
 
+@patch('helcim.bridge_oscar.gateway.Verification', MockProcessDjangoError)
+def test_verification_bridge_django_error():
+    verification = bridge_oscar.VerificationBridge(
+        '1', '2', MockCreditCard()
+    )
+
+    verification_instance = verification.process()
+
+    assert verification_instance is None
+
 @patch('helcim.bridge_oscar.gateway.Capture', MockProcessValid)
 def test_capture_bridge_valid():
     capture = bridge_oscar.CaptureBridge(1)
@@ -420,3 +467,11 @@ def test_capture_bridge_payment_error():
         assert True
     else:
         assert False
+
+@patch('helcim.bridge_oscar.gateway.Capture', MockProcessDjangoError)
+def test_capture_bridge_django_error():
+    capture = bridge_oscar.CaptureBridge(1)
+
+    capture_instance = capture.process()
+
+    assert capture_instance is None
