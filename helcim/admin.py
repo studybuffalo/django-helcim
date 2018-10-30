@@ -1,9 +1,9 @@
 """Admin settings for Helcim Commerce API transactions."""
+from django.conf import settings
 from django.contrib import admin
 
-from helcim import models
+from helcim.models import HelcimTransaction
 
-@admin.register(models.HelcimTransaction)
 class HelcimTransactionAdmin(admin.ModelAdmin):
     """Admin class for the HelcimTransaction model."""
     MODEL_FIELDS = [
@@ -41,3 +41,7 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'amount',
         'customer_code',
     ]
+
+# Only register the model if included in the settings
+if hasattr(settings, 'HELCIM_INCLUDE_ADMIN') and settings.HELCIM_INCLUDE_ADMIN:
+    admin.site.register(HelcimTransaction, HelcimTransactionAdmin)
