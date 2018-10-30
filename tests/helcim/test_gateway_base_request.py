@@ -7,6 +7,7 @@ import requests
 
 from django.conf import settings
 from django.core import exceptions as django_exceptions
+from django.db import IntegrityError
 from django.test import override_settings
 
 from helcim import exceptions as helcim_exceptions, gateway
@@ -73,6 +74,9 @@ class MockPostAPIErrorResponse():
 class MockDjangoModel():
     def __init__(self, **kwargs):
         self.data = kwargs
+
+def mock_integrity_error(**kwargs):
+    raise IntegrityError
 
 API_DETAILS = {
     'url': 'https://www.test.com',
@@ -508,6 +512,21 @@ def test_save_transaction():
     model_instance = base.save_transaction('s')
 
     assert isinstance(model_instance, MockDjangoModel)
+
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    mock_integrity_error
+)
+def test_save_transaction_integrity_error():
+    base = gateway.BaseRequest()
+    base.response = {}
+
+    try:
+        base.save_transaction('s')
+    except helcim_exceptions.DjangoError:
+        assert True
+    else:
+        assert False
 
 def test_convert_expiry_to_date():
     base = gateway.BaseRequest()

@@ -19,3 +19,7 @@ class RefundError(HelcimError):
 class VerificationError(HelcimError):
     """Exception to handle errors during credit care verification."""
     pass
+
+class DjangoError(HelcimError):
+    """Exception for issues relating to Django interface."""
+    pass

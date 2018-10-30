@@ -13,6 +13,7 @@ import xmltodict
 
 from django.conf import settings
 from django.core import exceptions as django_exceptions
+from django.db import IntegrityError
 
 from helcim import conversions, exceptions as helcim_exceptions, models
 
@@ -476,14 +477,21 @@ class BaseRequest():
 
             Returns:
                 obj: A Django model instance of the saved data.
+
+            Raises:
+                DjangoError: Issue when attempting to save transaction
+                    to database.
         """
         self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
 
-        saved_model = models.HelcimTransaction.objects.create(
-            **model_dictionary
-        )
+        try:
+            saved_model = models.HelcimTransaction.objects.create(
+                **model_dictionary
+            )
+        except IntegrityError:
+            raise helcim_exceptions.DjangoError
 
         return saved_model
 
