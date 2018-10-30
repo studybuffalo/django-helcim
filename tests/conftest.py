@@ -14,6 +14,9 @@ def pytest_configure():
             }
         },
         'INSTALLED_APPS': {
+            'django.contrib.admin',
+            'django.contrib.auth',
+            'django.contrib.contenttypes',
             'helcim',
         },
         'HELCIM_ACCOUNT_ID': '1234567890',
