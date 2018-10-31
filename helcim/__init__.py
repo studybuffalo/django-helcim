@@ -1,3 +1,4 @@
+# pylint: disable=missing-docstring, invalid-name
 # Versioning details
 VERSION = '0.1.0'
 
