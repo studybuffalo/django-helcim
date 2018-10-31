@@ -1,0 +1,41 @@
+{% load currency_filters %}
+{% load i18n %}
+
+<h1>Helcim Commerce API Transactions</h1>
+
+{% if transactions %}
+  <table>
+    <thead>
+      <tr>
+        <th>{% trans "Transaction date" %}</th>
+        <th>{% trans "Transaction type" %}</th>
+        <th>{% trans "Transaction success" %}</th>
+        <th>{% trans "Helcim transaction ID" %}</th>
+        <th>{% trans "Amount" %}</th>
+        <th>{% trans "Order number" %}</th>
+        <th>{% trans "Customer code" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for transaction in transactions %}
+        <tr>
+          <td>{{ transaction.date_response }}</td>
+          <td>{{ transaction.transaction_type }}</td>
+          <td>{{ transaction.transaction_success }}</td>
+          <td>{{ transaction.transaction_id }}</td>
+          <td>{{ transaction.amount|currency|default:"-" }}</td>
+          <td>{{ transaction.order_number }}</td>
+          <td>{{ transaction.customer_code }}</td>
+          <td>
+            <a href="{% url 'helcim:transaction_detail' transaction.id %}">
+              {% trans "View" %}
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>{% trans "No transactions have been made yet." %}</p>
+{% endif %}

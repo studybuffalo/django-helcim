@@ -1,0 +1,13 @@
+{% load currency_filters %}
+{% load i18n %}
+
+<h1>Helcim Commerce API Transaction Detail</h1>
+
+<table>
+  <tbody>
+    <tr>
+      <th>{% trans "Helcim transaction ID" %}</th>
+      <td>{{ transaction.transaction_id }}</td>
+    </tr>
+  </tbody>
+</table>
