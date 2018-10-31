@@ -16,7 +16,7 @@ urlpatterns = [
     # NB: not officially supported with django-oscar; included for
     # debugging purposes only
     path('admin/', admin.site.urls),
-    # django-oscar-helcim URLs
+    # django-helcim URLs
     path('checkout/helcim/', include('helcim.urls')),
     # django-oscar URLs
     path('', application.urls),

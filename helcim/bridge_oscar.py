@@ -16,7 +16,7 @@ def remap_oscar_billing_address(address):
 
         Returns:
             dict: Billing address details formatted for
-                django-oscar-helcim.
+                django-helcim.
     """
     if address.get('first_name') and address.get('last_name'):
         contact_name = '{} {}'.format(
@@ -47,7 +47,7 @@ def remap_oscar_credit_card(card):
             card (obj): A credit card object provided by Django Oscar.
 
         Returns:
-            dict: Credit card details formatted for django-oscar-helcim.
+            dict: Credit card details formatted for django-helcim.
     """
     if card.expiry_date:
         cc_expiry = card.expiry_date.strftime('%m%y')

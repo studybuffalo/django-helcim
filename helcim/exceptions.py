@@ -1,4 +1,4 @@
-"""Custom exceptions for package, Helcim API, and django-oscar"""
+"""Custom exceptions for django-helcim."""
 
 class HelcimError(Exception):
     """Base exception for all package exceptions."""

@@ -1,4 +1,4 @@
-"""Models for the django-oscar-helcim application."""
+"""Models for the django-helcim application."""
 from uuid import uuid4
 
 from django.db import models

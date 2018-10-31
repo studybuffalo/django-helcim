@@ -1,7 +1,7 @@
 """Interface functions with the Helcim Commerce API.
 
 These functions provide an agonstic interface with the Helcim Commerce
-API and should work in any application (i.e. not just django-oscar).
+API and should work in any application.
 """
 from calendar import monthrange
 from datetime import datetime

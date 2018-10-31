@@ -1,4 +1,4 @@
-"""Setup script for the django-oscar-helcim package."""
+"""Setup script for the django-helcim package."""
 
 from setuptools import find_packages, setup
 
@@ -6,12 +6,12 @@ from helcim import VERSION
 
 
 setup(
-    name='django-oscar-helcim',
+    name='django-helcim',
     version=VERSION,
-    url='https://github.com/django-oscar/django-oscar-paypal',
-    description=('Payment integration with Helcim for django-oscar.'),
+    url='https://github.com/studybuffalo/django-helcim.',
+    description=('A Django-based integration with the Helcim Commerce API '),
     long_description=open('README.rst').read(),
-    keywords='Django, Oscar, Helcim, Payment',
+    keywords='Django, Helcim, Oscar, Payment',
     license=open('LICENSE').read(),
     platforms=['linux', 'windows'],
     packages=['helcim'],

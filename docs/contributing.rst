@@ -111,7 +111,7 @@ environment (see above) to proceed.
     environment with django-helcim installed. See `Getting started`_ if
     you need additional instructions.
 
-    .. _Getting started: https://django-helcim.readthedocs.io/en/latest/installation.html#install-django-oscar-helcim-and-its-dependencies
+    .. _Getting started: https://django-helcim.readthedocs.io/en/latest/installation.html#install-django-helcim-and-its-dependencies
 
 Deploying the site
 ==================
