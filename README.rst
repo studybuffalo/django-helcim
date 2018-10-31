@@ -31,6 +31,8 @@ optional module to connect with `Django Oscar`_.
 
 .. _Django: https://www.djangoproject.com/
 
+.. _Helcim Commerce API: https://www.helcim.com/support/article/625-helcim-commerce-api-api-overview/
+
 .. _Django Oscar: https://github.com/django-oscar/django-oscar
 
 ---------------
