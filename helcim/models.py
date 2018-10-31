@@ -144,9 +144,6 @@ class HelcimTransaction(models.Model):
             self.transaction_type,
         ]
 
-        if self.amount:
-            string_parts.append(self.amount)
-
         return ' - '.join(string_parts)
 
     @property
@@ -162,5 +159,5 @@ class HelcimTransaction(models.Model):
         return all([
             self.transaction_success,
             (self.transaction_type == 's' or self.transaction_type == 'c'),
-            self.amount > 0,
+            (self.amount if self.amount else 0) > 0,
         ])
