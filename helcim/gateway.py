@@ -121,44 +121,26 @@ class BaseRequest():
             'token': False,
         }
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_ALL')
-                and settings.HELCIM_REDACT_ALL
-        ):
+        if getattr(settings, 'HELCIM_REDACT_ALL', False):
             fields['name'] = True
             fields['number'] = True
             fields['expiry'] = True
             fields['type'] = True
             fields['token'] = True
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_CC_NAME')
-                and settings.HELCIM_REDACT_CC_NAME
-        ):
+        if getattr(settings, 'HELCIM_REDACT_CC_NAME', False):
             fields['name'] = True
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_CC_NUMBER')
-                and settings.HELCIM_REDACT_CC_NUMBER
-        ):
+        if getattr(settings, 'HELCIM_REDACT_CC_NUMBER', False):
             fields['number'] = True
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_CC_EXPIRY')
-                and settings.HELCIM_REDACT_CC_EXPIRY
-        ):
+        if getattr(settings, 'HELCIM_REDACT_CC_EXPIRY', False):
             fields['expiry'] = True
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_CC_TYPE')
-                and settings.HELCIM_REDACT_CC_TYPE
-        ):
+        if getattr(settings, 'HELCIM_REDACT_CC_TYPE', False):
             fields['type'] = True
 
-        if (
-                hasattr(settings, 'HELCIM_REDACT_TOKEN')
-                and settings.HELCIM_REDACT_TOKEN
-        ):
+        if getattr(settings, 'HELCIM_REDACT_TOKEN', False):
             fields['token'] = True
 
         return fields
@@ -243,10 +225,9 @@ class BaseRequest():
 
         # Checks for URL in settings; if not found uses default
         if api_details['url'] is None:
-            if hasattr(settings, 'HELCIM_API_URL'):
-                api_details['url'] = settings.HELCIM_API_URL
-            else:
-                api_details['url'] = 'https://secure.myhelcim.com/api/'
+            api_details['url'] = getattr(
+                settings, 'HELCIM_API_URL', 'https://secure.myhelcim.com/api/'
+            )
 
         # Checks for account ID in settings; raises error if not found
         if api_details['account_id'] is None:
@@ -268,8 +249,9 @@ class BaseRequest():
 
         # Check for terminal ID (optional)
         if api_details['terminal_id'] is None:
-            if hasattr(settings, 'HELCIM_TERMINAL_ID'):
-                api_details['terminal_id'] = settings.HELCIM_TERMINAL_ID
+            api_details['terminal_id'] = getattr(
+                settings, 'HELCIM_TERMINAL_ID', None
+            )
 
         return api_details
 

@@ -43,5 +43,5 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
     ]
 
 # Only register the model if included in the settings
-if hasattr(settings, 'HELCIM_INCLUDE_ADMIN') and settings.HELCIM_INCLUDE_ADMIN:
+if getattr(settings, 'HELCIM_INCLUDE_ADMIN', False):
     admin.site.register(HelcimTransaction, HelcimTransactionAdmin)
