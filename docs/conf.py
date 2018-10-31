@@ -21,7 +21,7 @@ sys.path.insert(0, os.path.abspath('../'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'django-oscar-helcim'
+project = 'django-helcim'
 copyright = '2018, Joshua Robert Torrance'
 author = 'Joshua Robert Torrance'
 
@@ -105,7 +105,7 @@ html_static_path = []
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'django-oscar-helcimdoc'
+htmlhelp_basename = 'django-helcimdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -134,8 +134,8 @@ latex_elements = {
 latex_documents = [
     (
         master_doc,
-        'django-oscar-helcim.tex',
-        'django-oscar-helcim Documentation',
+        'django-helcim.tex',
+        'django-helcim Documentation',
         'Joshua Robert Torrance',
         'manual'
     ),
@@ -147,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'django-oscar-helcim', 'django-oscar-helcim Documentation',
+    (master_doc, 'django-helcim', 'django-helcim Documentation',
      [author], 1)
 ]
 
@@ -160,13 +160,13 @@ man_pages = [
 texinfo_documents = [
     (
         master_doc,
-        'django-oscar-helcim',
-        'django-oscar-helcim Documentation',
+        'django-helcim',
+        'django-helcim Documentation',
         author,
-        'django-oscar-helcim',
+        'django-helcim',
         (
-            'This package provides integration of the Helcim Payment API with'
-            'django-oscar.'
+            'This package provides a Django-based integration with the Helcim '
+            'Commerce API.'
         ),
         'Miscellaneous'
     ),

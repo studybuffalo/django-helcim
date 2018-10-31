@@ -1,33 +1,35 @@
 ===================
-django-oscar-helcim
+django-helcim
 ===================
 
 |GithubRelease|_ |BuildStatus|_ |Coverage|_ |License|_
 
-.. |GithubRelease| image:: https://img.shields.io/github/release/studybuffalo/django-oscar-helcim/all.svg
+.. |GithubRelease| image:: https://img.shields.io/github/release/studybuffalo/django-helcim/all.svg
    :alt: GitHub release version
 
-.. _GithubRelease: https://github.com/studybuffalo/django-oscar-helcim/releases
+.. _GithubRelease: https://github.com/studybuffalo/django-helcim/releases
 
-.. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-oscar-helcim/job/master.svg
+.. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-helcim/job/master.svg
    :alt: Jenkins build status
 
-.. _BuildStatus: https://ci.studybuffalo.com/blue/organizations/jenkins/django-oscar-helcim/
+.. _BuildStatus: https://ci.studybuffalo.com/blue/organizations/jenkins/django-helcim/
 
-.. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-oscar-helcim/job/master
+.. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-helcim/job/master
    :alt: Code coverage
 
-.. _Coverage: https://ci.studybuffalo.com/job/django-oscar-helcim/job/master/lastBuild/cobertura/
+.. _Coverage: https://ci.studybuffalo.com/job/django-helcim/job/master/lastBuild/cobertura/
 
-.. |License| image:: https://img.shields.io/github/license/studybuffalo/django-oscar-helcim.svg
+.. |License| image:: https://img.shields.io/github/license/studybuffalo/django-helcim.svg
    :alt: License
 
-.. _License: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
+.. _License: https://github.com/studybuffalo/django-helcim/blob/master/LICENSE
 
-This package provides integration of the Helcim Payment API with
-`Django Oscar`_. Django-oscar-helcim can also be easily extended for use used
-with other python-based commerce solutions, as all base modules are platform
-agnostic.
+This package provides a `Django`_-based integration with the
+`Helcim Commerce API`_. It is designed to be easily implemented
+with existing Django-based commerce platforms and comes with an
+optional module to connect with `Django Oscar`_.
+
+.. _Django: https://www.djangoproject.com/
 
 .. _Django Oscar: https://github.com/django-oscar/django-oscar
 
@@ -35,24 +37,26 @@ agnostic.
 Getting Started
 ---------------
 
-Instructions on installing and configuration can be found on `Read The Docs`_.
+Instructions on installing and configuration can be found on
+`Read The Docs`_.
 
-.. _Read The Docs: https://django-oscar-helcim.readthedocs.io/en/latest/
+.. _Read The Docs: https://django-helcim.readthedocs.io/en/latest/
 
 -------
 Support
 -------
 
-The docs provide examples for setup and common issues to be aware of. If the
-issue involves connecting this package to Django Oscar, this repository
-contains a `sandbox environment`_ you can review for a minimal working
-example. For any other issues, you can submit a `GitHub Issue`_.
+The docs provide examples for setup and common issues to be aware of.
+If the issue involves connecting this package to Django Oscar, this
+repository contains a `sandbox environment`_ you can review for a
+minimal working example. For any other issues, you can submit a
+`GitHub Issue`_.
 
-.. _docs: https://django-oscar-helcim.readthedocs.io/en/latest/installation.html
+.. _docs: https://django-helcim.readthedocs.io/en/latest/installation.html
 
-.. _sandbox environment: https://django-oscar-helcim.readthedocs.io/en/latest/contributing.html#sandbox-website
+.. _sandbox environment: https://django-helcim.readthedocs.io/en/latest/contributing.html#sandbox-website
 
-.. _GitHub Issue: https://github.com/studybuffalo/django-oscar-helcim/issues
+.. _GitHub Issue: https://github.com/studybuffalo/django-helcim/issues
 
 ------------
 Contributing
@@ -61,13 +65,14 @@ Contributing
 Contributions are welcome, especially to address bugs and extend
 functionality. Full details on contributing can be found in the docs.
 
-.. _docs: https://django-oscar-helcim.readthedocs.io/en/latest/contributing.html
+.. _docs: https://django-helcim.readthedocs.io/en/latest/contributing.html
 
 ----------
 Versioning
 ----------
 
-This package uses a MAJOR.MINOR.PATCH versioning, as outlined at `Semantic Versioning 2.0.0`_.
+This package uses a MAJOR.MINOR.PATCH versioning, as outlined at
+`Semantic Versioning 2.0.0`_.
 
 .. _Semantic Versioning 2.0.0: https://semver.org/
 
@@ -85,7 +90,7 @@ License
 
 This project is licensed under the GPLv3. Please see the LICENSE_ file for details.
 
-.. _LICENSE: https://github.com/studybuffalo/django-oscar-helcim/blob/master/LICENSE
+.. _LICENSE: https://github.com/studybuffalo/django-helcim/blob/master/LICENSE
 
 ----------------
 Acknowledgements

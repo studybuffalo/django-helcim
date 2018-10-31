@@ -13,7 +13,7 @@ Reporting issues
 If you simply want to report an issue, you can use the
 `GitHub Issue page`_.
 
-.. _GitHub Issue page: https://github.com/studybuffalo/django-oscar-helcim/issues
+.. _GitHub Issue page: https://github.com/studybuffalo/django-helcim/issues
 
 --------------------------------------
 Setting up the development environment
@@ -29,12 +29,12 @@ install Pipenv through pip::
 
 To download the repository from GitHub via git::
 
-    $ git clone git://github.com/studybuffalo/django-oscar-helcim.git
+    $ git clone git://github.com/studybuffalo/django-helcim.git
 
 You can then install all the required dependencies by changing to the
 package directory and installing from Pipfile.lock::
 
-    $ cd django-oscar-helcim
+    $ cd django-helcim
     $ pipenv install --ignore-pipfile --dev
 
 Finally, you will need to build the package::
@@ -101,17 +101,17 @@ Sandbox Website
 ---------------
 
 The Sandbox website is a barebones Django Oscar store that demonstrates
-how to use django-oscar-helcim in your project and provides a way to
+how to use django-helcim with Django Oscar and provides a way to
 test any of your changes. You will need to setup your development
 environment (see above) to proceed.
 
 .. attention::
 
     These instructions assume you have already setup a pipenv virtual
-    environment with django-oscar-helcim installed. See `Getting started`_ if
+    environment with django-helcim installed. See `Getting started`_ if
     you need additional instructions.
 
-    .. _Getting started: https://django-oscar-helcim.readthedocs.io/en/latest/installation.html#install-django-oscar-helcim-and-its-dependencies
+    .. _Getting started: https://django-helcim.readthedocs.io/en/latest/installation.html#install-django-oscar-helcim-and-its-dependencies
 
 Deploying the site
 ==================
