@@ -39,7 +39,7 @@ class Migration(migrations.Migration):
                 ('customer_code', models.CharField(blank=True, help_text='The Helcim customer code', max_length=16, null=True)),
             ],
             options={
-                'ordering': ('-date_created',),
+                'ordering': ('-date_response',),
             },
         ),
     ]

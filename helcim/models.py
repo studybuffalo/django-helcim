@@ -136,4 +136,31 @@ class HelcimTransaction(models.Model):
     )
 
     class Meta:
-        ordering = ('-date_created',)
+        ordering = ('-date_response',)
+
+    def __str__(self):
+        string_parts = [
+            self.date_response,
+            self.transaction_type,
+        ]
+
+        if self.amount:
+            string_parts.append(self.amount)
+
+        return ' - '.join(string_parts)
+
+    @property
+    def can_be_captured(self):
+        """Check if this transaction can be captured."""
+        return bool(
+            self.transaction_success and self.transaction_type == 'p'
+        )
+
+    @property
+    def can_be_refunded(self):
+        """Check if this transaction can be refunded."""
+        return all([
+            self.transaction_success,
+            (self.transaction_type == 's' or self.transaction_type == 'c'),
+            self.amount > 0,
+        ])
