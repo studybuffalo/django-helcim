@@ -140,7 +140,7 @@ class HelcimTransaction(models.Model):
         permissions = (
             (
                 'helcim_transactions',
-                'Can view, capture, and refund transactions.'
+                'Can view and interact with Helcim transactions.'
             ),
         )
 
