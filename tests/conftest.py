@@ -19,6 +19,13 @@ def pytest_configure():
             'django.contrib.contenttypes',
             'helcim',
         },
+        'ROOT_URLCONF': 'helcim.urls',
+        'TEMPLATES': [
+            {
+                'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                'APP_DIRS': True,
+            },
+        ],
         'HELCIM_ACCOUNT_ID': '1234567890',
         'HELCIM_API_TOKEN': 'abcdefghijklmno1234567890',
     }
