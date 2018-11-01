@@ -1,5 +1,5 @@
 """Views for Helcim Commerce API transactions."""
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views import generic
 
 from helcim import models
