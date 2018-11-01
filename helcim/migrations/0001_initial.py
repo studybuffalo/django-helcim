@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'ordering': ('-date_response',),
+                'permissions': (('helcim_transactions', 'Can view, capture, and refund transactions.'),),
             },
         ),
     ]

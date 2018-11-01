@@ -137,6 +137,12 @@ class HelcimTransaction(models.Model):
 
     class Meta:
         ordering = ('-date_response',)
+        permissions = (
+            (
+                'helcim_transactions',
+                'Can view, capture, and refund transactions.'
+            ),
+        )
 
     def __str__(self):
         string_parts = [
