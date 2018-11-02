@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HelcimTransaction',
             fields=[
-                ('uuid', models.UUIDField(default=uuid4, editable=False, primary_key=True, verbose_name='ID')),
+                ('id', models.UUIDField(default=uuid4, editable=False, primary_key=True, verbose_name='ID')),
                 ('raw_request', models.CharField(blank=True, help_text='The raw request used for this transaction', max_length=1024, null=True)),
                 ('raw_response', models.CharField(blank=True, help_text='The raw response returned for this transaction', max_length=1024, null=True)),
                 ('transaction_success', models.BooleanField(help_text='Whether the transaction was successful or not')),
@@ -32,7 +32,7 @@ class Migration(migrations.Migration):
                 ('cc_expiry', models.DateField(blank=True, help_text='The credit card expiry date', null=True)),
                 ('cc_type', models.CharField(blank=True, help_text='The credit card type', max_length=32, null=True)),
                 ('token', models.CharField(blank=True, help_text='The Helcim generated and stored credit card token', max_length=23, null=True)),
-                ('token_f4l4', models.CharField(blank=True, help_text='The first and last 4 digits of the credit card number', max_length=23, null=True)),
+                ('token_f4l4', models.CharField(blank=True, help_text='The first and last 4 digits of the credit card number', max_length=8, null=True)),
                 ('avs_response', models.CharField(blank=True, help_text='The address verification response', max_length=1, null=True)),
                 ('cvv_response', models.CharField(blank=True, help_text='The CVV verification response', max_length=1, null=True)),
                 ('approval_code', models.CharField(blank=True, help_text='The transaction approval code', max_length=16, null=True)),

@@ -6,7 +6,7 @@ from django.db import models
 
 class HelcimTransaction(models.Model):
     """Details of a single Helcim transaction."""
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid4,
         editable=False,
         primary_key=True,

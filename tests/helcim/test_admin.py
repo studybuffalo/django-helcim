@@ -16,7 +16,7 @@ def test_admin_fields_match_model():
     field_names = [field.name for field in model_fields]
 
     # Remove UUID (not included in admin interface)
-    field_names.remove('uuid')
+    field_names.remove('id')
 
     # Get the fields included in the admin
     admin_fields = HelcimTransactionAdmin.MODEL_FIELDS
