@@ -146,7 +146,7 @@ with django-helcim.
 
 
 ``HELCIM_TRANSACTIONS_READ_ONLY``
-================================
+=================================
 
 **Required:** ``False``
 
