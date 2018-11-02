@@ -489,7 +489,6 @@ class BaseRequest():
 
 class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
-
     def determine_card_details(self):
         """Confirms valid payment details and updates self.cleaned.
 
