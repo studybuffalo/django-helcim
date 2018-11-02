@@ -104,6 +104,12 @@ class HelcimTransaction(models.Model):
         max_length=23,
         null=True,
     )
+    token_f4l4 = models.CharField(
+        blank=True,
+        help_text='The first and last 4 digits of the credit card number',
+        max_length=8,
+        null=True,
+    )
     avs_response = models.CharField(
         blank=True,
         help_text='The address verification response',

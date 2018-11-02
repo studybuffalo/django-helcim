@@ -23,6 +23,7 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'cc_expiry',
         'cc_type',
         'token',
+        'token_f4l4',
         'avs_response',
         'cvv_response',
         'approval_code',
