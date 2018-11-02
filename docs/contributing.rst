@@ -142,7 +142,7 @@ command::
     $ pipenv run python sandbox/manage.py createsuperuser
 
 You can create regular user accounts by running the sandbox sever and
-creating it with the web form:: http://127.0.0.1:8000/accounts/login/.
+creating it with the web form: http://127.0.0.1:8000/accounts/login/.
 
 .. tip::
 
