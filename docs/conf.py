@@ -176,7 +176,7 @@ texinfo_documents = [
 # -- Options for Autodoc -----------------------------------------------------
 
 # Mocks import of this module to prevent errors during doc build
-autodoc_mock_imports = ['xmltodict', 'django', 'django-oscar', 'oscar']
+autodoc_mock_imports = ['django-oscar', 'oscar']
 
 # -- Options for napoleon ----------------------------------------------------
 napoleon_google_docstring = True

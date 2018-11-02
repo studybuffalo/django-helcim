@@ -1,0 +1,3 @@
+# Requirements required to properly generated docs
+django
+xmltodict
