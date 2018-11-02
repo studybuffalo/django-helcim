@@ -383,6 +383,14 @@ class BaseRequest():
         else:
             cc_expiry = None
 
+        # Create the token_f4l4 data
+        cc_number = response.get('cc_number')
+
+        if cc_number:
+            token_f4l4 = '{}{}'.format(cc_number[:3], cc_number[-3:])
+        else:
+            token_f4l4 = None
+
         return {
             'raw_request': response.get('raw_request'),
             'raw_response': response.get('raw_response'),
@@ -399,6 +407,7 @@ class BaseRequest():
             'cc_expiry': cc_expiry,
             'cc_type': response.get('cc_type'),
             'token': response.get('token'),
+            'token_f4l4': token_f4l4,
             'avs_response': response.get('avs_response'),
             'cvv_response': response.get('cvv_response'),
             'approval_code': response.get('approval_code'),
