@@ -296,6 +296,7 @@ class BaseRequest():
 
         if fields['token']:
             self._redact_field('cardToken', 'token')
+            self._redact_field('cardF4L4', 'token_f4l4')
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.

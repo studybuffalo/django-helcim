@@ -134,7 +134,8 @@ If set to ``True``, redacts all reference to the credit card type.
 **Default (boolean):** ``False``
 
 If set to ``True``, redacts all reference to the Helcim Commerce credit
-card token.
+card token and the 'first four last four' digits of the credit card
+number.
 
 ------------------------
 Additional Functionality

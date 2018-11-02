@@ -75,7 +75,7 @@ class MockDjangoModel():
     def __init__(self, **kwargs):
         self.data = kwargs
 
-def mock_integrity_error(**kwargs):
+def mock_integrity_error(**kwargs): # pylint: disable=unused-argument
     raise IntegrityError
 
 API_DETAILS = {
@@ -470,6 +470,8 @@ def test_redact_data_token():
     )
     assert base.redacted_response['token'] is None
 
+# TODO: Create test to ensure the f4l4 field is redacted as well
+
 @override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_redact_data_partial():
     base = gateway.BaseRequest()
@@ -631,3 +633,5 @@ def test_create_model_arguments_missing_date():
     arguments = base.create_model_arguments('z')
 
     assert arguments['date_response'] is None
+
+# TODO: test that create_model_arguments formats f4l4 properly
