@@ -245,7 +245,7 @@ def test_process_api_response_valid():
         api_response, raw_request, raw_response
     )
 
-    assert len(response) == 7
+    assert len(response) == 8
     assert response['transaction_success'] is True
     assert response['response_message'] == 'Transaction successful.'
     assert response['notice'] == 'API v2 being depreciated.'
@@ -255,7 +255,7 @@ def test_process_api_response_valid():
     assert response['raw_response'] == 'This is a raw response.'
     assert response['amount'] == Decimal('50.01')
     assert response['cc_number'] == '1111********9999'
-
+    assert response['token_f4l4'] == '11119999'
 
 @patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
 def test_process_api_response_string_field():
@@ -369,7 +369,6 @@ def test_process_api_response_missing_field():
     assert response['fake_field'] == 'fake.'
     assert isinstance(response['fake_field'], str)
 
-
 @patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
 def test_process_api_response_missing_required_field():
     api_response = {
@@ -383,6 +382,32 @@ def test_process_api_response_missing_required_field():
         assert str(error) == "'notice'"
     else:
         assert False
+
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+def test_process_api_response_create_f4l4():
+    api_response = {
+        'response': 1,
+        'responseMessage': '',
+        'notice': '',
+        'transaction': {
+            'cardNumber': '1111********9999',
+        }
+    }
+    response = conversions.process_api_response(api_response)
+
+    assert response['token_f4l4'] == '11119999'
+
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+def test_process_api_response_create_f4l4_with_no_cc():
+    api_response = {
+        'response': 1,
+        'responseMessage': '',
+        'notice': '',
+        'transaction': {},
+    }
+    response = conversions.process_api_response(api_response)
+
+    assert response['token_f4l4'] is None
 
 def test_create_raw_response_with_data():
     response_data = {

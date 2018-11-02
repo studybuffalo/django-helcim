@@ -458,19 +458,23 @@ def test_redact_data_cc_type():
 def test_redact_data_token():
     base = gateway.BaseRequest()
     base.response = {
-        'raw_request': 'cardToken=a',
-        'raw_response': '<cardToken>a</cardToken>',
+        'raw_request': 'cardToken=a&cardF4L4=11119999',
+        'raw_response': (
+            '<cardToken>a</cardToken><cardF4L4>11119999</cardF4L4>'
+        ),
         'token': 'a',
+        'token_f4l4': '11119999'
     }
     base.redact_data()
 
-    assert base.redacted_response['raw_request'] == 'cardToken=REDACTED'
+    assert base.redacted_response['raw_request'] == (
+        'cardToken=REDACTED&cardF4L4=REDACTED'
+    )
     assert base.redacted_response['raw_response'] == (
-        '<cardToken>REDACTED</cardToken>'
+        '<cardToken>REDACTED</cardToken><cardF4L4>REDACTED</cardF4L4>'
     )
     assert base.redacted_response['token'] is None
-
-# TODO: Create test to ensure the f4l4 field is redacted as well
+    assert base.redacted_response['token_f4l4'] is None
 
 @override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_redact_data_partial():
@@ -543,7 +547,7 @@ def test_create_model_arguments_partial():
 
     arguments = base.create_model_arguments('z')
 
-    assert len(arguments) == 20
+    assert len(arguments) == 21
     assert arguments['raw_request'] is None
     assert arguments['raw_response'] is None
     assert arguments['transaction_success'] is None
@@ -583,16 +587,17 @@ def test_create_model_arguments_full():
         'cc_expiry': '0620',
         'cc_type': 'k',
         'token': 'l',
-        'avs_response': 'm',
-        'cvv_response': 'n',
-        'approval_code': 'o',
-        'order_number': 'p',
-        'customer_code': 'q',
+        'token_f4l4': 'm',
+        'avs_response': 'n',
+        'cvv_response': 'o',
+        'approval_code': 'p',
+        'order_number': 'q',
+        'customer_code': 'r',
     }
 
     arguments = base.create_model_arguments('z')
 
-    assert len(arguments) == 20
+    assert len(arguments) == 21
     assert arguments['raw_request'] == 'a'
     assert arguments['raw_response'] == 'b'
     assert arguments['transaction_success'] == 'c'
@@ -607,11 +612,12 @@ def test_create_model_arguments_full():
     assert arguments['cc_expiry'] == datetime(20, 6, 30).date()
     assert arguments['cc_type'] == 'k'
     assert arguments['token'] == 'l'
-    assert arguments['avs_response'] == 'm'
-    assert arguments['cvv_response'] == 'n'
-    assert arguments['approval_code'] == 'o'
-    assert arguments['order_number'] == 'p'
-    assert arguments['customer_code'] == 'q'
+    assert arguments['token_f4l4'] == 'm'
+    assert arguments['avs_response'] == 'n'
+    assert arguments['cvv_response'] == 'o'
+    assert arguments['approval_code'] == 'p'
+    assert arguments['order_number'] == 'q'
+    assert arguments['customer_code'] == 'r'
     assert arguments['transaction_type'] == 'z'
 
 def test_create_model_arguments_missing_time():
@@ -633,5 +639,3 @@ def test_create_model_arguments_missing_date():
     arguments = base.create_model_arguments('z')
 
     assert arguments['date_response'] is None
-
-# TODO: test that create_model_arguments formats f4l4 properly
