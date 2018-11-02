@@ -11,9 +11,11 @@
   </tbody>
 </table>
 
-<!-- TODO: Add buttons here to do additional functions (capture, refund) -->
-<form method="post" action=".">
-    {% csrf_token %}
-    <button {% if not transaction.can_be_refunded %}disabled="disabled"{% end if %} type="submit" name="action" value="refund">{% trans "Refund" %}</button>
-    <button {% if not transaction.can_be_captured %}disabled="disabled"{% end if %} type="submit" name="action" value="capture">{% trans "Capture" %}</button>
-</form>
+
+{% if show_form_buttons %}
+  <form method="post" action=".">
+      {% csrf_token %}
+      <button {% if not transaction.can_be_refunded %}disabled="disabled"{% end if %} type="submit" name="action" value="refund">{% trans "Refund" %}</button>
+      <button {% if not transaction.can_be_captured %}disabled="disabled"{% end if %} type="submit" name="action" value="capture">{% trans "Capture" %}</button>
+  </form>
+{% endif %}

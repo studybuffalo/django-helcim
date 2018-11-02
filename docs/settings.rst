@@ -135,3 +135,22 @@ If set to ``True``, redacts all reference to the credit card type.
 
 If set to ``True``, redacts all reference to the Helcim Commerce credit
 card token.
+
+------------------------
+Additional Functionality
+------------------------
+
+These settings allow you to enable or disable additional functionality
+with django-helcim.
+
+
+``HELCIM_TRANSACTIONS_READ_ONLY``
+================================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``False``, will allow you to capture and refund transactions
+from the ``HelcimTransactionDetailView``. Otherwise, this functionality
+is turned off and the transaction detail view is read only.
