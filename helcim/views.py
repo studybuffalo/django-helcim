@@ -45,13 +45,13 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
         # Checks if this is setup as a read-only transaction
         if read_only:
             transaction = self.get_object()
-
             messages.error(
                 self.request, 'Transactions cannot be modified'
             )
+
             return HttpResponseRedirect(
                 reverse(
-                    'transaction_list',
+                    'transaction_detail',
                     kwargs={'transaction_id': transaction.id}
                 )
             )
@@ -83,13 +83,13 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
         try:
             refund.process()
         except exceptions.RefundError:
-            messages.error(self.request, 'Unable to refund transaction.')
+            messages.error(self.request, 'Unable to refund transaction')
         else:
             messages.success(self.request, 'Transaction refunded')
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_details',
+                'transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
@@ -105,14 +105,14 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         try:
             capture.process()
-        except exceptions.RefundError:
-            messages.error(self.request, 'Unable to capture transaction.')
+        except exceptions.PaymentError:
+            messages.error(self.request, 'Unable to capture transaction')
         else:
             messages.success(self.request, 'Transaction captured')
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_details',
+                'transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
