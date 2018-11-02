@@ -8,14 +8,17 @@
 
 # pylint: disable=missing-docstring,invalid-name,redefined-builtin
 
+# -- Required imports --------------------------------------------------------
+import os
+import sys
+import django
+from django.conf import settings
+
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
-import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 
@@ -173,10 +176,49 @@ texinfo_documents = [
 ]
 
 
-# -- Options for Autodoc -----------------------------------------------------
+# -- Options and settings for autodoc ----------------------------------------
 
 # Mocks import of this module to prevent errors during doc build
 autodoc_mock_imports = ['django-oscar', 'oscar']
+
+# Loads some default Django settings to allow autodoc to create Django
+# documentation
+django_settings = {
+    'DATABASES': {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    },
+    'INSTALLED_APPS': {
+        'django.contrib.admin',
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'helcim',
+    },
+    'MIDDLEWARE': [
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+    ],
+    'ROOT_URLCONF': 'helcim.urls',
+    'TEMPLATES': [
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'APP_DIRS': True,
+        },
+    ],
+    'HELCIM_ACCOUNT_ID': '1234567890',
+    'HELCIM_API_TOKEN': 'abcdefghijklmno1234567890',
+}
+
+settings.configure(**django_settings)
+
+# Initiate Django
+django.setup()
+
 
 # -- Options for napoleon ----------------------------------------------------
 napoleon_google_docstring = True
