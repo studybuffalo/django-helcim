@@ -79,9 +79,9 @@ def test_transaction_list_200_if_authorized(client, django_user_model):
 @pytest.mark.django_db
 def test_transaction_detail_template(admin_client):
     """Tests for proper HTML template."""
-    # Create a transaction
+    # Create transaction
     transaction = create_transaction('s')
-    print(transaction.id)
+
     response = admin_client.get(
         reverse(
             'transaction_detail',
@@ -95,35 +95,51 @@ def test_transaction_detail_template(admin_client):
         ]
     )
 
-# @pytest.mark.django_db
-# def test_transaction_detail_403_if_not_authorized(client, django_user_model):
-#     """Tests transaction detail redirect if inadequate permissions."""
-#     # Create user and login
-#     django_user_model.objects.create_user(username='user', password='password')
-#     client.login(username='user', password='password')
+@pytest.mark.django_db
+def test_transaction_detail_403_if_not_authorized(client, django_user_model):
+    """Tests transaction detail redirect if inadequate permissions."""
+    # Create transaction
+    transaction = create_transaction('s')
 
-#     response = client.get(reverse('transaction_detail'))
+    # Create user and login
+    django_user_model.objects.create_user(username='user', password='password')
+    client.login(username='user', password='password')
 
-#     assert response.status_code == 403
+    response = client.get(
+        reverse(
+            'transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        )
+    )
 
-# @pytest.mark.django_db()
-# def test_transaction_detail_200_if_authorized(client, django_user_model):
-#     """Tests transaction detail doesn't redirect with permissions."""
-#     # Get the helcim_transactions permission
-#     content = ContentType.objects.get_for_model(models.HelcimTransaction)
-#     permission = Permission.objects.get(
-#         content_type=content, codename='helcim_transactions'
-#     )
+    assert response.status_code == 403
 
-#     # Create the user and add permissions
-#     user = django_user_model.objects.create_user(
-#         username='user', password='password'
-#     )
-#     user.user_permissions.add(permission)
+@pytest.mark.django_db()
+def test_transaction_detail_200_if_authorized(client, django_user_model):
+    """Tests transaction detail doesn't redirect with permissions."""
+    # Create transaction
+    transaction = create_transaction('s')
 
-#     # Login and test response
-#     client.login(username='user', password='password')
+    # Get the helcim_transactions permission
+    content = ContentType.objects.get_for_model(models.HelcimTransaction)
+    permission = Permission.objects.get(
+        content_type=content, codename='helcim_transactions'
+    )
 
-#     response = client.get(reverse('transaction_detail'))
+    # Create the user and add permissions
+    user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
+    user.user_permissions.add(permission)
 
-#     assert response.status_code == 200
+    # Login and test response
+    client.login(username='user', password='password')
+
+    response = client.get(
+        reverse(
+            'transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        )
+    )
+
+    assert response.status_code == 200
