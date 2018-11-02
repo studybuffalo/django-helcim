@@ -20,8 +20,8 @@ class TransactionListView(PermissionRequiredMixin, generic.ListView):
 class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
     """Details of a specific transaction made by django-helcim."""
     model = models.HelcimTransaction
-    slug_field = 'id'
-    slug_url_kwargs = 'transaction_id'
+    pk_field = 'id'
+    pk_url_kwarg = 'transaction_id'
     permission_required = 'helcim.helcim_transactions'
     raise_exception = True
     context_object_name = 'transaction'
