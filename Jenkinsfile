@@ -12,6 +12,9 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
+          sh 'pip install pipenv'
+        }
+        script {
           sh 'pipenv install --dev --ignore-pipfile'
         }
       }
