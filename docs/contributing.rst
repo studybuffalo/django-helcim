@@ -183,3 +183,33 @@ deleted you will need to rebuild the file for the changes to populate
 on Read the Docs. You can do this with the following command::
 
     $ pipenv run sphinx-apidoc -fTM -o docs helcim helcim/migrations helcim/urls.py helcim/apps.py helcim/admin.py
+
+--------------------
+Distributing package
+--------------------
+
+Django-helcim is designed to be distributed with PyPI. While most
+contributors will not need to worry about uploading to PyPI, the
+following instructions list the general process in case anyone wishes
+to fork the repository or test out the process.
+
+.. note::
+
+    It is recommended you use `TestPyPI`_ to test uploading your
+    distribution while you are learning and seeing how things
+    work.
+
+.. _TestPyPI: https://test.pypi.org/
+
+To generate source archives and built distributions, you can use the
+following::
+
+    $ pipenv run python setup.py sdist bdist_wheel
+
+To upload the distributions, you can use the following ``twine``
+commands::
+
+    $ pipenv run twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+You will need to provide a PyPI username and password before the upload
+will start.

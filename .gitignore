@@ -19,3 +19,8 @@ reports/*
 # Sandbox Files
 sandbox/db.sqlite3
 sandbox/media/
+
+# Distribution files
+*.egg-info
+dist/
+build/
