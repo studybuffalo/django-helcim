@@ -13,7 +13,7 @@ pipeline {
         echo 'Setup virtual environment'
         script {
           sh 'pip install pipenv'
-          sh 'apk add gcc jpeg-dev zlib-dev'
+          sh 'apk add python-dev gcc jpeg-dev zlib-dev'
           sh 'pipenv install --dev --ignore-pipfile'
         }
       }
