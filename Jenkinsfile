@@ -13,7 +13,7 @@ pipeline {
         echo 'Setup virtual environment'
         script {
           sh 'pip install pipenv'
-          sh 'apt-get install libjpeg-dev zlib1g-dev'
+          sh 'apk add libjpeg-dev zlib1g-dev'
           sh 'pipenv install --dev --ignore-pipfile'
         }
       }
