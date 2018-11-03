@@ -196,8 +196,8 @@ to fork the repository or test out the process.
 .. note::
 
     It is recommended you use `TestPyPI`_ to test uploading your
-    distribution while you are learning and seeing how things
-    work.
+    distribution while you are learning and seeing how things work. The
+    following examples below will use TestPyPI as the upload target.
 
 .. _TestPyPI: https://test.pypi.org/
 
