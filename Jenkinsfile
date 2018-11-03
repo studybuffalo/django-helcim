@@ -1,5 +1,7 @@
 pipeline {
-  agent any
+  agent {
+    docker { image 'python:3.6.7-alpine' }
+  }
   options {
     disableConcurrentBuilds()
     buildDiscarder(logRotator(numToKeepStr: '10'))
@@ -13,29 +15,6 @@ pipeline {
           sh 'pipenv install --dev --ignore-pipfile'
         }
       }
-    }
-    stage('Test') {
-      steps {
-        echo 'Running tests'
-        script {
-          sh 'pipenv run tox'
-        }
-
-      }
-    }
-    stage('Security') {
-      steps {
-        echo 'Running security checks'
-        script {
-          sh 'pipenv check'
-        }
-      }
-    }
-  }
-  post {
-    always {
-      step([$class: 'CoberturaPublisher', coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 10, onlyStable: false, sourceEncoding: 'ASCII'])
-      junit 'reports/tests.*.xml'
     }
   }
 }
