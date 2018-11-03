@@ -36,7 +36,6 @@ sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
 setuptools = "*"  # https://pypi.org/project/setuptools/#description
 wheel = "*"  # https://pypi.org/project/wheel/
 twine = "*"  # https://github.com/pypa/twine
-restructuredtext-lint = "*"
 
 [requires]
 python_version = "3.6"

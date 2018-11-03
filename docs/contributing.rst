@@ -184,6 +184,15 @@ on Read the Docs. You can do this with the following command::
 
     $ pipenv run sphinx-apidoc -fTM -o docs helcim helcim/migrations helcim/urls.py helcim/apps.py helcim/admin.py
 
+Linting documentation
+=====================
+
+If you are having issues with the ReStructuredText (reST) formatting,
+you can use rst-lint to screen for syntax errors. You can run a check
+on a file with the following::
+
+    $ pipenv run rst-lint /path/to/file.rst
+
 --------------------
 Distributing package
 --------------------
