@@ -110,3 +110,11 @@ Thanks to the `django-oscar-paypal`_ developers, from which many of this
 packages design decisions are based.
 
 .. _django-oscar-paypal: https://github.com/django-oscar/django-oscar-paypal
+
+---------
+Changelog
+---------
+
+You can view all `package changes on the docs`_.
+
+.. _package changes on the docs: https://django-helcim.readthedocs.io/en/latest/changelog.html
