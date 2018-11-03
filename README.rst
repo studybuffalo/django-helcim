@@ -2,7 +2,7 @@
 django-helcim
 ===================
 
-|PyPI|_ |PythonVersions|_ |DjangoVersions|_ |License|_
+|PyPI|_ |PythonVersions| |DjangoVersions| |License|_
 
 |BuildStatus|_ |Coverage|_
 
