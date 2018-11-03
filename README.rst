@@ -48,13 +48,13 @@ Instructions on installing and configuration can be found on
 Support
 -------
 
-The docs provide examples for setup and common issues to be aware of.
-If the issue involves connecting this package to Django Oscar, this
+The `docs provide examples for setup and common issues`_ to be aware
+of. If the issue involves connecting this package to Django Oscar, this
 repository contains a `sandbox environment`_ you can review for a
 minimal working example. For any other issues, you can submit a
 `GitHub Issue`_.
 
-.. _docs: https://django-helcim.readthedocs.io/en/latest/installation.html
+.. _docs provide examples for setup and common issues: https://django-helcim.readthedocs.io/en/latest/installation.html
 
 .. _sandbox environment: https://django-helcim.readthedocs.io/en/latest/contributing.html#sandbox-website
 
@@ -65,9 +65,9 @@ Contributing
 ------------
 
 Contributions are welcome, especially to address bugs and extend
-functionality. Full details on contributing can be found in the docs.
+functionality. Full `details on contributing can be found in the docs`_.
 
-.. _docs: https://django-helcim.readthedocs.io/en/latest/contributing.html
+.. _details on contributing can be found in the docs: https://django-helcim.readthedocs.io/en/latest/contributing.html
 
 ----------
 Versioning
