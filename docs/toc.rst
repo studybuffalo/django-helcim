@@ -5,3 +5,4 @@
    contributing
    settings
    Package reference <helcim>
+   changelog
