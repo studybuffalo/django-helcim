@@ -2,12 +2,20 @@
 django-helcim
 ===================
 
-|GithubRelease|_ |BuildStatus|_ |Coverage|_ |License|_
+|PyPI|_ |PythonVersions|_ |DjangoVersions|_ |License|_
 
-.. |GithubRelease| image:: https://img.shields.io/github/release/studybuffalo/django-helcim/all.svg
-   :alt: GitHub release version
+|BuildStatus|_ |Coverage|_
 
-.. _GithubRelease: https://github.com/studybuffalo/django-helcim/releases
+.. |PyPI| image:: https://img.shields.io/pypi/v/django-helcim.svg
+   :alt: PyPI
+
+.. _PyPI: https://pypi.org/project/django-helcim/
+
+.. |PythonVersions| image:: https://img.shields.io/pypi/pyversions/django-helcim.svg
+   :alt: PyPI - Python Version
+
+.. |DjangoVersions| image:: https://img.shields.io/pypi/djversions/django-helcim.svg
+   :alt: PyPI - Django Version
 
 .. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-helcim/job/master.svg
    :alt: Jenkins build status
