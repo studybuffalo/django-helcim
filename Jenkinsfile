@@ -5,7 +5,7 @@ pipeline {
   options {
     disableConcurrentBuilds()
     buildDiscarder(logRotator(numToKeepStr: '10'))
-    timeout(time: 1, unit: 'HOURS')
+    timeout(time: 30, unit: 'MINUTES')
   }
   stages {
     stage('Build') {
@@ -15,6 +15,23 @@ pipeline {
           sh 'pip install pipenv'
           sh 'apk add musl-dev gcc jpeg-dev zlib-dev'
           sh 'pipenv install --dev --ignore-pipfile'
+        }
+      }
+    }
+    stage('Test') {
+      steps {
+        echo 'Running tests'
+        script {
+          sh 'pipenv run tox'
+        }
+
+      }
+    }
+    stage('Security') {
+      steps {
+        echo 'Running security checks'
+        script {
+          sh 'pipenv check'
         }
       }
     }
