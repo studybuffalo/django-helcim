@@ -249,9 +249,8 @@ def test_process_api_response_valid():
     assert response['transaction_success'] is True
     assert response['response_message'] == 'Transaction successful.'
     assert response['notice'] == 'API v2 being depreciated.'
-    assert response['raw_request'] == (
-        'field_1=Field value 1&field_2=Field value 2'
-    )
+    assert 'field_1=Field value 1' in response['raw_request']
+    assert 'field_2=Field value 2' in response['raw_request']
     assert response['raw_response'] == 'This is a raw response.'
     assert response['amount'] == Decimal('50.01')
     assert response['cc_number'] == '1111********9999'
