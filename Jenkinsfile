@@ -12,8 +12,7 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
-          sh 'export LC_ALL=C.UTF-8'
-          sh 'export LANG=C.UTF-8'
+          sh 'update-locale --reset'
           sh 'apt-get update'
           sh 'apt-get install -y software-properties-common'
           sh 'add-apt-repository ppa:deadsnakes/ppa'
