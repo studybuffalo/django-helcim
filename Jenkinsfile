@@ -10,7 +10,7 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
-          sh 'pipenv install --python 3.6 --dev --system --ignore-pipfile'
+          sh 'pipenv install --dev --deploy --system --ignore-pipfile'
         }
       }
     }
