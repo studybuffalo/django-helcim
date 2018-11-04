@@ -1,7 +1,5 @@
 pipeline {
-  agent {
-    docker { image 'ubuntu:16.04' }
-  }
+  agent { dockerfile true }
   options {
     disableConcurrentBuilds()
     buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -12,16 +10,6 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
-          sh 'apt-get update'
-          sh 'apt-get upgrade -y'
-          sh 'apt-get install -y locales locales-all'
-          sh 'export LANG=C.UTF-8'
-          sh 'export LC_ALL=C.UTF-8'
-          sh 'apt-get install -y software-properties-common'
-          sh 'add-apt-repository ppa:deadsnakes/ppa'
-          sh 'apt-get update'
-          sh 'apt-get install -y python3.4 python3.5 python3.6 python3.7 python-pip'
-          sh 'pip install pipenv'
           sh 'pipenv install --dev --ignore-pipfile'
         }
       }
