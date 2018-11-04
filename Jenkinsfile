@@ -4,7 +4,7 @@ pipeline {
   }
   options {
     disableConcurrentBuilds()
-    buildDiscarder(logRotator(numToKeepStr: '10'))
+    buildDiscarder(logRotator(numToKeepStr: '5'))
     timeout(time: 60, unit: 'MINUTES')
   }
   stages {
@@ -16,7 +16,7 @@ pipeline {
           sh 'apt-get install -y software-properties-common'
           sh 'add-apt-repository ppa:deadsnakes/ppa'
           sh 'apt-get update'
-          sh 'apt-get install -y python3.4 python3.5 python3.6 python3.7 pip'
+          sh 'apt-get install -y python3.4 python3.5 python3.6 python3.7 python-pip'
           sh 'pip install pipenv'
           sh 'pipenv install --dev --ignore-pipfile'
         }
