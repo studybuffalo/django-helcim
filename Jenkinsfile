@@ -12,6 +12,8 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
+          sh 'export LC_ALL=C.UTF-8'
+          sh 'export LANG=C.UTF-8'
           sh 'apt-get update'
           sh 'apt-get install -y software-properties-common'
           sh 'add-apt-repository ppa:deadsnakes/ppa'
@@ -19,8 +21,6 @@ pipeline {
           sh 'apt-get install -y python3.4 python3.5 python3.6 python3.7 python-pip'
           sh 'pip install pipenv'
           sh 'pipenv install --dev --ignore-pipfile'
-          sh 'export LC_ALL=C.UTF-8'
-          sh 'export LANG=C.UTF-8'
         }
       }
     }
