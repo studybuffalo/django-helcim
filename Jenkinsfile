@@ -14,8 +14,8 @@ pipeline {
         script {
           sh 'apt-get update'
           sh 'apt-get upgrade -y'
-          sh 'export LC_ALL="C.UTF-8"'
-          sh 'export LANG="C.UTF-8"'
+          sh 'echo LC_ALL=C.UTF-8 > ~/.profile'
+          sh 'echo LANG=C.UTF-8 > ~/.profile'
           sh 'apt-get install -y software-properties-common'
           sh 'add-apt-repository ppa:deadsnakes/ppa'
           sh 'apt-get update'
