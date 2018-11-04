@@ -19,6 +19,8 @@ pipeline {
           sh 'apt-get install -y python3.4 python3.5 python3.6 python3.7 python-pip'
           sh 'pip install pipenv'
           sh 'pipenv install --dev --ignore-pipfile'
+          sh 'unset LC_ALL'
+          sh 'unset LANG'
           sh 'export LC_ALL=C.UTF-8'
           sh 'export LANG=C.UTF-8'
         }
