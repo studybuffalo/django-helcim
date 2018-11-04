@@ -418,7 +418,7 @@ def test_create_raw_response_with_data():
     request_string = conversions.create_raw_request(response_data)
 
     assert isinstance(request_string, str)
-    assert 'accountId=123456789&' in request_string
+    assert 'accountId=123456789' in request_string
     assert 'token=987654321' in request_string
 
 def test_create_raw_response_without_data():
