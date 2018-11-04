@@ -14,7 +14,9 @@ pipeline {
         script {
           sh 'apt-get update'
           sh 'apt-get upgrade -y'
-          sh 'dpkg-reconfigure tzdata'
+          sh 'apt-get install -y locales locales-all'
+          sh 'export LANG C.UTF8'
+          sh 'export LC_ALL C.UTF8'
           sh 'apt-get install -y software-properties-common'
           sh 'add-apt-repository ppa:deadsnakes/ppa'
           sh 'apt-get update'
