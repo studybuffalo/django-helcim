@@ -10,7 +10,7 @@ pipeline {
       steps {
         echo 'Setup virtual environment'
         script {
-          sh 'pipenv install --dev --ignore-pipfile'
+          sh 'pipenv install --dev --system --deploy --ignore-pipfile'
         }
       }
     }
