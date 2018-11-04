@@ -1,16 +1,16 @@
 pipeline {
-  agent any
+  agent { dockerfile true }
   options {
     disableConcurrentBuilds()
-    buildDiscarder(logRotator(numToKeepStr: '10'))
-    timeout(time: 1, unit: 'HOURS')
+    buildDiscarder(logRotator(numToKeepStr: '5'))
+    timeout(time: 60, unit: 'MINUTES')
   }
   stages {
     stage('Build') {
       steps {
         echo 'Setup virtual environment'
         script {
-          sh 'pipenv install --dev --ignore-pipfile'
+          sh 'pipenv install --dev --deploy --system --ignore-pipfile'
         }
       }
     }
@@ -20,7 +20,6 @@ pipeline {
         script {
           sh 'pipenv run tox'
         }
-
       }
     }
     stage('Security') {
