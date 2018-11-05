@@ -33,6 +33,7 @@ pipeline {
   }
   post {
     always {
+      echo 'Publishing test and coverage results'
       step([$class: 'CoberturaPublisher', coberturaReportFile: 'reports/coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 10, onlyStable: false, sourceEncoding: 'ASCII'])
       junit 'reports/tests.*.xml'
     }
