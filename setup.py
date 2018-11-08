@@ -1,14 +1,14 @@
 """PyPI setup script for the django-helcim package."""
 from setuptools import find_packages, setup
 
-from helcim import VERSION
+from helcim import __version__
 
 with open('README.rst', 'r') as readme_file:
     LONG_DESCRIPTION = readme_file.read()
 
 setup(
     name='django-helcim',
-    version=VERSION,
+    version=__version__,
     url='https://github.com/studybuffalo/django-helcim.',
     description=('A Django-based integration with the Helcim Commerce API.'),
     long_description=LONG_DESCRIPTION,

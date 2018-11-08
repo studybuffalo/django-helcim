@@ -1,6 +1,22 @@
 # pylint: disable=missing-docstring, invalid-name
-# Versioning details
-VERSION = '0.1.0'
+__version__ = '0.1.0'
+
+# Provide DepreciationWarning for older Django versions
+import warnings
+
+import django
+
+django_version = django.__version__.split('.')
+
+if django_version[0] == '1' and django_version[1] == '11':
+    warnings.warn(
+        (
+            'Django 1.11 LTS and django-helcim will stop receiving '
+            'support in April 2020. Ensure you have updated your '
+            'versions before then.'
+        ),
+        DeprecationWarning
+    )
 
 # Django configuration details
 default_app_config = 'helcim.apps.HelcimConfig'
