@@ -94,7 +94,9 @@ following command::
 You will need to have all versions of Python installed locally for
 tox to run tests. Any versions you are missing will be skipped. The
 Continuous Integration (CI) server will run tests against all versions
-on any pull requests or commits.
+on any pull requests or commits. **Note:** The CI testing can take over
+60 minutes to complete as there are multiple combinations of Python and
+Django versions that must be tested against.
 
 ---------------
 Sandbox Website
