@@ -6,9 +6,7 @@ import warnings
 
 import django
 
-django_version = django.__version__.split('.')
-
-if django_version[0] == '1' and django_version[1] == '11':
+if '1.11' in django.__version__:
     warnings.warn(
         (
             'Django 1.11 LTS and django-helcim will stop receiving '
