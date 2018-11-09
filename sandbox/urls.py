@@ -1,25 +1,26 @@
 """URLs for the sandbox demo."""
 
 from django.conf import settings
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.conf.urls.static import static
-from django.urls import include, path
+from django.urls import include
 
 from applications.apps import application
 
 admin.autodiscover()
 
 urlpatterns = [
-    path('i18n/', include('django.conf.urls.i18n')),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
     # Admin URLs
     # NB: not officially supported with django-oscar; included for
     # debugging purposes only
-    path('admin/', admin.site.urls),
+    url(r'^admin/', admin.site.urls),
     # django-helcim URLs
-    path('checkout/helcim/', include('helcim.urls')),
+    url(r'^checkout/helcim/', include('helcim.urls')),
     # django-oscar URLs
-    path('', application.urls),
+    url(r'', application.urls),
 ]
 
 if settings.DEBUG:
@@ -29,5 +30,5 @@ if settings.DEBUG:
 
     import debug_toolbar
     urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
+        url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
