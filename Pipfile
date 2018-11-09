@@ -4,13 +4,13 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+django = "*"  # https://github.com/django/django
 requests = "*"  # https://github.com/requests/requests/
 xmltodict = "*"  # https://github.com/martinblech/xmltodict
 
 [dev-packages]
 # Django (for testing)
 # ------------------------------------------------------------------------------
-django = "*"  # https://github.com/django/django
 django-oscar = "*"  # https://github.com/django-oscar/django-oscar
 django-environ = "*"  # https://github.com/joke2k/django-environ
 django-debug-toolbar = "*"  # https://github.com/jazzband/django-debug-toolbar

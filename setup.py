@@ -26,7 +26,9 @@ setup(
     },
     python_required='>=3',
     install_requires=[
-        'django',
+        'django>=1.11',
+        'requests>=2.0',
+        'xmltodict>=0.11',
     ],
     extras_require={
         'oscar': ['django-oscar>=1.5,<1.7']
