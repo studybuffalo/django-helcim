@@ -1,4 +1,6 @@
 language: python
+sudo: required
+dist: xenial
 python:
   - 3.4
   - 3.5
@@ -6,6 +8,6 @@ python:
   - 3.7
 install:
   - pip install pipenv
-  - pipenv install tox-travis
+  - pipenv install --dev
 script:
   - pipenv run tox
