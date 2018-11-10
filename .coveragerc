@@ -1,9 +1,15 @@
 [run]
-data_file = reports/coverage_report
+branch = True
+source = __YOUR_PROJECT_FOLDER__
+
+[report]
+exclude_lines =
+    if self.debug:
+    pragma: no cover
+    raise NotImplementedError
+    if __name__ == .__main__.:
+ignore_errors = True
 omit = helcim/migrations/*,tests/*,helcim/urls.py
 
 [html]
 directory = reports/htmlcov
-
-[xml]
-output = reports/coverage.xml
