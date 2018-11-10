@@ -7,8 +7,7 @@ python:
   - 3.6
   - 3.7
 install:
-  - pip install pipenv
-  - pipenv run python -m pip install -U pip==18.0
-  - pipenv install tox tox-travis pytest pytest-cov
+  - pip install tox
+  - pip install coverage
 script:
-  - pipenv run tox
+  - tox

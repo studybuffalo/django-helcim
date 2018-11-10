@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = ">=1.11,<2.2"  # https://github.com/django/django
+django = "*"  # https://github.com/django/django
 requests = "*"  # https://github.com/requests/requests/
 xmltodict = "*"  # https://github.com/martinblech/xmltodict
 
@@ -26,7 +26,7 @@ restructuredtext-lint = "*"  # https://github.com/twolfson/restructuredtext-lint
 pytest = "*"  # https://github.com/pytest-dev/pytest
 pytest-cov = "*"  # https://github.com/pytest-dev/pytest-cov
 pytest-django = "*"  # https://pytest-django.readthedocs.io/en/latest/
-tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
+#tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
 tox-travis = "*"  # https://github.com/tox-dev/tox-travis
 # Package Documentation
 # ------------------------------------------------------------------------------
