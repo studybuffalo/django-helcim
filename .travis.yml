@@ -9,7 +9,6 @@ python:
 install:
   - pip install pipenv
   - pipenv run python -m pip install -U pip==18.0
-  - pipenv update
-  - pipenv install
+  - pipenv update --dev
 script:
   - pipenv run tox
