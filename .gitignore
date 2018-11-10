@@ -11,6 +11,7 @@ _templates/
 *.env
 
 # Testing files and reports
+.coverage
 .tox
 .pytest_cache
 reports/*

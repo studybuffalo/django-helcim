@@ -1,9 +1,8 @@
 [run]
 branch = True
-source = helcim
-
-[report]
+data_file = reports/.coverage
 omit = helcim/migrations/*,tests/*,helcim/urls.py
+source = helcim
 
 [html]
 directory = reports/htmlcov
