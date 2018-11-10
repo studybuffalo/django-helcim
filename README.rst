@@ -21,10 +21,9 @@ django-helcim
    :alt: Travis-CI build status
    :target: https://travis-ci.org/studybuffalo/django-helcim
 
-.. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-helcim/job/master
-   :alt: Code coverage
-
-.. _Coverage: https://ci.studybuffalo.com/job/django-helcim/job/master/lastBuild/cobertura/
+.. |Coverage| image:: https://codecov.io/gh/studybuffalo/django-helcim/branch/master/graph/badge.svg
+   :alt: Codecov code coverage
+   :target: https://codecov.io/gh/studybuffalo/django-helcim
 
 .. |License| image:: https://img.shields.io/github/license/studybuffalo/django-helcim.svg
    :alt: License
