@@ -25,7 +25,7 @@ django-helcim
 .. |Coverage| image:: https://codecov.io/gh/studybuffalo/django-helcim/branch/master/graph/badge.svg
    :alt: Codecov code coverage
 
-.. _Covearge: https://codecov.io/gh/studybuffalo/django-helcim
+.. _Coverage: https://codecov.io/gh/studybuffalo/django-helcim
 
 .. |License| image:: https://img.shields.io/github/license/studybuffalo/django-helcim.svg
    :alt: License
