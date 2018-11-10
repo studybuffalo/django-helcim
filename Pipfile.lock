@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "7cc181113cfa8a04cb754528b6c2ecb01232a184f7c9d84f008855f87be1e501"
+            "sha256": "b9abd7c727be841c5e33f136032b78ea08af6bc7288cd1149ca1ceb7c5af722a"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -450,6 +450,14 @@
             ],
             "version": "==5.3.0"
         },
+        "pipenv": {
+            "hashes": [
+                "sha256:a785235bf2ddf65ea8a91531b3372471d9ad86036335dba8bd63f20c00a68e63",
+                "sha256:aca036e5fe988c8c2850167976b9361cfa8519afffe95bb1010105547622f9ee",
+                "sha256:d5ac9a7705c654ec6ed0059df4f0470d88119591d2724828cb5268207547afc1"
+            ],
+            "version": "==2018.10.13"
+        },
         "pkginfo": {
             "hashes": [
                 "sha256:5878d542a4b3f237e359926384f1dde4e099c9f5525d236b1840cf704fa8d474",
@@ -662,6 +670,14 @@
             ],
             "version": "==3.5.3"
         },
+        "tox-pipenv": {
+            "hashes": [
+                "sha256:3b8aa83278d9cc2424b0403be6f8e81f97f6b7d43514ddc3132cde956097aebb",
+                "sha256:a1f97ec74fd3df651bc6e0d3feb0c610b99522606202b1863353b3dd14cd4a1d"
+            ],
+            "index": "pypi",
+            "version": "==1.8.0"
+        },
         "tox-travis": {
             "hashes": [
                 "sha256:7e2f0b9db1ff9521da6a32a34aa4bfe292ea1c90ff8eb26001bf52f44ca0dc47"
@@ -733,6 +749,12 @@
                 "sha256:f899fafcd92e1150f40c8215328be38ff24b519cd95357fa6e78e006c7638208"
             ],
             "version": "==16.1.0"
+        },
+        "virtualenv-clone": {
+            "hashes": [
+                "sha256:afce268508aa5596c90dda234abe345deebc401a57d287bcbd76baa140a1aa58"
+            ],
+            "version": "==0.4.0"
         },
         "webencodings": {
             "hashes": [
