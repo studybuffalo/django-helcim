@@ -17,10 +17,9 @@ django-helcim
 .. |DjangoVersions| image:: https://img.shields.io/pypi/djversions/django-helcim.svg
    :alt: PyPI - Django Version
 
-.. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-helcim/job/master.svg
-   :alt: Jenkins build status
-
-.. _BuildStatus: https://ci.studybuffalo.com/blue/organizations/jenkins/django-helcim/
+.. image:: https://travis-ci.org/studybuffalo/django-helcim.svg?branch=master
+   :alt: Travis-CI build status
+   :target: https://travis-ci.org/studybuffalo/django-helcim
 
 .. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-helcim/job/master
    :alt: Code coverage
