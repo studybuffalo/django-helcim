@@ -17,7 +17,7 @@ django-helcim
 .. |DjangoVersions| image:: https://img.shields.io/pypi/djversions/django-helcim.svg
    :alt: PyPI - Django Version
 
-.. image:: https://travis-ci.org/studybuffalo/django-helcim.svg?branch=master
+.. |BuildStatus| image:: https://travis-ci.org/studybuffalo/django-helcim.svg?branch=master
    :alt: Travis-CI build status
    :target: https://travis-ci.org/studybuffalo/django-helcim
 
