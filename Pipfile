@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"  # https://github.com/django/django
+django = ">=1.11,<2.2"  # https://github.com/django/django
 requests = "*"  # https://github.com/requests/requests/
 xmltodict = "*"  # https://github.com/martinblech/xmltodict
 
@@ -37,6 +37,3 @@ sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
 setuptools = "*"  # https://pypi.org/project/setuptools/#description
 wheel = "*"  # https://pypi.org/project/wheel/
 twine = "*"  # https://github.com/pypa/twine
-
-[requires]
-python_version = "3.6"
