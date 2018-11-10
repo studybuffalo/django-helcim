@@ -19,11 +19,13 @@ django-helcim
 
 .. |BuildStatus| image:: https://travis-ci.org/studybuffalo/django-helcim.svg?branch=master
    :alt: Travis-CI build status
-   :target: https://travis-ci.org/studybuffalo/django-helcim
+
+.. _BuildStatus: https://travis-ci.org/studybuffalo/django-helcim
 
 .. |Coverage| image:: https://codecov.io/gh/studybuffalo/django-helcim/branch/master/graph/badge.svg
    :alt: Codecov code coverage
-   :target: https://codecov.io/gh/studybuffalo/django-helcim
+
+.. _Covearge: https://codecov.io/gh/studybuffalo/django-helcim
 
 .. |License| image:: https://img.shields.io/github/license/studybuffalo/django-helcim.svg
    :alt: License
