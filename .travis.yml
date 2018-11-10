@@ -6,6 +6,8 @@ python:
   - 3.5
   - 3.6
   - 3.7
+before_install:
+  - pip install codecov
 install:
   - pip install pipenv
   # Temporary: some python versions & pip 18.1 have issues with pipenv
@@ -14,3 +16,5 @@ install:
   - pipenv update --dev
 script:
   - pipenv run tox
+after_success:
+  - codecov
