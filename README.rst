@@ -17,15 +17,15 @@ django-helcim
 .. |DjangoVersions| image:: https://img.shields.io/pypi/djversions/django-helcim.svg
    :alt: PyPI - Django Version
 
-.. |BuildStatus| image:: https://img.shields.io/jenkins/s/https/ci.studybuffalo.com/job/django-helcim/job/master.svg
-   :alt: Jenkins build status
+.. |BuildStatus| image:: https://travis-ci.org/studybuffalo/django-helcim.svg?branch=master
+   :alt: Travis-CI build status
 
-.. _BuildStatus: https://ci.studybuffalo.com/blue/organizations/jenkins/django-helcim/
+.. _BuildStatus: https://travis-ci.org/studybuffalo/django-helcim
 
-.. |Coverage| image:: https://badges.ci.studybuffalo.com/coverage/django-helcim/job/master
-   :alt: Code coverage
+.. |Coverage| image:: https://codecov.io/gh/studybuffalo/django-helcim/branch/master/graph/badge.svg
+   :alt: Codecov code coverage
 
-.. _Coverage: https://ci.studybuffalo.com/job/django-helcim/job/master/lastBuild/cobertura/
+.. _Coverage: https://codecov.io/gh/studybuffalo/django-helcim
 
 .. |License| image:: https://img.shields.io/github/license/studybuffalo/django-helcim.svg
    :alt: License

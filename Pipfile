@@ -27,6 +27,7 @@ pytest = "*"  # https://github.com/pytest-dev/pytest
 pytest-cov = "*"  # https://github.com/pytest-dev/pytest-cov
 pytest-django = "*"  # https://pytest-django.readthedocs.io/en/latest/
 tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
+tox-travis = "*"  # https://github.com/tox-dev/tox-travis
 # Package Documentation
 # ------------------------------------------------------------------------------
 sphinx = "*"  # https://github.com/sphinx-doc/sphinx
@@ -36,6 +37,3 @@ sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
 setuptools = "*"  # https://pypi.org/project/setuptools/#description
 wheel = "*"  # https://pypi.org/project/wheel/
 twine = "*"  # https://github.com/pypa/twine
-
-[requires]
-python_version = "3.6"
