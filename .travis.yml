@@ -9,6 +9,6 @@ python:
 install:
   - pip install pipenv
   - pipenv run python -m pip install -U pip==18.0
-  - pipenv install --dev
+  - pipenv install tox tox-travis
 script:
   - pipenv run tox
