@@ -286,14 +286,15 @@ def process_api_response(response, raw_request=None, raw_response=None):
                 )
                 processed[field_name] = field_value
 
-    # If possible, create the F4L4 field
-    cc_number = processed.get('cc_number')
+        # If possible, create the F4L4 field
+        cc_number = processed.get('cc_number')
 
-    if cc_number:
-        processed['token_f4l4'] = '{}{}'.format(cc_number[:4], cc_number[-4:])
-    else:
-        processed['token_f4l4'] = None
-
+        if cc_number:
+            processed['token_f4l4'] = '{}{}'.format(
+                cc_number[:4], cc_number[-4:]
+            )
+        else:
+            processed['token_f4l4'] = None
 
     # Add additional audit information
     processed['raw_request'] = create_raw_request(raw_request)
