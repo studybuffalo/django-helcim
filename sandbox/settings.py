@@ -1,6 +1,5 @@
 """Django settings file to get basic Django instance running."""
 # pylint: disable=unused-wildcard-import
-
 import environ
 
 from oscar import OSCAR_MAIN_TEMPLATE_DIR, get_core_apps
@@ -12,7 +11,7 @@ from oscar.defaults import * # pylint: disable=wildcard-import
 ROOT_DIR = environ.Path(__file__) - 1
 PACKAGE_DIR = environ.Path(__file__) - 2
 ENV = environ.Env()
-ENV.read_env(env_file=ROOT_DIR.file("config.env"))
+ENV.read_env(env_file=ROOT_DIR.file('config.env'))
 
 # DEBUG SETTINGS
 # Used for sandbox - DO NOT USE IN PRODUCTION
