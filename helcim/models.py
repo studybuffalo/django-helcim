@@ -1,6 +1,7 @@
 """Models for the django-helcim application."""
 from uuid import uuid4
 
+from django.contrib.auth import get_user_model
 from django.db import models
 
 
@@ -173,3 +174,39 @@ class HelcimTransaction(models.Model):
             (self.transaction_type == 's' or self.transaction_type == 'c'),
             (self.amount if self.amount else 0) > 0,
         ])
+
+class HelcimToken(models.Model):
+    """A Helcim card token."""
+    token = models.CharField(
+        help_text='The Helcim card token number',
+        max_length=23,
+    )
+    token_f4l4 = models.CharField(
+        help_text='The first & last four digits of the credit card number',
+        max_length=8
+    )
+    date_added = models.DateTimeField(
+        auto_now_add=True,
+        help_text='Date and time this token was added to database',
+    )
+    customer_code = models.CharField(
+        blank=True,
+        help_text='The Helcim customer code',
+        max_length=16,
+        null=True,
+    )
+    django_user = models.ForeignKey(
+        get_user_model(),
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='tokens',
+    )
+
+    class Meta:
+        permissions = (
+            (
+                'helcim_tokens',
+                'Can view and interact with Helcim tokens.'
+            ),
+        )
