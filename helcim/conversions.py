@@ -280,6 +280,15 @@ def process_api_response(response, raw_request=None, raw_response=None):
                     processed[new_name] = datetime.strptime(
                         field_value, '%H:%M:%S'
                     ).time()
+
+                # Handle any invalid types (should never happen...)
+                else:
+                    LOG.warning(
+                        'Field %s has invalid type: %s',
+                        api_field.field_name,
+                        api_field.field_type,
+                    )
+                    processed[field_name] = field_value
             except KeyError:
                 LOG.warning(
                     'Response field not in FROM_API_FIELDS: %s', field_name
