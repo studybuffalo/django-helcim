@@ -27,4 +27,4 @@ def test_other_django_versions_depreciation_warning(recwarn):
     """Tests that warning doesn't fire for other Django versions."""
     reload(helcim)
 
-    assert len(recwarn) == 0
+    assert len(recwarn) is 0
