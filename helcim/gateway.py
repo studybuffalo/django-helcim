@@ -627,9 +627,7 @@ class Purchase(BaseCardTransaction):
                 'transactionType': 'purchase',
             }
         )
-
         self.post(purchase_data)
-
         purchase = self.save_transaction('s')
 
         if self.save_token:
@@ -654,11 +652,16 @@ class Preauthorize(BaseCardTransaction):
                 'transactionType': 'preauth',
             }
         )
-
         self.post(preauth_data)
         preauth = self.save_transaction('p')
 
-        return preauth
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+
+        return preauth, token
 
 class Refund(BaseCardTransaction):
     """Makes a refund request."""
@@ -696,11 +699,16 @@ class Verification(BaseCardTransaction):
                 'transactionType': 'verify',
             }
         )
-
         self.post(verification_data)
         verification = self.save_transaction('v')
 
-        return verification
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+
+        return verification, token
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""
