@@ -107,3 +107,12 @@ def test_helcim_transaction_can_be_refunded_invalid_amount():
     )
 
     assert transaction.can_be_refunded is False
+
+@pytest.mark.django_db
+def test_helcim_token_minimal_model_creation():
+    models.HelcimToken.objects.create(
+        token='abcdefghijklmnopqrstuvw',
+        token_f4l4='11119999',
+    )
+
+    assert models.HelcimToken.objects.all().count() == 1
