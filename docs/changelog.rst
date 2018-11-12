@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.2.0 (2018-Nov-12)
+===================
+
+Feature Updates
+---------------
+
+* Added the HelcimToken model (AKA the "Token Vault") - allows saving of
+  Helcim Commerce card tokens to allow re-use in later transactions.
+
 0.1.2 (2018-Nov-08)
 ===================
 
