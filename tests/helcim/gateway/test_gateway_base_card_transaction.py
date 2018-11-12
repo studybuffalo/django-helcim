@@ -11,6 +11,9 @@ class MockDjangoModel():
     def __init__(self, **kwargs):
         self.data = kwargs
 
+def mock_get_or_create_created(**kwargs):
+    return (MockDjangoModel(**kwargs), True)
+
 API_DETAILS = {
     'url': 'https://www.test.com',
     'account_id': '12345678',
@@ -322,8 +325,8 @@ def test_determine_card_details_mag_encrypted_priority():
     assert 'mag_enc' in transaction.cleaned
 
 @patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
 )
 def test_save_token():
     details = {
@@ -347,8 +350,8 @@ def test_save_token():
     assert token_entry.data['django_user'] == 1
 
 @patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
 )
 def test_save_token_missing_redacted_response():
     details = {
@@ -370,10 +373,6 @@ def test_save_token_missing_redacted_response():
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] == 1
 
-@patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
-)
 def test_save_token_missing_token():
     details = {
         'token_f4l4': '11119999',
@@ -390,10 +389,6 @@ def test_save_token_missing_token():
     # Checks that all proper fields ended up getting passed to model
     assert token_entry is None
 
-@patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
-)
 def test_save_token_missing_token_f4l4():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -411,8 +406,8 @@ def test_save_token_missing_token_f4l4():
     assert token_entry is None
 
 @patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
 )
 def test_save_token_missing_customer_code():
     details = {
@@ -434,8 +429,8 @@ def test_save_token_missing_customer_code():
     assert token_entry.data['django_user'] == 1
 
 @patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
 )
 def test_save_token_missing_django_user():
     details = {
@@ -455,3 +450,6 @@ def test_save_token_missing_django_user():
     assert token_entry.data['token_f4l4'] == '11119999'
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] is None
+
+def test_save_token_duplicate_token():
+    pass

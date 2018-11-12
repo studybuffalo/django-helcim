@@ -42,6 +42,9 @@ class MockDjangoModel():
     def __init__(self, **kwargs):
         self.data = kwargs
 
+def mock_get_or_create_created(**kwargs):
+    return (MockDjangoModel(**kwargs), True)
+
 API_DETAILS = {
     'url': 'https://www.test.com',
     'account_id': '12345678',
@@ -82,8 +85,8 @@ def test_process_error_response_purchase():
     MockDjangoModel
 )
 @patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
-    MockDjangoModel
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
 )
 def test_process_with_save_token_enabled():
     details = {
@@ -104,10 +107,6 @@ def test_process_with_save_token_enabled():
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
-    MockDjangoModel
-)
-@patch(
-    'helcim.gateway.models.HelcimToken.objects.create',
     MockDjangoModel
 )
 def test_process_with_save_token_disabled():
