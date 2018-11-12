@@ -3,6 +3,8 @@
 
 from unittest.mock import patch
 
+from django.test import override_settings
+
 from helcim import exceptions as helcim_exceptions, gateway
 
 
@@ -60,9 +62,9 @@ def test_verification_processing():
     }
 
     verification = gateway.Verification(api_details=API_DETAILS, **details)
-    response = verification.process()
+    transaction, _ = verification.process()
 
-    assert isinstance(response, MockDjangoModel)
+    assert isinstance(transaction, MockDjangoModel)
 
 def test_process_error_response_verification():
     verification_request = gateway.Verification()
@@ -73,3 +75,53 @@ def test_process_error_response_verification():
         assert True
     else:
         assert False
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.create',
+    MockDjangoModel
+)
+def test_process_with_save_token_enabled():
+    details = {
+        'amount': 100.00,
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    verification = gateway.Verification(
+        api_details=API_DETAILS, save_token=True, **details
+    )
+    _, token = verification.process()
+
+    assert isinstance(token, MockDjangoModel)
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
+@patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.create',
+    MockDjangoModel
+)
+def test_process_with_save_token_disabled():
+    details = {
+        'amount': 100.00,
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    verification = gateway.Verification(
+        api_details=API_DETAILS, save_token=True, **details
+    )
+    _, token = verification.process()
+
+    assert token is None
