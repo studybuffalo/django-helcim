@@ -660,7 +660,6 @@ class Preauthorize(BaseCardTransaction):
         else:
             token = None
 
-
         return preauth, token
 
 class Refund(BaseCardTransaction):
@@ -678,11 +677,16 @@ class Refund(BaseCardTransaction):
                 'transactionType': 'refund',
             }
         )
-
         self.post(refund_data)
         refund = self.save_transaction('r')
 
-        return refund
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+
+        return refund, token
 
 class Verification(BaseCardTransaction):
     """Makes a verification request to Helcim Commerce API."""
