@@ -155,3 +155,14 @@ with django-helcim.
 If set to ``False``, will allow you to capture and refund transactions
 from the ``HelcimTransactionDetailView``. Otherwise, this functionality
 is turned off and the transaction detail view is read only.
+
+``HELCIM_ENABLE_TOKEN_VAULT``
+=============================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, enables the Helcim card token vault. This stores
+the card token returned from the Helcim Commerce API, along with the
+customer code. The token will also be associated to the logged in user.
