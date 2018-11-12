@@ -85,3 +85,27 @@ def test_save_token_saves_to_model_with_user():
     base.save_token_to_vault()
 
     assert count + 1 == models.HelcimToken.objects.all().count()
+
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@pytest.mark.django_db
+def test_save_token_handles_duplicate_token():
+    first_instance = models.HelcimToken.objects.create(
+        token='abcdefghijklmnopqrstuvw',
+        customer_code='CST1000',
+        token_f4l4='11119999',
+        django_user=None,
+    )
+
+    count = models.HelcimToken.objects.all().count()
+
+    base = gateway.BaseCardTransaction(save_token=True)
+    base.response = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'customer_code': 'CST1000',
+        'token_f4l4': '11119999',
+    }
+    second_instance = base.save_token_to_vault()
+
+    assert count == models.HelcimToken.objects.all().count()
+    assert first_instance == second_instance

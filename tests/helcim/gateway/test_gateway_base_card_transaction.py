@@ -450,6 +450,3 @@ def test_save_token_missing_django_user():
     assert token_entry.data['token_f4l4'] == '11119999'
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] is None
-
-def test_save_token_duplicate_token():
-    pass
