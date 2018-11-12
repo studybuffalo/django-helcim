@@ -210,3 +210,6 @@ class HelcimToken(models.Model):
                 'Can view and interact with Helcim tokens.'
             ),
         )
+        unique_together = (
+            'token', 'token_f4l4', 'customer_code', 'django_user'
+        )

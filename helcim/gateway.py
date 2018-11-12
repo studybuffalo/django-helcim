@@ -597,12 +597,14 @@ class BaseCardTransaction(BaseRequest):
         if token and token_f4l4:
             customer_code = self.redacted_response.get('customer_code', None)
 
-            return models.HelcimToken.objects.create(
+            token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
                 token_f4l4=token_f4l4,
                 customer_code=customer_code,
                 django_user=self.django_user,
             )
+
+            return token_instance
 
         return None
 
