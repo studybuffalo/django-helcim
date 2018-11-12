@@ -465,7 +465,9 @@ class BaseRequest():
                 DjangoError: Issue when attempting to save transaction
                     to database.
         """
-        self.redact_data()
+        # Redacts data if not already done
+        if not self.redacted_response:
+            self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
 
@@ -490,6 +492,23 @@ class BaseRequest():
 
 class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
+    def __init__(self, save_token=False, django_user=None, **kwargs):
+        """Extends BaseRequest to include save_token and django_user."""
+        super(BaseCardTransaction, self).__init__(**kwargs)
+        self.save_token = self._determine_save_token_status(save_token)
+        self.django_user = django_user
+
+    def _determine_save_token_status(self, user_decision):
+        """Determines if Helcim card token should be saved."""
+        # Check if vault is enabled in settings
+        vault_enabled = getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False)
+
+        # If yes, check if user requested save
+        if vault_enabled:
+            return user_decision
+
+        return False
+
     def determine_card_details(self):
         """Confirms valid payment details and updates self.cleaned.
 
@@ -560,6 +579,28 @@ class BaseCardTransaction(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
+    def save_token_to_vault(self):
+        """Saves Helcim card token (if enabled)."""
+        # Redacts data if not already done
+        if not self.redacted_response:
+            self.redact_data()
+
+        # Check that required data is available in response
+        token = getattr(self.redacted_response, 'token', None)
+        token_f4l4 = getattr(self.redacted_response, 'token_f4l4', None)
+
+        if token and token_f4l4:
+            customer_code = getattr(
+                self.redacted_response, 'customer_code', None
+            )
+
+            models.HelcimToken.objects.create(
+                token=token,
+                token_f4l4=token_f4l4,
+                customer_code=customer_code,
+                django_user=self.django_user,
+            )
+
 class Purchase(BaseCardTransaction):
     """Makes a purchase request to Helcim Commerce API."""
     def process(self):
@@ -577,7 +618,11 @@ class Purchase(BaseCardTransaction):
         )
 
         self.post(purchase_data)
+
         purchase = self.save_transaction('s')
+
+        if self.save_token:
+            self.save_token_to_vault()
 
         return purchase
 
