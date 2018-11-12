@@ -8,14 +8,58 @@ from unittest.mock import patch
 from helcim import conversions
 
 # *_API_FIELDS being mocked to allow proper testing of validation
-MOCK_TO_API_FIELDS = {
+MOCK_TO_API_FIELDS_DECIMAL = {
+    'amount': conversions.Field('amount', 'c', 10, 100),
+}
+
+MOCK_TO_API_FIELDS_STRING = {
+    'cc_cvv': conversions.Field('cardCVV', 's', 3, 4),
+}
+
+MOCK_TO_API_FIELDS_INTEGER = {
+    'product_id': conversions.Field('productId', 'i', 1, 100),
+}
+
+MOCK_TO_API_FIELDS_BOOLEAN = {
+    'test': conversions.Field('test', 'b'),
+}
+
+MOCK_TO_API_FIELDS_ALL = {
     'amount': conversions.Field('amount', 'c', 10, 100),
     'cc_cvv': conversions.Field('cardCVV', 's', 3, 4),
     'product_id': conversions.Field('productId', 'i', 1, 100),
     'test': conversions.Field('test', 'b'),
 }
 
-MOCK_FROM_API_FIELDS = {
+MOCK_TO_API_FIELDS_INVALID = {
+    'invalid': conversions.Field('value', 't'),
+}
+
+MOCK_FROM_API_FIELDS_DECIMAL = {
+    'amount': conversions.Field('amount', 'c'),
+}
+
+MOCK_FROM_API_FIELDS_STRING = {
+    'cardNumber': conversions.Field('cc_number', 's'),
+}
+
+MOCK_FROM_API_FIELDS_INTEGER = {
+    'transactionId': conversions.Field('transaction_id', 'i'),
+}
+
+MOCK_FROM_API_FIELDS_BOOLEAN = {
+    'availability': conversions.Field('availability', 'b'),
+}
+
+MOCK_FROM_API_FIELDS_DATE = {
+    'date': conversions.Field('transaction_date', 'd'),
+}
+
+MOCK_FROM_API_FIELDS_TIME = {
+    'time': conversions.Field('transaction_time', 't')
+}
+
+MOCK_FROM_API_FIELDS_ALL = {
     'amount': conversions.Field('amount', 'c'),
     'cardNumber': conversions.Field('cc_number', 's'),
     'transactionId': conversions.Field('transaction_id', 'i'),
@@ -24,7 +68,16 @@ MOCK_FROM_API_FIELDS = {
     'time': conversions.Field('transaction_time', 't')
 }
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+class InvalidField():
+    def __init__(self, field_name, field_type):
+        self.field_name = field_name
+        self.field_type = field_type
+
+MOCK_FROM_API_FIELDS_INVALID = {
+    'invalid': InvalidField('field', 'x')
+}
+
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_STRING)
 def test_validate_request_fields_string_valid():
     details = {
         'cc_cvv': '123'
@@ -35,7 +88,7 @@ def test_validate_request_fields_string_valid():
     assert 'cc_cvv' in cleaned
     assert cleaned['cc_cvv'] == details['cc_cvv']
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_STRING)
 def test_validate_request_fields_string_min():
     details = {
         'cc_cvv': '12'
@@ -48,7 +101,7 @@ def test_validate_request_fields_string_min():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_STRING)
 def test_validate_request_fields_string_max():
     details = {
         'cc_cvv': '12345'
@@ -61,7 +114,7 @@ def test_validate_request_fields_string_max():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_INTEGER)
 def test_validate_request_fields_integer_valid():
     details = {
         'product_id': 100
@@ -72,7 +125,7 @@ def test_validate_request_fields_integer_valid():
     assert 'product_id' in cleaned
     assert cleaned['product_id'] == details['product_id']
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_INTEGER)
 def test_validate_request_fields_integer_min():
     details = {
         'product_id': 0
@@ -85,7 +138,7 @@ def test_validate_request_fields_integer_min():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_INTEGER)
 def test_validate_request_fields_integer_max():
     details = {
         'product_id': 101
@@ -98,7 +151,7 @@ def test_validate_request_fields_integer_max():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_DECIMAL)
 def test_validate_request_fields_decimal_valid():
     details = {
         'amount': Decimal('50.00')
@@ -109,7 +162,7 @@ def test_validate_request_fields_decimal_valid():
     assert 'amount' in cleaned
     assert cleaned['amount'] == details['amount']
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_DECIMAL)
 def test_validate_request_fields_decimal_min():
     details = {
         'amount': Decimal('1.00')
@@ -122,7 +175,7 @@ def test_validate_request_fields_decimal_min():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_DECIMAL)
 def test_validate_request_fields_decimal_max():
     details = {
         'amount': Decimal('200.00')
@@ -135,7 +188,7 @@ def test_validate_request_fields_decimal_max():
     else:
         assert False
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_BOOLEAN)
 def test_validate_request_fields_boolean_true():
     details = {
         'test': True
@@ -146,7 +199,7 @@ def test_validate_request_fields_boolean_true():
     assert 'test' in cleaned
     assert cleaned['test'] == 1
 
-@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS)
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_BOOLEAN)
 def test_validate_request_fields_boolean_false():
     details = {
         'test': False
@@ -156,6 +209,52 @@ def test_validate_request_fields_boolean_false():
 
     assert 'test' in cleaned
     assert cleaned['test'] == 0
+
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_ALL)
+def test_validate_request_fields_all_valid():
+    """Tests that validations works for all fields at once."""
+    details = {
+        'cc_cvv': '123',
+        'product_id': 100,
+        'amount': Decimal('50.00'),
+        'test': True,
+    }
+
+    cleaned = conversions.validate_request_fields(details)
+
+    assert 'cc_cvv' in cleaned
+    assert cleaned['cc_cvv'] == details['cc_cvv']
+    assert 'product_id' in cleaned
+    assert cleaned['product_id'] == details['product_id']
+    assert 'amount' in cleaned
+    assert cleaned['amount'] == details['amount']
+    assert 'test' in cleaned
+    assert cleaned['test'] == 1
+
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_ALL)
+def test_validate_request_fields_invalid_field_name():
+    details = {'invalid': 'field'}
+
+    try:
+        conversions.validate_request_fields(details)
+    except KeyError:
+        assert True
+    else:
+        assert False
+
+@patch('helcim.conversions.TO_API_FIELDS', MOCK_TO_API_FIELDS_INVALID)
+def test_validate_request_fields_invalid_field_type():
+    """Tests that error is generated if invalid field type is passed."""
+    details = {'invalid': 'field'}
+
+    try:
+        conversions.validate_request_fields(details)
+    except UnboundLocalError as error:
+        assert str(error) == (
+            "local variable 'cleaned_value' referenced before assignment"
+        )
+    else:
+        assert False
 
 def test_field_invalid_type():
     try:
@@ -224,7 +323,7 @@ def test_process_request_fields_invalid_api():
     else:
         assert False
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
 def test_process_api_response_valid():
     api_response = {
         'response': 1,
@@ -256,7 +355,7 @@ def test_process_api_response_valid():
     assert response['cc_number'] == '1111********9999'
     assert response['token_f4l4'] == '11119999'
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_STRING)
 def test_process_api_response_string_field():
     api_response = {
         'response': 1,
@@ -272,7 +371,7 @@ def test_process_api_response_string_field():
     assert response['cc_number'] == '1111********9999'
     assert isinstance(response['cc_number'], str)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_DECIMAL)
 def test_process_api_response_decimal_field():
     api_response = {
         'response': 1,
@@ -288,7 +387,7 @@ def test_process_api_response_decimal_field():
     assert response['amount'] == Decimal('50.01')
     assert isinstance(response['amount'], Decimal)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_INTEGER)
 def test_process_api_response_integer_field():
     api_response = {
         'response': 1,
@@ -304,7 +403,7 @@ def test_process_api_response_integer_field():
     assert response['transaction_id'] == 101
     assert isinstance(response['transaction_id'], int)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_BOOLEAN)
 def test_process_api_response_boolean_field():
     api_response = {
         'response': 1,
@@ -320,7 +419,7 @@ def test_process_api_response_boolean_field():
     assert response['availability'] is True
     assert isinstance(response['availability'], bool)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_DATE)
 def test_process_api_response_date_field():
     api_response = {
         'response': 1,
@@ -336,7 +435,7 @@ def test_process_api_response_date_field():
     assert response['transaction_date'] == date(2018, 1, 1)
     assert isinstance(response['transaction_date'], date)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_TIME)
 def test_process_api_response_time_field():
     api_response = {
         'response': 1,
@@ -352,7 +451,7 @@ def test_process_api_response_time_field():
     assert response['transaction_time'] == time(8, 30, 15)
     assert isinstance(response['transaction_time'], time)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
 def test_process_api_response_missing_field():
     api_response = {
         'response': 1,
@@ -368,7 +467,7 @@ def test_process_api_response_missing_field():
     assert response['fake_field'] == 'fake.'
     assert isinstance(response['fake_field'], str)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
 def test_process_api_response_missing_required_field():
     api_response = {
         'response': 1,
@@ -382,7 +481,7 @@ def test_process_api_response_missing_required_field():
     else:
         assert False
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
 def test_process_api_response_create_f4l4():
     api_response = {
         'response': 1,
@@ -396,7 +495,7 @@ def test_process_api_response_create_f4l4():
 
     assert response['token_f4l4'] == '11119999'
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
 def test_process_api_response_create_f4l4_with_no_cc():
     api_response = {
         'response': 1,
@@ -407,6 +506,39 @@ def test_process_api_response_create_f4l4_with_no_cc():
     response = conversions.process_api_response(api_response)
 
     assert response['token_f4l4'] is None
+
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_ALL)
+def test_process_api_response_missing_transaction():
+    api_response = {
+        'response': 1,
+        'responseMessage': 'Transaction successful.',
+        'notice': '',
+    }
+
+    response = conversions.process_api_response(api_response)
+
+    assert len(response) == 5
+    assert 'notice' in response
+    assert 'raw_request' in response
+    assert 'raw_response' in response
+    assert 'response_message' in response
+    assert 'transaction_success' in response
+
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_INVALID)
+def test_process_api_response_invalid_type():
+    api_response = {
+        'response': 1,
+        'responseMessage': '',
+        'notice': '',
+        'transaction': {
+            'invalid': 'field',
+        }
+    }
+    response = conversions.process_api_response(api_response)
+
+    assert 'invalid' in response
+    assert response['invalid'] == 'field'
+
 
 def test_create_raw_response_with_data():
     response_data = {

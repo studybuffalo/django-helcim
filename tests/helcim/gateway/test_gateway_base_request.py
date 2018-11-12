@@ -390,6 +390,22 @@ def test_redact_field():
     )
     assert base.redacted_response['cc_name'] is None
 
+def test_redact_field_only_redacts_specified_details():
+    base = gateway.BaseRequest()
+    base.redacted_response = {
+        'raw_request': 'cardHolderName=a',
+        'raw_response': '<cardHolderName>a</cardHolderName>',
+        'cc_name': 'a',
+    }
+    base._redact_field('cardNumber', 'cc_number')
+
+    assert len(base.redacted_response) == 3
+    assert base.redacted_response['raw_request'] == 'cardHolderName=a'
+    assert base.redacted_response['raw_response'] == (
+        '<cardHolderName>a</cardHolderName>'
+    )
+    assert base.redacted_response['cc_name'] is 'a'
+
 @override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_redact_data_cc_name():
     base = gateway.BaseRequest()
