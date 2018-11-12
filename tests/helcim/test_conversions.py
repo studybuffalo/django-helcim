@@ -25,10 +25,10 @@ MOCK_TO_API_FIELDS_BOOLEAN = {
 }
 
 MOCK_TO_API_FIELDS_ALL = {
-    **MOCK_TO_API_FIELDS_DECIMAL,
-    **MOCK_TO_API_FIELDS_STRING,
-    **MOCK_TO_API_FIELDS_INTEGER,
-    **MOCK_TO_API_FIELDS_BOOLEAN,
+    'amount': conversions.Field('amount', 'c', 10, 100),
+    'cc_cvv': conversions.Field('cardCVV', 's', 3, 4),
+    'product_id': conversions.Field('productId', 'i', 1, 100),
+    'test': conversions.Field('test', 'b'),
 }
 
 MOCK_TO_API_FIELDS_INVALID = {
@@ -60,12 +60,12 @@ MOCK_FROM_API_FIELDS_TIME = {
 }
 
 MOCK_FROM_API_FIELDS_ALL = {
-    **MOCK_FROM_API_FIELDS_DECIMAL,
-    **MOCK_FROM_API_FIELDS_STRING,
-    **MOCK_FROM_API_FIELDS_INTEGER,
-    **MOCK_FROM_API_FIELDS_BOOLEAN,
-    **MOCK_FROM_API_FIELDS_DATE,
-    **MOCK_FROM_API_FIELDS_TIME,
+    'amount': conversions.Field('amount', 'c'),
+    'cardNumber': conversions.Field('cc_number', 's'),
+    'transactionId': conversions.Field('transaction_id', 'i'),
+    'availability': conversions.Field('availability', 'b'),
+    'date': conversions.Field('transaction_date', 'd'),
+    'time': conversions.Field('transaction_time', 't')
 }
 
 class InvalidField():
