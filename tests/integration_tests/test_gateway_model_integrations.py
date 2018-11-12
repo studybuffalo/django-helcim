@@ -4,6 +4,9 @@ from datetime import datetime
 
 import pytest
 
+from django.contrib.auth import get_user_model
+from django.test import override_settings
+
 from helcim import exceptions as helcim_exceptions, gateway, models
 
 
@@ -49,3 +52,36 @@ def test_save_transaction_invalid_data_type_handling():
         assert True
     else:
         assert False
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@pytest.mark.django_db
+def test_save_token_saves_to_model():
+    count = models.HelcimToken.objects.all().count()
+
+    base = gateway.BaseCardTransaction(save_token=True)
+    base.response = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'customer_code': 'CST1000',
+        'token_f4l4': '11119999',
+    }
+    base.save_token_to_vault()
+
+    assert count + 1 == models.HelcimToken.objects.all().count()
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@pytest.mark.django_db
+def test_save_token_saves_to_model_with_user():
+    user = get_user_model().objects.create_user(
+        username='user', password='password'
+    )
+    count = models.HelcimToken.objects.all().count()
+
+    base = gateway.BaseCardTransaction(save_token=True, django_user=user)
+    base.response = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'customer_code': 'CST1000',
+        'token_f4l4': '11119999',
+    }
+    base.save_token_to_vault()
+
+    assert count + 1 == models.HelcimToken.objects.all().count()

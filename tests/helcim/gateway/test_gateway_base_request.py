@@ -519,6 +519,37 @@ def test_save_transaction():
 
     assert isinstance(model_instance, MockDjangoModel)
 
+
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+def test_save_transaction_with_redacted_data():
+    base = gateway.BaseRequest()
+    base.response = {
+        'transaction_success': True,
+        'response_message': 'APPROVED',
+        'notice': '',
+        'raw_request': 'cardHolderName=a&cardToken=b',
+        'raw_response': (
+            '<cardHolderName>a</cardHolderName><cardToken>b</cardToken>'
+        ),
+        'cc_name': 'a',
+    }
+    base.redacted_response = {
+        'transaction_success': True,
+        'response_message': 'APPROVED',
+        'notice': '',
+        'raw_request': 'cardHolderName=REDACTED',
+        'raw_response': (
+            '<cardHolderName>REDACTED</cardHolderName>'
+        ),
+        'cc_name': 'REDACTED',
+    }
+    model_instance = base.save_transaction('s')
+
+    assert isinstance(model_instance, MockDjangoModel)
+
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
     mock_integrity_error
