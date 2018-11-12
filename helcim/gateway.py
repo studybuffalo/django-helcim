@@ -580,31 +580,42 @@ class BaseCardTransaction(BaseRequest):
             self.cleaned.pop(field, None)
 
     def save_token_to_vault(self):
-        """Saves Helcim card token (if enabled)."""
+        """Saves Helcim card token.
+
+            Returns:
+                obj: The HelcimToken model instance, or ``None`` (if
+                    model not created).
+        """
         # Redacts data if not already done
         if not self.redacted_response:
             self.redact_data()
 
         # Check that required data is available in response
-        token = getattr(self.redacted_response, 'token', None)
-        token_f4l4 = getattr(self.redacted_response, 'token_f4l4', None)
+        token = self.redacted_response.get('token', None)
+        token_f4l4 = self.redacted_response.get('token_f4l4', None)
 
         if token and token_f4l4:
-            customer_code = getattr(
-                self.redacted_response, 'customer_code', None
-            )
+            customer_code = self.redacted_response.get('customer_code', None)
 
-            models.HelcimToken.objects.create(
+            return models.HelcimToken.objects.create(
                 token=token,
                 token_f4l4=token_f4l4,
                 customer_code=customer_code,
                 django_user=self.django_user,
             )
 
+        return None
+
 class Purchase(BaseCardTransaction):
     """Makes a purchase request to Helcim Commerce API."""
     def process(self):
-        """Makes a purchase request."""
+        """Makes a purchase request.
+
+            Returns:
+                purchase (obj): The saved HelcimTransaction model
+                    instance.
+                token (obj): The saved HelcimToken model.
+        """
         self.validate_fields()
         self.configure_test_transaction()
         self.determine_card_details()
@@ -622,9 +633,11 @@ class Purchase(BaseCardTransaction):
         purchase = self.save_transaction('s')
 
         if self.save_token:
-            self.save_token_to_vault()
+            token = self.save_token_to_vault()
+        else:
+            token = None
 
-        return purchase
+        return purchase, token
 
 class Preauthorize(BaseCardTransaction):
     """Makes a pre-authorization request to Helcim Commerce API."""
