@@ -589,16 +589,12 @@ class BaseCardTransaction(BaseRequest):
                 obj: The HelcimToken model instance, or ``None`` (if
                     model not created).
         """
-        # Redacts data if not already done
-        if not self.redacted_response:
-            self.redact_data()
-
         # Check that required data is available in response
-        token = self.redacted_response.get('token', None)
-        token_f4l4 = self.redacted_response.get('token_f4l4', None)
+        token = self.response.get('token', None)
+        token_f4l4 = self.response.get('token_f4l4', None)
 
         if token and token_f4l4:
-            customer_code = self.redacted_response.get('customer_code', None)
+            customer_code = self.response.get('customer_code', None)
 
             token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
