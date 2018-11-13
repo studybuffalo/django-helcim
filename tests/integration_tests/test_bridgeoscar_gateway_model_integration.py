@@ -93,7 +93,7 @@ def test_purchase_bridge_valid_with_token():
 )
 @override_settings(HELCIM_REDACT_ALL=True, HELCIM_ENABLE_TOKEN_VAULT=True)
 @pytest.mark.django_db
-def test_purchase_bridge_valid_redact_sensitive_information():
+def test_purchase_bridge_valid_redact_sensitive_cc_data():
     """Tests that the purchase bridge properly creates models."""
     credit_card = MockCreditCard(
         name='Test Person',
@@ -109,7 +109,7 @@ def test_purchase_bridge_valid_redact_sensitive_information():
         save_token=True
     )
     transaction, _ = purchase.process()
-    print(transaction.raw_request)
+
     assert transaction.cc_name is None
     assert transaction.cc_number is None
     assert transaction.cc_expiry is None
