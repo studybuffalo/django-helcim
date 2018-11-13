@@ -121,27 +121,28 @@ class BaseRequest():
             'token': False,
         }
 
-        if getattr(settings, 'HELCIM_REDACT_ALL', False):
-            fields['name'] = True
-            fields['number'] = True
-            fields['expiry'] = True
-            fields['type'] = True
-            fields['token'] = True
+        if hasattr(settings, 'HELCIM_REDACT_ALL'):
+            if settings.HELCIM_REDACT_ALL:
+                fields['name'] = True
+                fields['number'] = True
+                fields['expiry'] = True
+                fields['type'] = True
+                fields['token'] = True
+        else:
+            if getattr(settings, 'HELCIM_REDACT_CC_NAME', True):
+                fields['name'] = True
 
-        if getattr(settings, 'HELCIM_REDACT_CC_NAME', False):
-            fields['name'] = True
+            if getattr(settings, 'HELCIM_REDACT_CC_NUMBER', True):
+                fields['number'] = True
 
-        if getattr(settings, 'HELCIM_REDACT_CC_NUMBER', False):
-            fields['number'] = True
+            if getattr(settings, 'HELCIM_REDACT_CC_EXPIRY', True):
+                fields['expiry'] = True
 
-        if getattr(settings, 'HELCIM_REDACT_CC_EXPIRY', False):
-            fields['expiry'] = True
+            if getattr(settings, 'HELCIM_REDACT_CC_TYPE', True):
+                fields['type'] = True
 
-        if getattr(settings, 'HELCIM_REDACT_CC_TYPE', False):
-            fields['type'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_TOKEN', False):
-            fields['token'] = True
+            if getattr(settings, 'HELCIM_REDACT_TOKEN', False):
+                fields['token'] = True
 
         return fields
 
@@ -176,19 +177,21 @@ class BaseRequest():
                 python_name (str): The field name used by this
                     application.
         """
-        # Redacts the raw_request data
-        self.redacted_response['raw_request'] = re.sub(
-            r'({}=.+?)(&|$)'.format(api_name),
-            r'{}=REDACTED\g<2>'.format(api_name),
-            self.redacted_response['raw_request']
-        )
+        # Redacts the raw_request data (if present)
+        if self.redacted_response.get('raw_request', None):
+            self.redacted_response['raw_request'] = re.sub(
+                r'({}=.+?)(&|$)'.format(api_name),
+                r'{}=REDACTED\g<2>'.format(api_name),
+                self.redacted_response['raw_request']
+            )
 
-        # Redacts the raw_response data
-        self.redacted_response['raw_response'] = re.sub(
-            r'<{}>.*</{}>'.format(api_name, api_name),
-            r'<{}>REDACTED</{}>'.format(api_name, api_name),
-            self.redacted_response['raw_response']
-        )
+        # Redacts the raw_response data (if present)
+        if self.redacted_response.get('raw_response', None):
+            self.redacted_response['raw_response'] = re.sub(
+                r'<{}>.*</{}>'.format(api_name, api_name),
+                r'<{}>REDACTED</{}>'.format(api_name, api_name),
+                self.redacted_response['raw_response']
+            )
 
         if python_name in self.redacted_response:
             self.redacted_response[python_name] = None
@@ -375,8 +378,8 @@ class BaseRequest():
         else:
             date_response = None
 
-        # Format the credit card expiry date
-        if 'cc_expiry' in response:
+        # Format the credit card expiry date (if present)
+        if response.get('cc_expiry', None):
             cc_expiry = self.convert_expiry_to_date(
                 response['cc_expiry']
             )

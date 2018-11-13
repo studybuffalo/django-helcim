@@ -94,7 +94,7 @@ settings below.**
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card cardholder
 name.
@@ -104,7 +104,7 @@ name.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card number.
 
@@ -113,7 +113,7 @@ If set to ``True``, redacts all reference to the credit card number.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card expiry date.
 
@@ -122,7 +122,7 @@ If set to ``True``, redacts all reference to the credit card expiry date.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card type.
 
