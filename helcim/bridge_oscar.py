@@ -105,7 +105,7 @@ class PurchaseBridge(BaseCardTransactionBridge):
         purchase_instance = gateway.Purchase(
             save_token=self.save_token,
             django_user=self.django_user,
-            **self.transaction_details,
+            **self.transaction_details
         )
 
         try:
@@ -137,7 +137,7 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
         preauth_instance = gateway.Preauthorize(
             save_token=self.save_token,
             django_user=self.django_user,
-            **self.transaction_details,
+            **self.transaction_details
         )
 
         try:
@@ -169,7 +169,7 @@ class RefundBridge(BaseCardTransactionBridge):
         refund_instance = gateway.Refund(
             save_token=self.save_token,
             django_user=self.django_user,
-            **self.transaction_details,
+            **self.transaction_details
         )
 
         try:
@@ -201,7 +201,7 @@ class VerificationBridge(BaseCardTransactionBridge):
         verification_instance = gateway.Verification(
             save_token=self.save_token,
             django_user=self.django_user,
-            **self.transaction_details,
+            **self.transaction_details
         )
 
         try:
