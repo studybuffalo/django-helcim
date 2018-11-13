@@ -292,7 +292,7 @@ class BaseRequest():
             self._redact_field('cardNumber', 'cc_number')
 
         if fields['expiry']:
-            self._redact_field('expiryDate', 'cc_expiry')
+            self._redact_field('cardExpiry', 'cc_expiry')
 
         if fields['type']:
             self._redact_field('cardType', 'cc_type')
