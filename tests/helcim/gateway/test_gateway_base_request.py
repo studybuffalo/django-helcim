@@ -13,8 +13,6 @@ from django.test import override_settings
 from helcim import exceptions as helcim_exceptions, gateway
 
 
-# TODO: Add tests to confirm redaction settings have proper overrides
-
 class MockPostResponse():
     def __init__(self, url, data):
         self.content = """<?xml version="1.0"?>
