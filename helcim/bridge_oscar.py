@@ -70,7 +70,10 @@ class BaseCardTransactionBridge():
             card (obj): Instance of the Oscar bankcard class.
             billing_address (dict): The billing address information.
     """
-    def __init__(self, order_number, amount, card, billing_address=None):
+    def __init__(
+            self, order_number, amount, card, billing_address=None,
+            save_token=False, django_user=None
+    ):
         transaction_details = {
             'order_number': order_number,
             'amount': amount,
@@ -84,6 +87,8 @@ class BaseCardTransactionBridge():
         transaction_details.update(remap_oscar_credit_card(card))
 
         self.transaction_details = transaction_details
+        self.save_token = save_token
+        self.django_user = django_user
 
 class PurchaseBridge(BaseCardTransactionBridge):
     """Class to bridge Oscar and Helcim purchase transactions."""
@@ -97,7 +102,11 @@ class PurchaseBridge(BaseCardTransactionBridge):
                     error processing the payment.
         """
 
-        purchase_instance = gateway.Purchase(**self.transaction_details)
+        purchase_instance = gateway.Purchase(
+            **self.transaction_details,
+            save_token=self.save_token,
+            django_user=self.django_user,
+        )
 
         try:
             return purchase_instance.process()
@@ -125,7 +134,11 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
                     error processing the payment.
         """
 
-        preauth_instance = gateway.Preauthorize(**self.transaction_details)
+        preauth_instance = gateway.Preauthorize(
+            **self.transaction_details,
+            save_token=self.save_token,
+            django_user=self.django_user,
+        )
 
         try:
             return preauth_instance.process()
@@ -153,7 +166,11 @@ class RefundBridge(BaseCardTransactionBridge):
                     error processing the payment.
         """
 
-        refund_instance = gateway.Refund(**self.transaction_details)
+        refund_instance = gateway.Refund(
+            **self.transaction_details,
+            save_token=self.save_token,
+            django_user=self.django_user,
+        )
 
         try:
             return refund_instance.process()
@@ -182,7 +199,9 @@ class VerificationBridge(BaseCardTransactionBridge):
         """
 
         verification_instance = gateway.Verification(
-            **self.transaction_details
+            **self.transaction_details,
+            save_token=self.save_token,
+            django_user=self.django_user,
         )
 
         try:
