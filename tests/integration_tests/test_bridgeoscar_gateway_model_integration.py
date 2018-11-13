@@ -28,7 +28,7 @@ class MockPostResponse():
                     <currency>CAD</currency>
                     <cardNumber>1111********4444</cardNumber>
                     <cardToken>abcdefghijklmnopqrstuvw</cardToken>
-                    <expiryDate>0125</expiryDate>
+                    <cardExpiry>0125</cardExpiry>
                     <cardType>MasterCard</cardType>
                     <avsResponse>X</avsResponse>
                     <cvvResponse>M</cvvResponse>
@@ -121,7 +121,10 @@ def test_purchase_bridge_valid_redact_sensitive_cc_data():
     assert 'cardHolderName=REDACTED' in transaction.raw_request
     assert 'cardNumber=REDACTED' in transaction.raw_request
     assert 'cardExpiry=REDACTED' in transaction.raw_request
-
-# TODO: Add ability to Redact CCV
-# TODO: CONFIRM ALL SENSITIVE FIELDS CAN BE REDACTED
-# TODO: Make sure redaction can work when field is missing
+    assert (
+        '<cardHolderName>REDACTED</cardHolderName>' in transaction.raw_response
+    )
+    assert '<cardNumber>REDACTED</cardNumber>' in transaction.raw_response
+    assert '<cardExpiry>REDACTED</cardExpiry>' in transaction.raw_response
+    assert '<cardType>REDACTED</cardType>' in transaction.raw_response
+    assert '<cardToken>REDACTED</cardToken>' in transaction.raw_response
