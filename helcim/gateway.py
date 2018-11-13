@@ -707,41 +707,36 @@ def identify_redact_fields():
     """
     redact_fields = {
         'name': {
-            'redact': False,
+            'redact': True,
             'settings': 'HELCIM_REDACT_CC_NAME',
-            'default': True,
             'fields': [
                 {'api': 'cardHolderName', 'python': 'cc_name'},
             ]
         },
         'number': {
-            'redact': False,
+            'redact': True,
             'settings': 'HELCIM_REDACT_CC_NUMBER',
-            'default': True,
             'fields': [
                 {'api': 'cardNumber', 'python': 'cc_number'},
             ]
         },
         'expiry': {
-            'redact': False,
+            'redact': True,
             'settings': 'HELCIM_REDACT_CC_EXPIRY',
-            'default': True,
             'fields': [
                 {'api': 'cardExpiry', 'python': 'cc_expiry'},
             ]
         },
         'type': {
-            'redact': False,
+            'redact': True,
             'settings': 'HELCIM_REDACT_CC_TYPE',
-            'default': True,
             'fields': [
                 {'api': 'cardType', 'python': 'cc_type'},
             ]
         },
         'cvv': {
-            'redact': False,
+            'redact': True,
             'settings': 'HELCIM_REDACT_CC_CVV',
-            'default': True,
             'fields': [
                 {'api': 'cardCVV', 'python': 'cc_cvv'},
             ]
@@ -749,7 +744,6 @@ def identify_redact_fields():
         'token': {
             'redact': False,
             'settings': 'HELCIM_REDACT_TOKEN',
-            'default': False,
             'fields': [
                 {'api': 'cardToken', 'python': 'token'},
                 {'api': 'cardF4L4', 'python': 'token_f4l4'},
@@ -757,15 +751,20 @@ def identify_redact_fields():
         },
     }
 
+    # HELCIM_REDACT_ALL overrides all other settings
     if hasattr(settings, 'HELCIM_REDACT_ALL'):
-        if settings.HELCIM_REDACT_ALL:
-            # Set redact to true for all fields
+        if settings.HELCIM_REDACT_ALL is True:
             for key in redact_fields:
                 redact_fields[key]['redact'] = True
+        else:
+            for key in redact_fields:
+                redact_fields[key]['redact'] = False
+
+    # Otherwise, assess each field individually
     else:
         for key, field in redact_fields.items():
-            # Get value from settings file or use default value
-            if getattr(settings, field['settings'], field['default']):
-                redact_fields[key]['redact'] = True
+            redact_fields[key]['redact'] = getattr(
+                settings, field['settings'], field['redact']
+            )
 
     return redact_fields
