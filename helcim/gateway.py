@@ -727,18 +727,18 @@ def identify_redact_fields():
                 {'api': 'cardExpiry', 'python': 'cc_expiry'},
             ]
         },
-        'type': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_TYPE',
-            'fields': [
-                {'api': 'cardType', 'python': 'cc_type'},
-            ]
-        },
         'cvv': {
             'redact': True,
             'settings': 'HELCIM_REDACT_CC_CVV',
             'fields': [
                 {'api': 'cardCVV', 'python': 'cc_cvv'},
+            ]
+        },
+        'type': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_TYPE',
+            'fields': [
+                {'api': 'cardType', 'python': 'cc_type'},
             ]
         },
         'token': {
@@ -747,6 +747,21 @@ def identify_redact_fields():
             'fields': [
                 {'api': 'cardToken', 'python': 'token'},
                 {'api': 'cardF4L4', 'python': 'token_f4l4'},
+            ]
+        },
+        'mag': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_MAGNETIC',
+            'fields': [
+                {'api': 'cardMag', 'python': 'mag'},
+            ]
+        },
+        'mag_enc': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED',
+            'fields': [
+                {'api': 'cardMagEnc', 'python': 'mag_enc'},
+                {'api': 'serialNumber', 'python': 'mang_enc_serial_number'},
             ]
         },
     }
