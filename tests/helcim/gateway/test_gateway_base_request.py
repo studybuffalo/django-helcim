@@ -251,147 +251,123 @@ def test_configure_test_transaction_not_set():
     assert 'test' not in base.cleaned
 
 def test_identify_redact_fields_defaults():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_ALL=True)
 def test_identify_redact_fields_redact_all():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is True
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is True
 
 @override_settings(HELCIM_REDACT_CC_NAME=True)
 def test_identify_redact_fields_redact_name_true():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_NAME=False)
 def test_identify_redact_fields_redact_name_false():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is False
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is False
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_NUMBER=True)
 def test_identify_redact_fields_redact_number_true():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_NUMBER=False)
 def test_identify_redact_fields_redact_number_false():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is False
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is False
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_EXPIRY=True)
 def test_identify_redact_fields_redact_expiry_true():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_EXPIRY=False)
 def test_identify_redact_fields_redact_expiry_false():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is False
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is False
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_TYPE=True)
 def test_identify_redact_fields_redact_type_true():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_CC_TYPE=False)
 def test_identify_redact_fields_redact_type_false():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is False
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is False
+    assert fields['token']['redact'] is False
 
 @override_settings(HELCIM_REDACT_TOKEN=True)
 def test_identify_redact_fields_redact_token_true():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is True
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is True
 
 @override_settings(HELCIM_REDACT_TOKEN=False)
 def test_identify_redact_fields_redact_token_false():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is False
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is False
 
 @override_settings(
     HELCIM_REDACT_ALL=True, HELCIM_REDACT_CC_NAME=False,
@@ -399,15 +375,13 @@ def test_identify_redact_fields_redact_token_false():
     HELCIM_REDACT_CC_TYPE=False, HELCIM_REDACT_TOKEN=False
 )
 def test_identify_redact_fields_redact_all_true_overrides():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is True
-    assert fields['number'] is True
-    assert fields['expiry'] is True
-    assert fields['type'] is True
-    assert fields['token'] is True
+    assert fields['name']['redact'] is True
+    assert fields['number']['redact'] is True
+    assert fields['expiry']['redact'] is True
+    assert fields['type']['redact'] is True
+    assert fields['token']['redact'] is True
 
 @override_settings(
     HELCIM_REDACT_ALL=False, HELCIM_REDACT_CC_NAME=True,
@@ -415,15 +389,13 @@ def test_identify_redact_fields_redact_all_true_overrides():
     HELCIM_REDACT_CC_TYPE=True, HELCIM_REDACT_TOKEN=True
 )
 def test_identify_redact_fields_redact_all_false_overrides():
-    base = gateway.BaseRequest()
+    fields = gateway.identify_redact_fields()
 
-    fields = base._identify_redact_fields()
-
-    assert fields['name'] is False
-    assert fields['number'] is False
-    assert fields['expiry'] is False
-    assert fields['type'] is False
-    assert fields['token'] is False
+    assert fields['name']['redact'] is False
+    assert fields['number']['redact'] is False
+    assert fields['expiry']['redact'] is False
+    assert fields['type']['redact'] is False
+    assert fields['token']['redact'] is False
 
 def test_redact_api_data_account_id():
     base = gateway.BaseRequest()
@@ -521,15 +493,15 @@ def test_redact_data_cc_number():
 def test_redact_data_cc_expiry():
     base = gateway.BaseRequest()
     base.response = {
-        'raw_request': 'expiryDate=a',
-        'raw_response': '<expiryDate>a</expiryDate>',
+        'raw_request': 'cardExpiry=a',
+        'raw_response': '<cardExpiry>a</cardExpiry>',
         'cc_expiry': 'a',
     }
     base.redact_data()
 
-    assert base.redacted_response['raw_request'] == 'expiryDate=REDACTED'
+    assert base.redacted_response['raw_request'] == 'cardExpiry=REDACTED'
     assert base.redacted_response['raw_response'] == (
-        '<expiryDate>REDACTED</expiryDate>'
+        '<cardExpiry>REDACTED</cardExpiry>'
     )
     assert base.redacted_response['cc_expiry'] is None
 

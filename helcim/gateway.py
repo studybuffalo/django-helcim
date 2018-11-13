@@ -105,47 +105,6 @@ class BaseRequest():
         self.response = {}
         self.redacted_response = {}
 
-    def _identify_redact_fields(self):
-        """Identifies which fields (if any) should be redacted.
-
-            Configured using flags in the Django settings file.
-
-            Returns:
-                dict: A dictionary of fields to redact
-        """
-        fields = {
-            'name': False,
-            'number': False,
-            'expiry': False,
-            'type': False,
-            'token': False,
-        }
-
-        if hasattr(settings, 'HELCIM_REDACT_ALL'):
-            if settings.HELCIM_REDACT_ALL:
-                fields['name'] = True
-                fields['number'] = True
-                fields['expiry'] = True
-                fields['type'] = True
-                fields['token'] = True
-        else:
-            if getattr(settings, 'HELCIM_REDACT_CC_NAME', True):
-                fields['name'] = True
-
-            if getattr(settings, 'HELCIM_REDACT_CC_NUMBER', True):
-                fields['number'] = True
-
-            if getattr(settings, 'HELCIM_REDACT_CC_EXPIRY', True):
-                fields['expiry'] = True
-
-            if getattr(settings, 'HELCIM_REDACT_CC_TYPE', True):
-                fields['type'] = True
-
-            if getattr(settings, 'HELCIM_REDACT_TOKEN', False):
-                fields['token'] = True
-
-        return fields
-
     def _redact_api_data(self):
         """Redacts API data and updates redacted_response attribute."""
         if 'raw_request' in self.redacted_response:
@@ -283,23 +242,12 @@ class BaseRequest():
         self._redact_api_data()
 
         # Identify and redact any other specified fields
-        fields = self._identify_redact_fields()
+        fields = identify_redact_fields()
 
-        if fields['name']:
-            self._redact_field('cardHolderName', 'cc_name')
-
-        if fields['number']:
-            self._redact_field('cardNumber', 'cc_number')
-
-        if fields['expiry']:
-            self._redact_field('cardExpiry', 'cc_expiry')
-
-        if fields['type']:
-            self._redact_field('cardType', 'cc_type')
-
-        if fields['token']:
-            self._redact_field('cardToken', 'token')
-            self._redact_field('cardF4L4', 'token_f4l4')
+        for _, redact_field in fields.items():
+            if redact_field['redact']:
+                for field in redact_field['fields']:
+                    self._redact_field(field['api'], field['python'])
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
@@ -747,3 +695,77 @@ class Capture(BaseRequest):
         capture = self.save_transaction('c')
 
         return capture
+
+def identify_redact_fields():
+    """Identifies which fields (if any) should be redacted.
+
+        Configured using flags in the Django settings file.
+
+        Returns:
+            dict: A dictionary of fields to redact with corresponding
+                API field and variable names.
+    """
+    redact_fields = {
+        'name': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_CC_NAME',
+            'default': True,
+            'fields': [
+                {'api': 'cardHolderName', 'python': 'cc_name'},
+            ]
+        },
+        'number': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_CC_NUMBER',
+            'default': True,
+            'fields': [
+                {'api': 'cardNumber', 'python': 'cc_number'},
+            ]
+        },
+        'expiry': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_CC_EXPIRY',
+            'default': True,
+            'fields': [
+                {'api': 'cardExpiry', 'python': 'cc_expiry'},
+            ]
+        },
+        'type': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_CC_TYPE',
+            'default': True,
+            'fields': [
+                {'api': 'cardType', 'python': 'cc_type'},
+            ]
+        },
+        'cvv': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_CC_CVV',
+            'default': True,
+            'fields': [
+                {'api': 'cardCVV', 'python': 'cc_cvv'},
+            ]
+        },
+        'token': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_TOKEN',
+            'default': False,
+            'fields': [
+                {'api': 'cardToken', 'python': 'token'},
+                {'api': 'cardF4L4', 'python': 'token_f4l4'},
+            ]
+        },
+    }
+
+    if hasattr(settings, 'HELCIM_REDACT_ALL'):
+        if settings.HELCIM_REDACT_ALL:
+            # Set redact to true for all fields
+            for key in redact_fields:
+                redact_fields[key]['redact'] = True
+    else:
+        for key, field in redact_fields.items():
+            # Get value from settings file or use default value
+            if getattr(settings, field['settings'], field['default']):
+                redact_fields[key]['redact'] = True
+
+    return redact_fields
