@@ -9,7 +9,7 @@ from helcim import exceptions as helcim_exceptions, gateway
 
 class MockPostResponse():
     def __init__(self, url, data):
-        self.content = """<?xml version="1.0"?>
+        self.text = """<?xml version="1.0"?>
             <message>
                 <response>1</response>
                 <responseMessage>APPROVED</responseMessage>

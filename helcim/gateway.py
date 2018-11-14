@@ -388,7 +388,7 @@ class BaseRequest():
             )
 
         # Create the dictionary ('message' is the XML structure object)
-        dict_response = xmltodict.parse(response.content)['message']
+        dict_response = xmltodict.parse(response.text)['message']
 
         # Catch any issues with the API response
         if dict_response['response'] == '0':
@@ -398,7 +398,7 @@ class BaseRequest():
         self.response = conversions.process_api_response(
             dict_response,
             post_data,
-            response.content.decode('utf-8')
+            response.text
         )
 
     def save_transaction(self, transaction_type):
