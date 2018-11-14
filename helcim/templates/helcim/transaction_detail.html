@@ -104,13 +104,13 @@
   <form method="post" action=".">
       {% csrf_token %}
 
-      {% if capture enabled %}
+      {% if capture_enabled %}
         <button {% if not transaction.can_be_captured %}disabled="disabled"{% endif %} type="submit" name="action" value="capture">
           {% trans "Capture" %}
         </button>
       {% endif %}
 
-      {% if refund enabled %}
+      {% if refund_enabled %}
         <button {% if not transaction.can_be_refunded %}disabled="disabled"{% endif %} type="submit" name="action" value="refund">
           {% trans "Refund" %}
         </button>
