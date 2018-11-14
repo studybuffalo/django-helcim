@@ -1,7 +1,7 @@
 [run]
 branch = True
 data_file = reports/.coverage
-omit = helcim/migrations/*,tests/*,helcim/urls.py
+omit = helcim/migrations/*,tests/*
 source = helcim
 
 [html]
