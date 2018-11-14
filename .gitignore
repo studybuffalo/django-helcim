@@ -19,7 +19,7 @@ reports/*
 
 # Sandbox Files
 sandbox/db.sqlite3
-#sandbox/media/*
+sandbox/media/*
 sandbox/static/*
 
 # Distribution files
