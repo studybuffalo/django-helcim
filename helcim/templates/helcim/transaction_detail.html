@@ -8,6 +8,94 @@
       <th>{% trans "Helcim transaction ID" %}</th>
       <td>{{ transaction.transaction_id }}</td>
     </tr>
+    <tr>
+      <th>{% trans "API raw request" %}</th>
+      <td>{{ transaction.raw_request }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "API raw response" %}</th>
+      <td>{{ transaction.raw_response }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Transaction success" %}</th>
+      <td>{{ transaction.transaction_success }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Response message" %}</th>
+      <td>{{ transaction.response_message }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Notice" %}</th>
+      <td>{{ transaction.notice }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Response date" %}</th>
+      <td>{{ transaction.date_response }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Creation date" %}</th>
+      <td>{{ transaction.date_created }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Transaction type" %}</th>
+      <td>{{ transaction.get_transaction_type_display }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Helcim transaction ID" %}</th>
+      <td>{{ transaction.transaction_id }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Amount" %}</th>
+      <td>{{ transaction.amount }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Currency" %}</th>
+      <td>{{ transaction.currency }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Cardholder name" %}</th>
+      <td>{{ transaction.cc_name }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Credit card number" %}</th>
+      <td>{{ transaction.cc_number }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Credit card expiry" %}</th>
+      <td>{{ transaction.cc_expiry }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Credit card type" %}</th>
+      <td>{{ transaction.cc_type }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Helcim card token" %}</th>
+      <td>{{ transaction.token }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Helcim card token F4L4" %}</th>
+      <td>{{ transaction.token_f4l4 }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "AVS response" %}</th>
+      <td>{{ transaction.avs_response }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "CVV response" %}</th>
+      <td>{{ transaction.cvv_response }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Approval code" %}</th>
+      <td>{{ transaction.approval_code }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Helcim order number" %}</th>
+      <td>{{ transaction.order_number }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Customer code" %}</th>
+      <td>{{ transaction.customer_code }}</td>
+    </tr>
   </tbody>
 </table>
 
