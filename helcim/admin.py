@@ -2,7 +2,7 @@
 from django.conf import settings
 from django.contrib import admin
 
-from helcim.models import HelcimTransaction
+from helcim.models import HelcimTransaction, HelcimToken
 
 class HelcimTransactionAdmin(admin.ModelAdmin):
     """Admin class for the HelcimTransaction model."""
@@ -42,7 +42,29 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'amount',
         'customer_code',
     ]
+class HelcimTokenAdmin(admin.ModelAdmin):
+    """Admin class for the HelcimToken model."""
+    MODEL_FIELDS = [
+        'token',
+        'token_f4l4',
+        'date_added',
+        'customer_code',
+        'django_user'
+    ]
 
-# Only register the model if included in the settings
+    fields = MODEL_FIELDS
+
+    readonly_fields = MODEL_FIELDS
+
+    list_display = [
+        'date_added',
+        'django_user',
+        'customer_code',
+        'token',
+        'token_f4l4',
+    ]
+
+# Only register admin models if enabled in settings
 if getattr(settings, 'HELCIM_INCLUDE_ADMIN', False):
     admin.site.register(HelcimTransaction, HelcimTransactionAdmin)
+    admin.site.register(HelcimToken, HelcimTokenAdmin)
