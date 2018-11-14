@@ -177,6 +177,12 @@ class HelcimTransaction(models.Model):
 
 class HelcimToken(models.Model):
     """A Helcim card token."""
+    id = models.UUIDField(
+        default=uuid4,
+        editable=False,
+        primary_key=True,
+        verbose_name='ID',
+    )
     token = models.CharField(
         help_text='The Helcim card token number',
         max_length=23,

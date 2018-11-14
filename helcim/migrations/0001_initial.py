@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HelcimToken',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.UUIDField(default=uuid4, editable=False, primary_key=True, verbose_name='ID')),
                 ('token', models.CharField(help_text='The Helcim card token number', max_length=23)),
                 ('token_f4l4', models.CharField(help_text='The first & last four digits of the credit card number', max_length=8)),
                 ('date_added', models.DateTimeField(auto_now_add=True, help_text='Date and time this token was added to database')),
