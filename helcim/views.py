@@ -30,7 +30,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
         context = super(TransactionDetailView, self).get_context_data(**kwargs)
         # Checks settings for whether transaction should be read only
         context['show_form_buttons'] = not getattr(
-            settings, 'HELCIM_TRANSACTIONS_READ_ONLY', False
+            settings, 'HELCIM_TRANSACTIONS_READ_ONLY', True
         )
 
         return context

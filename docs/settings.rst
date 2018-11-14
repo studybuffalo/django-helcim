@@ -184,7 +184,7 @@ with django-helcim.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``False``, will allow you to capture and refund transactions
 from the ``HelcimTransactionDetailView``. Otherwise, this functionality
