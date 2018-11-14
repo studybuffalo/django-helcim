@@ -57,7 +57,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
             return HttpResponseRedirect(
                 reverse(
-                    'transaction_detail',
+                    'helcim_transaction_detail',
                     kwargs={'transaction_id': transaction.id}
                 )
             )
@@ -95,7 +95,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_detail',
+                'helcim_transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
@@ -118,7 +118,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_detail',
+                'helcim_transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
@@ -134,10 +134,15 @@ class TokenListView(PermissionRequiredMixin, generic.ListView):
 class TokenDeleteView(PermissionRequiredMixin, generic.DeleteView):
     """Allows deletion of a Helcim API token."""
     model = models.HelcimToken
-    permission_required = 'helcim.helcim_transactions'
+    permission_required = 'helcim.helcim_tokens'
     raise_exception = True
     pk_url_kwarg = 'token_id'
     context_object_name = 'token'
     success_message = 'Token successfully deleted.'
-    success_url = reverse_lazy('helcim:token_list')
+    success_url = reverse_lazy('helcim_token_list')
     template_name = 'helcim/token_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        """Override delete to allow success message to be added."""
+        messages.success(self.request, self.success_message)
+        return super(TokenDeleteView, self).delete(request, *args, **kwargs)
