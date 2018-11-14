@@ -398,7 +398,7 @@ class BaseRequest():
         self.response = conversions.process_api_response(
             dict_response,
             post_data,
-            response.content
+            response.content.decode('utf-8')
         )
 
     def save_transaction(self, transaction_type):
