@@ -18,7 +18,7 @@ urlpatterns = [
     # debugging purposes only
     url(r'^admin/', admin.site.urls),
     # django-helcim URLs
-    url(r'^checkout/helcim/', include('helcim.urls')),
+    url(r'^helcim/', include('helcim.urls')),
     # django-oscar URLs
     url(r'', application.urls),
 ]
