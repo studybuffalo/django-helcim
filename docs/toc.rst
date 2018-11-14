@@ -2,7 +2,7 @@
    :maxdepth: 2
 
    installation
-   contributing
    settings
+   contributing
    Package reference <helcim>
    changelog

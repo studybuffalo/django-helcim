@@ -43,6 +43,9 @@ following settings: `HELCIM_API_URL`, `HELCIM_ACCOUNT_ID`,
     HELCIM_API_TOKEN = 123456789abcdefg
     HELCIM_TERMINAL_ID = 123456
 
-A summary of all settings can be found in the `Settings page`_.
+This package defaults where possible to the most restrictive settings
+possible, given the secure nature of financial data. You will need to
+manually enable functionality as your application requires. You can see
+a summary of all settings in the `Settings page`_.
 
 .. _Settings page: https://django-helcim.readthedocs.io/en/latest/settings.html
