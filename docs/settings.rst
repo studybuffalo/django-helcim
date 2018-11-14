@@ -179,16 +179,25 @@ These settings allow you to enable or disable additional functionality
 with django-helcim.
 
 
-``HELCIM_TRANSACTIONS_READ_ONLY``
-=================================
+``HELCIM_ENABLE_TRANSACTION_CAPTURE``
+=====================================
 
 **Required:** ``False``
 
-**Default (boolean):** ``True``
+**Default (boolean):** ``False``
 
-If set to ``False``, will allow you to capture and refund transactions
-from the ``HelcimTransactionDetailView``. Otherwise, this functionality
-is turned off and the transaction detail view is read only.
+If set to ``True``, will allow you to capture transactions from the
+``HelcimTransactionDetailView``.
+
+``HELCIM_ENABLE_TRANSACTION_REFUND``
+=====================================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, will allow you to refund transactions from the
+``HelcimTransactionDetailView``.
 
 ``HELCIM_ENABLE_TOKEN_VAULT``
 =============================

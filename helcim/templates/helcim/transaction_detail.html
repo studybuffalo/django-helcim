@@ -100,10 +100,20 @@
 </table>
 
 
-{% if show_form_buttons %}
+{% if capture_enabled or refund_enabled %}
   <form method="post" action=".">
       {% csrf_token %}
-      <button {% if not transaction.can_be_refunded %}disabled="disabled"{% endif %} type="submit" name="action" value="refund">{% trans "Refund" %}</button>
-      <button {% if not transaction.can_be_captured %}disabled="disabled"{% endif %} type="submit" name="action" value="capture">{% trans "Capture" %}</button>
+
+      {% if capture enabled %}
+        <button {% if not transaction.can_be_captured %}disabled="disabled"{% endif %} type="submit" name="action" value="capture">
+          {% trans "Capture" %}
+        </button>
+      {% endif %}
+
+      {% if refund enabled %}
+        <button {% if not transaction.can_be_refunded %}disabled="disabled"{% endif %} type="submit" name="action" value="refund">
+          {% trans "Refund" %}
+        </button>
+      {% endif %}
   </form>
 {% endif %}
