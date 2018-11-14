@@ -11,12 +11,12 @@ urlpatterns = [
     url(
         r'^transactions/$',
         views.TransactionListView.as_view(),
-        name='transaction_list'
+        name='helcim_transaction_list'
     ),
     url(
         r'^transactions/(?P<transaction_id>[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12})/$',
         views.TransactionDetailView.as_view(),
-        name='transaction_detail'
+        name='helcim_transaction_detail'
     ),
 ]
 
@@ -26,11 +26,11 @@ if getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False):
         url(
             r'^tokens/$',
             views.TokenListView.as_view(),
-            name='token_list'
+            name='helcim_token_list'
         ),
         url(
             r'^tokens/(?P<token_id>[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12})/$',
             views.TokenDeleteView.as_view(),
-            name='token_delete'
+            name='helcim_token_delete'
         ),
     ]
