@@ -2,6 +2,14 @@
 
 <h1>Delete Helcim Commerce API Token</h1>
 
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
 <p>
   <strong>Are you sure you want to delete this token?</strong>
 
@@ -16,6 +24,6 @@
 
 <form method="POST">
   {% csrf_token %}
-  <submit>Yes</submit>
+  <input type="submit" value="Delete">
   <a href="{% url 'helcim:token_list' %}">Cancel</a>
 </form>

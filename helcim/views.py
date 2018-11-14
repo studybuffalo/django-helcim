@@ -134,7 +134,10 @@ class TokenListView(PermissionRequiredMixin, generic.ListView):
 class TokenDeleteView(PermissionRequiredMixin, generic.DeleteView):
     """Allows deletion of a Helcim API token."""
     model = models.HelcimToken
-    success_url = reverse_lazy('token_list')
+    permission_required = 'helcim.helcim_transactions'
+    raise_exception = True
     pk_url_kwarg = 'token_id'
     context_object_name = 'token'
+    success_message = 'Token successfully deleted.'
+    success_url = reverse_lazy('helcim:token_list')
     template_name = 'helcim/token_delete.html'
