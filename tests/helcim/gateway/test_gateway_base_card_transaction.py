@@ -2,6 +2,7 @@
 # pylint: disable=missing-docstring, protected-access
 from unittest.mock import patch
 
+from django.conf import settings
 from django.test import override_settings
 
 from helcim import gateway
@@ -81,7 +82,9 @@ def test_determine_save_token_status_disabled_user_no():
 
     assert status is False
 
+@override_settings()
 def test_determine_save_token_status_not_specified():
+    del settings.HELCIM_ENABLE_TOKEN_VAULT
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
         'customer_code': 'CST1000',
