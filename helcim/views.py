@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 from helcim import exceptions, models, gateway
@@ -20,7 +20,6 @@ class TransactionListView(PermissionRequiredMixin, generic.ListView):
 class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
     """Details of a specific transaction made by django-helcim."""
     model = models.HelcimTransaction
-    pk_field = 'id'
     pk_url_kwarg = 'transaction_id'
     permission_required = 'helcim.helcim_transactions'
     raise_exception = True
@@ -116,3 +115,19 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
                 kwargs={'transaction_id': transaction.id}
             )
         )
+
+class TokenListView(PermissionRequiredMixin, generic.ListView):
+    """List of all transactions submitted made by django-helcim."""
+    model = models.HelcimToken
+    permission_required = 'helcim.helcim_tokens'
+    raise_exception = True
+    context_object_name = 'tokens'
+    template_name = 'helcim/token_list.html'
+
+class TokenDeleteView(PermissionRequiredMixin, generic.DeleteView):
+    """Allows deletion of a Helcim API token."""
+    model = models.HelcimToken
+    success_url = reverse_lazy('token_list')
+    pk_url_kwarg = 'token_id'
+    context_object_name = 'token'
+    template_name = 'helcim/token_delete.html'

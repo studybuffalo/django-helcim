@@ -1,0 +1,36 @@
+{% load i18n %}
+
+<h1>Helcim Commerce API Tokens</h1>
+
+{% if tokens %}
+  <table>
+    <thead>
+      <tr>
+        <th>{% trans "Date added" %}</th>
+        <th>{% trans "Helcim customer code" %}</th>
+        <th>{% trans "User account" %}</th>
+        <th>{% trans "Token" %}</th>
+        <th>{% trans "Token F4L4" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for token in tokens %}
+        <tr>
+          <td>{{ token.date_added }}</td>
+          <td>{{ token.customer_code }}</td>
+          <td>{{ token.django_user }}</td>
+          <td>{{ token.token }}</td>
+          <td>{{ token.token_f4l4 }}</td>
+          <td>
+            <a href="{% url 'helcim:transaction_delete' token.id %}">
+              {% trans "Delete" %}
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>{% trans "No tokens have been added yet." %}</p>
+{% endif %}
