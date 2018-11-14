@@ -190,8 +190,8 @@ def test_transaction_detail_200_if_authorized(client, django_user_model):
     assert response.status_code == 200
 
 @pytest.mark.django_db
-def test_transaction_detail_get_context_read_only_missing(admin_client):
-    """Tests that read only flag defaults to False."""
+def test_transaction_detail_get_context_capture_enabled_missing(admin_client):
+    """Tests that capture_enabled flag defaults to False."""
     # Create transaction
     transaction = create_transaction('s')
 
@@ -202,12 +202,12 @@ def test_transaction_detail_get_context_read_only_missing(admin_client):
         )
     )
 
-    assert response.context['show_form_buttons'] is False
+    assert response.context['capture_enabled'] is False
 
-@override_settings(HELCIM_TRANSACTIONS_READ_ONLY=False)
+@override_settings(HELCIM_ENABLE_TRANSACTION_CAPTURE=False)
 @pytest.mark.django_db
-def test_transaction_detail_get_context_read_only_false(admin_client):
-    """Tests that read only flag is false when explicitly set."""
+def test_transaction_detail_get_context_capture_enabled_false(admin_client):
+    """Tests that capture_enabled flag is false when explicitly set."""
     # Create transaction
     transaction = create_transaction('s')
 
@@ -218,12 +218,12 @@ def test_transaction_detail_get_context_read_only_false(admin_client):
         )
     )
 
-    assert response.context['show_form_buttons'] is False
+    assert response.context['capture_enabled'] is False
 
-@override_settings(HELCIM_TRANSACTIONS_READ_ONLY=True)
+@override_settings(HELCIM_ENABLE_TRANSACTION_CAPTURE=True)
 @pytest.mark.django_db
-def test_transaction_detail_get_context_read_only_true(admin_client):
-    """Tests that read only flag is true when explicitly set."""
+def test_transaction_detail_get_context_capture_enabled_true(admin_client):
+    """Tests that capture_enabled flag is true when explicitly set."""
     # Create transaction
     transaction = create_transaction('s')
 
@@ -234,7 +234,54 @@ def test_transaction_detail_get_context_read_only_true(admin_client):
         )
     )
 
-    assert response.context['show_form_buttons'] is True
+    assert response.context['capture_enabled'] is True
+
+@pytest.mark.django_db
+def test_transaction_detail_get_context_refund_enabled_missing(admin_client):
+    """Tests that refund_enabled flag defaults to False."""
+    # Create transaction
+    transaction = create_transaction('s')
+
+    response = admin_client.get(
+        reverse(
+            'transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        )
+    )
+
+    assert response.context['refund_enabled'] is False
+
+@override_settings(HELCIM_ENABLE_TRANSACTION_REFUND=False)
+@pytest.mark.django_db
+def test_transaction_detail_get_context_refund_enabled_false(admin_client):
+    """Tests that refund_enabled flag is false when explicitly set."""
+    # Create transaction
+    transaction = create_transaction('s')
+
+    response = admin_client.get(
+        reverse(
+            'transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        )
+    )
+
+    assert response.context['refund_enabled'] is False
+
+@override_settings(HELCIM_ENABLE_TRANSACTION_REFUND=True)
+@pytest.mark.django_db
+def test_transaction_detail_get_context_refund_enabled_true(admin_client):
+    """Tests that refund_enabled flag is true when explicitly set."""
+    # Create transaction
+    transaction = create_transaction('s')
+
+    response = admin_client.get(
+        reverse(
+            'transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        )
+    )
+
+    assert response.context['refund_enabled'] is True
 
 @pytest.mark.django_db
 def test_transaction_detail_post_no_action(admin_client):
