@@ -101,7 +101,6 @@ class PurchaseBridge(BaseCardTransactionBridge):
                 PaymentError: An Oscar error raised when there was an
                     error processing the payment.
         """
-        # TODO: Change the unpackaging here to accomodate python 3.4
         purchase_instance = gateway.Purchase(
             save_token=self.save_token,
             django_user=self.django_user,
