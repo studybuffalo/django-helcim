@@ -69,6 +69,10 @@ class BaseCardTransactionBridge():
             amount (dec): The transaction total.
             card (obj): Instance of the Oscar bankcard class.
             billing_address (dict): The billing address information.
+            save_token (bool): Whether the card token should be saved
+                in the token vault or not.
+            django_user (obj): The user to associate with the saved
+                card token.
     """
     def __init__(
             self, order_number, amount, card, billing_address=None,
@@ -94,6 +98,8 @@ class PurchaseBridge(BaseCardTransactionBridge):
     """Class to bridge Oscar and Helcim purchase transactions."""
     def process(self):
         """Attempts to process Purchase with transaction details.
+
+            Returns the values of ``gateway.Purchase.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an
@@ -125,6 +131,8 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
     """Class to bridge Oscar and Helcim preauthorization transactions."""
     def process(self):
         """Attempts to process Preauthorize with transaction details.
+
+            Returns the values of ``gateway.Preauthorize.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an
@@ -158,6 +166,8 @@ class RefundBridge(BaseCardTransactionBridge):
     def process(self):
         """Attempts to process Refund with transaction details.
 
+            Returns the values of ``gateway.Refund.process``.
+
             Raises:
                 GatewayError: An Oscar error raised when there was an
                     error with the payment API.
@@ -189,6 +199,8 @@ class VerificationBridge(BaseCardTransactionBridge):
     """Class to bridge Oscar and Helcim Verification transactions."""
     def process(self):
         """Attempts to process Verification with transaction details.
+
+            Returns the values of ``gateway.Verification.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an
@@ -233,6 +245,8 @@ class CaptureBridge():
 
     def process(self):
         """Attempts to process Capture with transaction details.
+
+            Returns the values of ``gateway.Capture.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an

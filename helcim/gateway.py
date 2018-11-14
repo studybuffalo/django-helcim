@@ -158,18 +158,19 @@ class BaseRequest():
     def set_api_details(self, details):
         """Sets the API details for this transaction.
 
-        Will either return a dictionary of the API details from the
-        provided details argument, or will look to the Django settings
-        file.
+            Will either return a dictionary of the API details from the
+            provided details argument, or will look to the Django
+            settings file.
 
-        Parameters:
-            details (dict): A dictionary of the API details.
+            Parameters:
+                details (dict): A dictionary of the API details.
 
-        Returns:
-            dict: The proper API details from the provided data.
+            Returns:
+                dict: The proper API details from the provided data.
 
-        Raises:
-            ImproperlyConfigured: A required API setting is not found.
+            Raises:
+                ImproperlyConfigured: A required API setting is not
+                    found.
         """
         api_details = {
             'url': None,
@@ -220,9 +221,9 @@ class BaseRequest():
     def configure_test_transaction(self):
         """Adds test flag to post data if HELCIM_API_TEST is True.
 
-        Method applies to the cleaned data (not the raw POST data).
-        If the test flag is declared in both the POST data and Django
-        settings file, the POST data takes precedence.
+            Method applies to the cleaned data (not the raw POST data).
+            If the test flag is declared in both the POST data and
+            Django settings file, the POST data takes precedence.
         """
 
         if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
@@ -231,9 +232,9 @@ class BaseRequest():
     def redact_data(self):
         """Removes sensitive and identifiable data.
 
-        By default will redact API fields and populate
-        redacted_response attribute. Depending on Django settings, may
-        also redact other fields.
+            By default will redact API fields and populate
+            redacted_response attribute. Depending on Django settings,
+            may also redact other fields.
         """
         # Copy the response data to the redacted file for updating
         self.redacted_response = self.response
@@ -444,13 +445,28 @@ class BaseRequest():
 class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
     def __init__(self, save_token=False, django_user=None, **kwargs):
-        """Extends BaseRequest to include save_token and django_user."""
+        """Extends BaseRequest to include save_token and django_user.
+
+            Parameters:
+                save_token (bool): Whether the user has requested this
+                    token to be saved or not.
+                django_user (obj): The Django model for the requesting
+                    user.
+        """
         super(BaseCardTransaction, self).__init__(**kwargs)
         self.save_token = self._determine_save_token_status(save_token)
         self.django_user = django_user
 
     def _determine_save_token_status(self, user_decision):
-        """Determines if Helcim card token should be saved."""
+        """Determines if Helcim card token should be saved.
+
+            Parameters:
+                user_decision (bool): Whether the user has requested to
+                    save this token or not.
+
+            Returns:
+                bool: Whether a token should be saved.
+        """
         # Check if vault is enabled in settings
         vault_enabled = getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False)
 
