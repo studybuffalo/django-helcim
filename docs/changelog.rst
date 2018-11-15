@@ -6,7 +6,7 @@ Changelog
 Version 0 (Beta)
 ----------------
 
-0.2.0 (2018-Nov-12)
+0.2.0 (2018-Nov-14)
 ===================
 
 Feature Updates
@@ -14,14 +14,25 @@ Feature Updates
 
 * Added the HelcimToken model (AKA the "Token Vault") - allows saving of
   Helcim Commerce card tokens to allow re-use in later transactions.
+* Made functions for HelcimTransaction views more configurable - can
+  now choose exactly which features to enable and disable.
+* Reworked settings to default to more conservative values. Thinks will
+  generally be disabled or redacted by default, but can be enabled as
+  needed.
+* Added redaction settings for credit card CVV, credit card magnetic
+  strip data, and encrypted credit card magnetic strip data.
+* Improved sandbox functioning to make setting up a new demo site
+  easier.
 
 Bug Fixes
 ---------
 
 * Fixed issues where the ``HELCIM_REDACT_ALL`` flag was not overriding
   properly.
-* Updated redaction functions to accomodate all known fields containing
-  cardholder information.
+* Updated redaction functions to accommodate  all known fields
+  containing cardholder information.
+* Fixed issue where POST requests were returning byte-data rather than
+  string data.
 
 0.1.2 (2018-Nov-08)
 ===================
