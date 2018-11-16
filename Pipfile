@@ -14,7 +14,7 @@ xmltodict = "*"  # https://github.com/martinblech/xmltodict
 django-oscar = "*"  # https://github.com/django-oscar/django-oscar
 django-environ = "*"  # https://github.com/joke2k/django-environ
 django-debug-toolbar = "*"  # https://github.com/jazzband/django-debug-toolbar
-pycountry = "*"  # https://pypi.org/project/pycountry/
+#pycountry = "*"  # https://pypi.org/project/pycountry/
 # Code quality
 # ------------------------------------------------------------------------------
 coverage = "*"  # https://github.com/nedbat/coveragepy
