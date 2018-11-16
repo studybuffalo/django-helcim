@@ -105,46 +105,6 @@ class BaseRequest():
         self.response = {}
         self.redacted_response = {}
 
-    def _identify_redact_fields(self):
-        """Identifies which fields (if any) should be redacted.
-
-            Configured using flags in the Django settings file.
-
-            Returns:
-                dict: A dictionary of fields to redact
-        """
-        fields = {
-            'name': False,
-            'number': False,
-            'expiry': False,
-            'type': False,
-            'token': False,
-        }
-
-        if getattr(settings, 'HELCIM_REDACT_ALL', False):
-            fields['name'] = True
-            fields['number'] = True
-            fields['expiry'] = True
-            fields['type'] = True
-            fields['token'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_CC_NAME', False):
-            fields['name'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_CC_NUMBER', False):
-            fields['number'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_CC_EXPIRY', False):
-            fields['expiry'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_CC_TYPE', False):
-            fields['type'] = True
-
-        if getattr(settings, 'HELCIM_REDACT_TOKEN', False):
-            fields['token'] = True
-
-        return fields
-
     def _redact_api_data(self):
         """Redacts API data and updates redacted_response attribute."""
         if 'raw_request' in self.redacted_response:
@@ -176,19 +136,21 @@ class BaseRequest():
                 python_name (str): The field name used by this
                     application.
         """
-        # Redacts the raw_request data
-        self.redacted_response['raw_request'] = re.sub(
-            r'({}=.+?)(&|$)'.format(api_name),
-            r'{}=REDACTED\g<2>'.format(api_name),
-            self.redacted_response['raw_request']
-        )
+        # Redacts the raw_request data (if present)
+        if self.redacted_response.get('raw_request', None):
+            self.redacted_response['raw_request'] = re.sub(
+                r'({}=.+?)(&|$)'.format(api_name),
+                r'{}=REDACTED\g<2>'.format(api_name),
+                self.redacted_response['raw_request']
+            )
 
-        # Redacts the raw_response data
-        self.redacted_response['raw_response'] = re.sub(
-            r'<{}>.*</{}>'.format(api_name, api_name),
-            r'<{}>REDACTED</{}>'.format(api_name, api_name),
-            self.redacted_response['raw_response']
-        )
+        # Redacts the raw_response data (if present)
+        if self.redacted_response.get('raw_response', None):
+            self.redacted_response['raw_response'] = re.sub(
+                r'<{}>.*</{}>'.format(api_name, api_name),
+                r'<{}>REDACTED</{}>'.format(api_name, api_name),
+                self.redacted_response['raw_response']
+            )
 
         if python_name in self.redacted_response:
             self.redacted_response[python_name] = None
@@ -196,18 +158,19 @@ class BaseRequest():
     def set_api_details(self, details):
         """Sets the API details for this transaction.
 
-        Will either return a dictionary of the API details from the
-        provided details argument, or will look to the Django settings
-        file.
+            Will either return a dictionary of the API details from the
+            provided details argument, or will look to the Django
+            settings file.
 
-        Parameters:
-            details (dict): A dictionary of the API details.
+            Parameters:
+                details (dict): A dictionary of the API details.
 
-        Returns:
-            dict: The proper API details from the provided data.
+            Returns:
+                dict: The proper API details from the provided data.
 
-        Raises:
-            ImproperlyConfigured: A required API setting is not found.
+            Raises:
+                ImproperlyConfigured: A required API setting is not
+                    found.
         """
         api_details = {
             'url': None,
@@ -258,9 +221,9 @@ class BaseRequest():
     def configure_test_transaction(self):
         """Adds test flag to post data if HELCIM_API_TEST is True.
 
-        Method applies to the cleaned data (not the raw POST data).
-        If the test flag is declared in both the POST data and Django
-        settings file, the POST data takes precedence.
+            Method applies to the cleaned data (not the raw POST data).
+            If the test flag is declared in both the POST data and
+            Django settings file, the POST data takes precedence.
         """
 
         if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
@@ -269,9 +232,9 @@ class BaseRequest():
     def redact_data(self):
         """Removes sensitive and identifiable data.
 
-        By default will redact API fields and populate
-        redacted_response attribute. Depending on Django settings, may
-        also redact other fields.
+            By default will redact API fields and populate
+            redacted_response attribute. Depending on Django settings,
+            may also redact other fields.
         """
         # Copy the response data to the redacted file for updating
         self.redacted_response = self.response
@@ -280,23 +243,12 @@ class BaseRequest():
         self._redact_api_data()
 
         # Identify and redact any other specified fields
-        fields = self._identify_redact_fields()
+        fields = identify_redact_fields()
 
-        if fields['name']:
-            self._redact_field('cardHolderName', 'cc_name')
-
-        if fields['number']:
-            self._redact_field('cardNumber', 'cc_number')
-
-        if fields['expiry']:
-            self._redact_field('expiryDate', 'cc_expiry')
-
-        if fields['type']:
-            self._redact_field('cardType', 'cc_type')
-
-        if fields['token']:
-            self._redact_field('cardToken', 'token')
-            self._redact_field('cardF4L4', 'token_f4l4')
+        for _, redact_field in fields.items():
+            if redact_field['redact']:
+                for field in redact_field['fields']:
+                    self._redact_field(field['api'], field['python'])
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
@@ -375,8 +327,8 @@ class BaseRequest():
         else:
             date_response = None
 
-        # Format the credit card expiry date
-        if 'cc_expiry' in response:
+        # Format the credit card expiry date (if present)
+        if response.get('cc_expiry', None):
             cc_expiry = self.convert_expiry_to_date(
                 response['cc_expiry']
             )
@@ -437,7 +389,7 @@ class BaseRequest():
             )
 
         # Create the dictionary ('message' is the XML structure object)
-        dict_response = xmltodict.parse(response.content)['message']
+        dict_response = xmltodict.parse(response.text)['message']
 
         # Catch any issues with the API response
         if dict_response['response'] == '0':
@@ -447,7 +399,7 @@ class BaseRequest():
         self.response = conversions.process_api_response(
             dict_response,
             post_data,
-            response.content
+            response.text
         )
 
     def save_transaction(self, transaction_type):
@@ -465,7 +417,9 @@ class BaseRequest():
                 DjangoError: Issue when attempting to save transaction
                     to database.
         """
-        self.redact_data()
+        # Redacts data if not already done
+        if not self.redacted_response:
+            self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
 
@@ -490,6 +444,38 @@ class BaseRequest():
 
 class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
+    def __init__(self, save_token=False, django_user=None, **kwargs):
+        """Extends BaseRequest to include save_token and django_user.
+
+            Parameters:
+                save_token (bool): Whether the user has requested this
+                    token to be saved or not.
+                django_user (obj): The Django model for the requesting
+                    user.
+        """
+        super(BaseCardTransaction, self).__init__(**kwargs)
+        self.save_token = self._determine_save_token_status(save_token)
+        self.django_user = django_user
+
+    def _determine_save_token_status(self, user_decision):
+        """Determines if Helcim card token should be saved.
+
+            Parameters:
+                user_decision (bool): Whether the user has requested to
+                    save this token or not.
+
+            Returns:
+                bool: Whether a token should be saved.
+        """
+        # Check if vault is enabled in settings
+        vault_enabled = getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False)
+
+        # If yes, check if user requested save
+        if vault_enabled:
+            return user_decision
+
+        return False
+
     def determine_card_details(self):
         """Confirms valid payment details and updates self.cleaned.
 
@@ -560,10 +546,41 @@ class BaseCardTransaction(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
+    def save_token_to_vault(self):
+        """Saves Helcim card token.
+
+            Returns:
+                obj: The HelcimToken model instance, or ``None`` (if
+                    model not created).
+        """
+        # Check that required data is available in response
+        token = self.response.get('token', None)
+        token_f4l4 = self.response.get('token_f4l4', None)
+
+        if token and token_f4l4:
+            customer_code = self.response.get('customer_code', None)
+
+            token_instance, _ = models.HelcimToken.objects.get_or_create(
+                token=token,
+                token_f4l4=token_f4l4,
+                customer_code=customer_code,
+                django_user=self.django_user,
+            )
+
+            return token_instance
+
+        return None
+
 class Purchase(BaseCardTransaction):
     """Makes a purchase request to Helcim Commerce API."""
     def process(self):
-        """Makes a purchase request."""
+        """Makes a purchase request.
+
+            Returns:
+                purchase (obj): The saved HelcimTransaction model
+                    instance.
+                token (obj): The saved HelcimToken model.
+        """
         self.validate_fields()
         self.configure_test_transaction()
         self.determine_card_details()
@@ -575,11 +592,15 @@ class Purchase(BaseCardTransaction):
                 'transactionType': 'purchase',
             }
         )
-
         self.post(purchase_data)
         purchase = self.save_transaction('s')
 
-        return purchase
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+        return purchase, token
 
 class Preauthorize(BaseCardTransaction):
     """Makes a pre-authorization request to Helcim Commerce API."""
@@ -596,11 +617,15 @@ class Preauthorize(BaseCardTransaction):
                 'transactionType': 'preauth',
             }
         )
-
         self.post(preauth_data)
         preauth = self.save_transaction('p')
 
-        return preauth
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+        return preauth, token
 
 class Refund(BaseCardTransaction):
     """Makes a refund request."""
@@ -617,11 +642,16 @@ class Refund(BaseCardTransaction):
                 'transactionType': 'refund',
             }
         )
-
         self.post(refund_data)
         refund = self.save_transaction('r')
 
-        return refund
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+
+        return refund, token
 
 class Verification(BaseCardTransaction):
     """Makes a verification request to Helcim Commerce API."""
@@ -638,11 +668,16 @@ class Verification(BaseCardTransaction):
                 'transactionType': 'verify',
             }
         )
-
         self.post(verification_data)
         verification = self.save_transaction('v')
 
-        return verification
+        if self.save_token:
+            token = self.save_token_to_vault()
+        else:
+            token = None
+
+
+        return verification, token
 
 class Capture(BaseRequest):
     """Makes a capture request (to complete a preauthorization)."""
@@ -676,3 +711,91 @@ class Capture(BaseRequest):
         capture = self.save_transaction('c')
 
         return capture
+
+def identify_redact_fields():
+    """Identifies which fields (if any) should be redacted.
+
+        Configured using flags in the Django settings file.
+
+        Returns:
+            dict: A dictionary of fields to redact with corresponding
+                API field and variable names.
+    """
+    redact_fields = {
+        'name': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_NAME',
+            'fields': [
+                {'api': 'cardHolderName', 'python': 'cc_name'},
+            ]
+        },
+        'number': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_NUMBER',
+            'fields': [
+                {'api': 'cardNumber', 'python': 'cc_number'},
+            ]
+        },
+        'expiry': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_EXPIRY',
+            'fields': [
+                {'api': 'cardExpiry', 'python': 'cc_expiry'},
+            ]
+        },
+        'cvv': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_CVV',
+            'fields': [
+                {'api': 'cardCVV', 'python': 'cc_cvv'},
+            ]
+        },
+        'type': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_TYPE',
+            'fields': [
+                {'api': 'cardType', 'python': 'cc_type'},
+            ]
+        },
+        'token': {
+            'redact': False,
+            'settings': 'HELCIM_REDACT_TOKEN',
+            'fields': [
+                {'api': 'cardToken', 'python': 'token'},
+                {'api': 'cardF4L4', 'python': 'token_f4l4'},
+            ]
+        },
+        'mag': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_MAGNETIC',
+            'fields': [
+                {'api': 'cardMag', 'python': 'mag'},
+            ]
+        },
+        'mag_enc': {
+            'redact': True,
+            'settings': 'HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED',
+            'fields': [
+                {'api': 'cardMagEnc', 'python': 'mag_enc'},
+                {'api': 'serialNumber', 'python': 'mang_enc_serial_number'},
+            ]
+        },
+    }
+
+    # HELCIM_REDACT_ALL overrides all other settings
+    if hasattr(settings, 'HELCIM_REDACT_ALL'):
+        if settings.HELCIM_REDACT_ALL is True:
+            for key in redact_fields:
+                redact_fields[key]['redact'] = True
+        else:
+            for key in redact_fields:
+                redact_fields[key]['redact'] = False
+
+    # Otherwise, assess each field individually
+    else:
+        for key, field in redact_fields.items():
+            redact_fields[key]['redact'] = getattr(
+                settings, field['settings'], field['redact']
+            )
+
+    return redact_fields

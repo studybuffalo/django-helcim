@@ -69,8 +69,15 @@ class BaseCardTransactionBridge():
             amount (dec): The transaction total.
             card (obj): Instance of the Oscar bankcard class.
             billing_address (dict): The billing address information.
+            save_token (bool): Whether the card token should be saved
+                in the token vault or not.
+            django_user (obj): The user to associate with the saved
+                card token.
     """
-    def __init__(self, order_number, amount, card, billing_address=None):
+    def __init__(
+            self, order_number, amount, card, billing_address=None,
+            save_token=False, django_user=None
+    ):
         transaction_details = {
             'order_number': order_number,
             'amount': amount,
@@ -84,11 +91,15 @@ class BaseCardTransactionBridge():
         transaction_details.update(remap_oscar_credit_card(card))
 
         self.transaction_details = transaction_details
+        self.save_token = save_token
+        self.django_user = django_user
 
 class PurchaseBridge(BaseCardTransactionBridge):
     """Class to bridge Oscar and Helcim purchase transactions."""
     def process(self):
         """Attempts to process Purchase with transaction details.
+
+            Returns the values of ``gateway.Purchase.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an
@@ -96,8 +107,11 @@ class PurchaseBridge(BaseCardTransactionBridge):
                 PaymentError: An Oscar error raised when there was an
                     error processing the payment.
         """
-
-        purchase_instance = gateway.Purchase(**self.transaction_details)
+        purchase_instance = gateway.Purchase(
+            save_token=self.save_token,
+            django_user=self.django_user,
+            **self.transaction_details
+        )
 
         try:
             return purchase_instance.process()
@@ -118,6 +132,8 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
     def process(self):
         """Attempts to process Preauthorize with transaction details.
 
+            Returns the values of ``gateway.Preauthorize.process``.
+
             Raises:
                 GatewayError: An Oscar error raised when there was an
                     error with the payment API.
@@ -125,7 +141,11 @@ class PreauthorizeBridge(BaseCardTransactionBridge):
                     error processing the payment.
         """
 
-        preauth_instance = gateway.Preauthorize(**self.transaction_details)
+        preauth_instance = gateway.Preauthorize(
+            save_token=self.save_token,
+            django_user=self.django_user,
+            **self.transaction_details
+        )
 
         try:
             return preauth_instance.process()
@@ -146,6 +166,8 @@ class RefundBridge(BaseCardTransactionBridge):
     def process(self):
         """Attempts to process Refund with transaction details.
 
+            Returns the values of ``gateway.Refund.process``.
+
             Raises:
                 GatewayError: An Oscar error raised when there was an
                     error with the payment API.
@@ -153,7 +175,11 @@ class RefundBridge(BaseCardTransactionBridge):
                     error processing the payment.
         """
 
-        refund_instance = gateway.Refund(**self.transaction_details)
+        refund_instance = gateway.Refund(
+            save_token=self.save_token,
+            django_user=self.django_user,
+            **self.transaction_details
+        )
 
         try:
             return refund_instance.process()
@@ -174,6 +200,8 @@ class VerificationBridge(BaseCardTransactionBridge):
     def process(self):
         """Attempts to process Verification with transaction details.
 
+            Returns the values of ``gateway.Verification.process``.
+
             Raises:
                 GatewayError: An Oscar error raised when there was an
                     error with the payment API.
@@ -182,6 +210,8 @@ class VerificationBridge(BaseCardTransactionBridge):
         """
 
         verification_instance = gateway.Verification(
+            save_token=self.save_token,
+            django_user=self.django_user,
             **self.transaction_details
         )
 
@@ -215,6 +245,8 @@ class CaptureBridge():
 
     def process(self):
         """Attempts to process Capture with transaction details.
+
+            Returns the values of ``gateway.Capture.process``.
 
             Raises:
                 GatewayError: An Oscar error raised when there was an

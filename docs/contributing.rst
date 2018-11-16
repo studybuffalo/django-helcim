@@ -83,7 +83,7 @@ You may specify the output of the coverage report by changing the
 Testing with tox
 ================
 
-To ensure compatability with as wide variety of Python and Django
+To ensure compatibility with as wide variety of Python and Django
 versions, this package uses tox_. You can tests via tox with the
 following command::
 
@@ -118,7 +118,7 @@ environment (see above) to proceed.
 Deploying the site
 ==================
 
-First migrate the the Django database::
+First migrate the Django database::
 
     $ pipenv run python sandbox/manage.py migrate
 
@@ -129,9 +129,13 @@ more details`_)::
 
 .. _Django Oscar page for more details: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html#initial-data
 
-Finally, import a basic catalogue of store items to test with::
+Next, import a basic catalogue of store items to test with::
 
     $ pipenv run python sandbox/manage.py oscar_import_catalogue sandbox/fixtures/catalogue.csv
+
+Finally, collect all the static files for the site::
+
+    $ pipenv run python sandbox/manage.py collectstatic
 
 You can now start your site through the standard Django commands and
 access it at http://127.0.0.1:8000/::

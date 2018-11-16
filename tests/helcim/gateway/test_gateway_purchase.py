@@ -1,14 +1,15 @@
 """Tests for the gateway module."""
 # pylint: disable=missing-docstring, protected-access
-
 from unittest.mock import patch
+
+from django.test import override_settings
 
 from helcim import exceptions as helcim_exceptions, gateway
 
 
 class MockPostResponse():
     def __init__(self, url, data):
-        self.content = """<?xml version="1.0"?>
+        self.text = """<?xml version="1.0"?>
             <message>
                 <response>1</response>
                 <responseMessage>APPROVED</responseMessage>
@@ -21,8 +22,8 @@ class MockPostResponse():
                     <cardHolderName>Test Person</cardHolderName>
                     <amount>100.00</amount>
                     <currency>CAD</currency>
-                    <cardNumber>5454********5454</cardNumber>
-                    <cardToken>80defad45bae30e557da0e</cardToken>
+                    <cardNumber>1111********9999</cardNumber>
+                    <cardToken>abcdefghijklmnopqrstuvw</cardToken>
                     <expiryDate>0125</expiryDate>
                     <cardType>MasterCard</cardType>
                     <avsResponse>X</avsResponse>
@@ -40,6 +41,9 @@ class MockPostResponse():
 class MockDjangoModel():
     def __init__(self, **kwargs):
         self.data = kwargs
+
+def mock_get_or_create_created(**kwargs):
+    return (MockDjangoModel(**kwargs), True)
 
 API_DETAILS = {
     'url': 'https://www.test.com',
@@ -60,9 +64,9 @@ def test_purchase_processing():
     }
 
     purchase = gateway.Purchase(api_details=API_DETAILS, **details)
-    response = purchase.process()
+    transaction, _ = purchase.process()
 
-    assert isinstance(response, MockDjangoModel)
+    assert isinstance(transaction, MockDjangoModel)
 
 def test_process_error_response_purchase():
     purchase_request = gateway.Purchase()
@@ -73,3 +77,49 @@ def test_process_error_response_purchase():
         assert True
     else:
         assert False
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
+)
+def test_process_with_save_token_enabled():
+    details = {
+        'amount': 100.00,
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    purchase = gateway.Purchase(
+        api_details=API_DETAILS, save_token=True, **details
+    )
+    _, token = purchase.process()
+
+    assert isinstance(token, MockDjangoModel)
+
+@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
+@patch('helcim.gateway.requests.post', MockPostResponse)
+@patch(
+    'helcim.gateway.models.HelcimTransaction.objects.create',
+    MockDjangoModel
+)
+def test_process_with_save_token_disabled():
+    details = {
+        'amount': 100.00,
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    purchase = gateway.Purchase(
+        api_details=API_DETAILS, save_token=True, **details
+    )
+    _, token = purchase.process()
+
+    assert token is None

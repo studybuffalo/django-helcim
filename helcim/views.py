@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import generic
 
 from helcim import exceptions, models, gateway
@@ -20,7 +20,6 @@ class TransactionListView(PermissionRequiredMixin, generic.ListView):
 class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
     """Details of a specific transaction made by django-helcim."""
     model = models.HelcimTransaction
-    pk_field = 'id'
     pk_url_kwarg = 'transaction_id'
     permission_required = 'helcim.helcim_transactions'
     raise_exception = True
@@ -29,10 +28,17 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(TransactionDetailView, self).get_context_data(**kwargs)
-        # Checks settings for whether transaction should be read only
-        context['show_form_buttons'] = getattr(
-            settings, 'HELCIM_TRANSACTIONS_READ_ONLY', False
+
+        # Check if transaction capture is enabled
+        context['capture_enabled'] = getattr(
+            settings, 'HELCIM_ENABLE_TRANSACTION_CAPTURE', False
         )
+
+        # Check if transaction refund is enabled
+        context['refund_enabled'] = getattr(
+            settings, 'HELCIM_ENABLE_TRANSACTION_REFUND', False
+        )
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -51,7 +57,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
             return HttpResponseRedirect(
                 reverse(
-                    'transaction_detail',
+                    'helcim_transaction_detail',
                     kwargs={'transaction_id': transaction.id}
                 )
             )
@@ -89,7 +95,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_detail',
+                'helcim_transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
@@ -112,7 +118,31 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         return HttpResponseRedirect(
             reverse(
-                'transaction_detail',
+                'helcim_transaction_detail',
                 kwargs={'transaction_id': transaction.id}
             )
         )
+
+class TokenListView(PermissionRequiredMixin, generic.ListView):
+    """List of all transactions submitted made by django-helcim."""
+    model = models.HelcimToken
+    permission_required = 'helcim.helcim_tokens'
+    raise_exception = True
+    context_object_name = 'tokens'
+    template_name = 'helcim/token_list.html'
+
+class TokenDeleteView(PermissionRequiredMixin, generic.DeleteView):
+    """Allows deletion of a Helcim API token."""
+    model = models.HelcimToken
+    permission_required = 'helcim.helcim_tokens'
+    raise_exception = True
+    pk_url_kwarg = 'token_id'
+    context_object_name = 'token'
+    success_message = 'Token successfully deleted.'
+    success_url = reverse_lazy('helcim_token_list')
+    template_name = 'helcim/token_delete.html'
+
+    def delete(self, request, *args, **kwargs):
+        """Override delete to allow success message to be added."""
+        messages.success(self.request, self.success_message)
+        return super(TokenDeleteView, self).delete(request, *args, **kwargs)

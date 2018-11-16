@@ -35,6 +35,7 @@ def pytest_configure():
         ],
         'HELCIM_ACCOUNT_ID': '1234567890',
         'HELCIM_API_TOKEN': 'abcdefghijklmno1234567890',
+        'HELCIM_ENABLE_TOKEN_VAULT': True,
     }
 
     settings.configure(**django_settings)

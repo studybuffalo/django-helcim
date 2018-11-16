@@ -84,17 +84,16 @@ risk and severity of a data breach.**
 
 **Default (boolean):** ``False``
 
-If set to ``True``, all references to the cardholder name, credit card
-number, credit card expiry, credit card type, and Helcim Commerce
-token will be redacted. **This setting overrides any of the individual
-settings below.**
+If set to ``True``, all references to sensitive cardholder information
+will be redacted. **This setting applies to and overrides any of the
+individual settings below.**
 
 ``HELCIM_REDACT_CC_NAME``
 =========================
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card cardholder
 name.
@@ -104,7 +103,7 @@ name.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card number.
 
@@ -113,18 +112,47 @@ If set to ``True``, redacts all reference to the credit card number.
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card expiry date.
+
+``HELCIM_REDACT_CC_CVV``
+========================
+
+**Required:** ``False``
+
+**Default (boolean):** ``True``
+
+If set to ``True``, redacts all reference to the credit card CVV.
 
 ``HELCIM_REDACT_CC_TYPE``
 =========================
 
 **Required:** ``False``
 
-**Default (boolean):** ``False``
+**Default (boolean):** ``True``
 
 If set to ``True``, redacts all reference to the credit card type.
+
+``HELCIM_REDACT_CC_MAGNETIC``
+=============================
+
+**Required:** ``False``
+
+**Default (boolean):** ``True``
+
+If set to ``True``, redacts all reference to the credit card magnetic
+strip data.
+
+``HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED``
+=======================================
+
+**Required:** ``False``
+
+**Default (boolean):** ``True``
+
+If set to ``True``, redacts all reference to the credit card magnetic
+strip data and the terminal serial number.
 
 ``HELCIM_REDACT_TOKEN``
 =======================
@@ -137,6 +165,12 @@ If set to ``True``, redacts all reference to the Helcim Commerce credit
 card token and the 'first four last four' digits of the credit card
 number.
 
+.. note::
+
+    This setting will not override the **Helcim Token Vault**. If you
+    to turn off the vault, use the ``HELCIM_ENABLE_TOKEN_VAULT``
+    setting.
+
 ------------------------
 Additional Functionality
 ------------------------
@@ -145,13 +179,33 @@ These settings allow you to enable or disable additional functionality
 with django-helcim.
 
 
-``HELCIM_TRANSACTIONS_READ_ONLY``
-=================================
+``HELCIM_ENABLE_TRANSACTION_CAPTURE``
+=====================================
 
 **Required:** ``False``
 
 **Default (boolean):** ``False``
 
-If set to ``False``, will allow you to capture and refund transactions
-from the ``HelcimTransactionDetailView``. Otherwise, this functionality
-is turned off and the transaction detail view is read only.
+If set to ``True``, will allow you to capture transactions from the
+``HelcimTransactionDetailView``.
+
+``HELCIM_ENABLE_TRANSACTION_REFUND``
+=====================================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, will allow you to refund transactions from the
+``HelcimTransactionDetailView``.
+
+``HELCIM_ENABLE_TOKEN_VAULT``
+=============================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, enables the Helcim card token vault. This stores
+the card token returned from the Helcim Commerce API, along with the
+customer code. The token will also be associated to the logged in user.

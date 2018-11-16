@@ -1,6 +1,5 @@
 """Django settings file to get basic Django instance running."""
 # pylint: disable=unused-wildcard-import
-
 import environ
 
 from oscar import OSCAR_MAIN_TEMPLATE_DIR, get_core_apps
@@ -12,7 +11,7 @@ from oscar.defaults import * # pylint: disable=wildcard-import
 ROOT_DIR = environ.Path(__file__) - 1
 PACKAGE_DIR = environ.Path(__file__) - 2
 ENV = environ.Env()
-ENV.read_env(env_file=ROOT_DIR.file("config.env"))
+ENV.read_env(env_file=ROOT_DIR.file('config.env'))
 
 # DEBUG SETTINGS
 # Used for sandbox - DO NOT USE IN PRODUCTION
@@ -129,7 +128,7 @@ MEDIA_URL = '/media/'
 
 # STATIC SETTINGS
 STATIC_URL = '/static/'
-STATIC_ROOT = ROOT_DIR.path('/static/')
+STATIC_ROOT = ROOT_DIR.path('static')
 
 # AUTHENTICATION SETTINGS
 AUTHENTICATION_BACKENDS = (
@@ -144,7 +143,10 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': (
+                '%(levelname)s %(asctime)s %(module)s %(process)d '
+                '%(thread)d %(message)s'
+            )
         },
         'simple': {
             'format': '%(levelname)s %(message)s'
@@ -199,3 +201,10 @@ HELCIM_API_URL = ENV('HELCIM_API_URL', default='')
 HELCIM_ACCOUNT_ID = ENV('HELCIM_ACCOUNT_ID', default='')
 HELCIM_API_TOKEN = ENV('HELCIM_API_TOKEN', default='')
 HELCIM_TERMINAL_ID = ENV('HELCIM_TERMINAL_ID', default='')
+HELCIM_ENABLE_TRANSACTION_CAPTURE = ENV(
+    'HELCIM_ENABLE_TRANSACTION_CAPTURE', default=True
+)
+HELCIM_ENABLE_TRANSACTION_REFUND = ENV(
+    'HELCIM_ENABLE_TRANSACTION_REFUND', default=True
+)
+HELCIM_ENABLE_TOKEN_VAULT = ENV('HELCIM_ENABLE_TOKEN_VAULT', default=True)

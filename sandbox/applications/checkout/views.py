@@ -87,7 +87,9 @@ class PaymentDetailsView(views.PaymentDetailsView):
             order_number=order_number,
             amount=total.incl_tax,
             card=kwargs['bankcard'],
-            billing_address=kwargs['billing_address']
+            billing_address=kwargs['billing_address'],
+            save_token=True, # TODO: allow user to specify this setting
+            django_user=self.request.user, # TODO: confirm no side effects
         )
         purchase.process()
 

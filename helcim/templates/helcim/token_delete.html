@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<h1>Delete Helcim Commerce API Token</h1>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<p>
+  <strong>Are you sure you want to delete this token?</strong>
+
+  <ul>
+    <li><strong>Date added:</strong> {{ token.date_added }}</li>
+    <li><strong>Helcim customer code:</strong> {{ token.customer_code }}</li>
+    <li><strong>User account:</strong> {{ token.django_user }}</li>
+    <li><strong>Token:</strong> {{ token.token }}</li>
+    <li><strong>Token F4L4:</strong> {{ token.token_f4l4 }}</li>
+  </ul>
+</p>
+
+<form method="POST">
+  {% csrf_token %}
+  <input type="submit" value="Delete">
+  <a href="{% url 'helcim_token_list' %}">Cancel</a>
+</form>
