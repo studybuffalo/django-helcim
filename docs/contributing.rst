@@ -21,18 +21,18 @@ Setting up the development environment
 
 This package is built using Pipenv_, which will take care of both
 your virtual environment and package management. If needed, you can
-install Pipenv through pip::
+install ``pipenv`` through ``pip``::
 
     $ pip install pipenv
 
 .. _Pipenv: https://pipenv.readthedocs.io/en/latest/
 
-To download the repository from GitHub via git::
+To download the repository from GitHub via ``git``::
 
     $ git clone git://github.com/studybuffalo/django-helcim.git
 
 You can then install all the required dependencies by changing to the
-package directory and installing from Pipfile.lock::
+package directory and installing from ``Pipfile.lock``::
 
     $ cd django-helcim
     $ pipenv install --ignore-pipfile --dev
@@ -69,7 +69,7 @@ possible, try to test the smallest component possible.
 Running Tests
 =============
 
-You can run all tests with the standard pytest command::
+You can run all tests with the standard ``pytest`` command::
 
     $ pipenv run py.test
 
@@ -84,7 +84,7 @@ Testing with tox
 ================
 
 To ensure compatibility with as wide variety of Python and Django
-versions, this package uses tox_. You can tests via tox with the
+versions, this package uses tox_. You can tests via ``tox`` with the
 following command::
 
     $ pipenv run tox
@@ -93,25 +93,29 @@ following command::
 
 You will need to have all versions of Python installed locally for
 tox to run tests. Any versions you are missing will be skipped. The
-Continuous Integration (CI) server will run tests against all versions
-on any pull requests or commits. **Note:** The CI testing can take over
-60 minutes to complete as there are multiple combinations of Python and
-Django versions that must be tested against.
+Continuous Integration (CI) server will run tests against all  versions
+on any pull requests or commits.
+
+.. note::
+
+     **Note:** The CI testing may take a while to complete as there are
+     multiple combinations of Python and Django versions that must be
+     tested against.
 
 ---------------
 Sandbox Website
 ---------------
 
 The Sandbox website is a barebones Django Oscar store that demonstrates
-how to use django-helcim with Django Oscar and provides a way to
-test any of your changes. You will need to setup your development
+how to use Django Helcim with Django Oscar and provides a way to test
+any of your changes. You will need to setup your development
 environment (see above) to proceed.
 
 .. attention::
 
     These instructions assume you have already setup a pipenv virtual
-    environment with django-helcim installed. See `Getting started`_ if
-    you need additional instructions.
+    environment with ``django-helcim`` installed. See `Getting started`_
+    if you need additional instructions.
 
     .. _Getting started: https://django-helcim.readthedocs.io/en/latest/installation.html#install-django-helcim-and-its-dependencies
 
@@ -184,9 +188,10 @@ Building package reference documentation
 ========================================
 
 The content for the Package reference is built using the
-``sphinx-apidoc`` tool. If files in the ``helcim`` module are added or
-deleted you will need to rebuild the file for the changes to populate
-on Read the Docs. You can do this with the following command::
+``sphinx-apidoc`` tool. If any files are added or removed from the
+``helcim`` module you will need to rebuild the ``helcim.rst`` file for
+the changes to populate on Read the Docs. You can do this with the
+following command::
 
     $ pipenv run sphinx-apidoc -fTM -o docs helcim helcim/migrations helcim/urls.py helcim/apps.py helcim/admin.py
 
@@ -194,8 +199,8 @@ Linting documentation
 =====================
 
 If you are having issues with the ReStructuredText (reST) formatting,
-you can use rst-lint to screen for syntax errors. You can run a check
-on a file with the following::
+you can use ``rst-lint`` to screen for syntax errors. You can run a
+check on a file with the following::
 
     $ pipenv run rst-lint /path/to/file.rst
 
@@ -203,7 +208,7 @@ on a file with the following::
 Distributing package
 --------------------
 
-Django-helcim is designed to be distributed with PyPI. While most
+Django Helcim is designed to be distributed with PyPI. While most
 contributors will not need to worry about uploading to PyPI, the
 following instructions list the general process in case anyone wishes
 to fork the repository or test out the process.

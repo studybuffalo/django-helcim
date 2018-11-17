@@ -3,7 +3,7 @@ Settings
 ========
 
 Below is a comprehensive list of all the settings for
-django-helcim.
+Django Helcim.
 
 ------------
 API settings
@@ -42,7 +42,7 @@ The account ID for your Helcim account.
 **Default (string):** ``''``
 
 The API token generated on your Helcim Commerce API dashboard to allow
-django-helcim to make transactions via the Helcim Commerce API.
+``django-helcim`` to make transactions via the Helcim Commerce API.
 
 ``HELCIM_TERMINAL_ID``
 ======================
@@ -71,7 +71,7 @@ Private data storage settings
 -----------------------------
 
 These are settings that control what kind of private data is stored in
-your database. Django-helcim does not record the Primary Account
+your database. ``django-helcim`` does not record the Primary Account
 Number (PAN), but does give you the option to save select data that
 could be used to identify a specify customer and their account. **You
 should only store the minimum amount of data you need to reduce the
