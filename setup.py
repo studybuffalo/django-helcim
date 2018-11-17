@@ -9,7 +9,7 @@ with open('README.rst', 'r') as readme_file:
 setup(
     name='django-helcim',
     version=__version__,
-    url='https://github.com/studybuffalo/django-helcim.',
+    url='https://github.com/studybuffalo/django-helcim',
     description=('A Django-based integration with the Helcim Commerce API.'),
     long_description=LONG_DESCRIPTION,
     long_description_content_type='text/x-rst',
