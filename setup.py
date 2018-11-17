@@ -18,7 +18,9 @@ setup(
     keywords='Django, Helcim, Oscar, Payment',
     platforms=['linux', 'windows'],
     packages=find_packages(exclude=['sandbox*', 'tests*']),
-    include_package_data=True,
+    package_data={
+        'helcim': ['templates/helcim/*.html'],
+    },
     project_urls={
         'Documentation': 'https://django-helcim.readthedocs.io/en/latest/',
         'Source code': 'https://github.com/studybuffalo/django-helcim',

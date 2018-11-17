@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.2.1 (2018-Nov-17)
+===================
+
+Bug Fixes
+---------
+
+* HTML template files are now included in package when installed via
+  PyPI.
+
 0.2.0 (2018-Nov-14)
 ===================
 
