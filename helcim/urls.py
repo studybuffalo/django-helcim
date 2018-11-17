@@ -5,8 +5,6 @@ from django.conf.urls import url
 
 from helcim import views
 
-app_name = 'helcim'
-
 urlpatterns = [
     url(
         r'^transactions/$',

@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.2.2 (2018-Nov-17)
+===================
+
+Bug Fixes
+---------
+
+* Removing unnecessary ``app_name`` from urls which may cause namespace
+  issues.
+
 0.2.1 (2018-Nov-17)
 ===================
 
