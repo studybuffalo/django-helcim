@@ -6,9 +6,9 @@ Getting started
 Install django-helcim and its dependencies
 ------------------------------------------------
 
-Install django-helcim (which will install both Django as a dependency).
-It is strongly recommended you use a virtual environment for your
-projects. For example, you can do this easily with Pipenv_::
+Install ``django-helcim`` (which will install both Django as a
+dependency). It is strongly recommended you use a virtual environment
+for your projects. For example, you can do this easily with Pipenv_::
 
     $ pipenv install django-helcim
 
@@ -33,7 +33,7 @@ to install this package as well::
 Edit your Django settings
 -------------------------
 
-Once django-helcim has been installed, you will need to update
+Once ``django-helcim`` has been installed, you will need to update
 your Django settings. At a bare minimum you will need to specify the
 following settings: `HELCIM_API_URL`, `HELCIM_ACCOUNT_ID`,
 `HELCIM_API_TOKEN`, and `HELCIM_TERMINAL_ID`. For example::
