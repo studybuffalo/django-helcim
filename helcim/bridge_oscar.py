@@ -4,6 +4,7 @@ import logging
 from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
+from helcim.models import HelcimToken
 
 LOG = logging.getLogger(__name__)
 
@@ -60,6 +61,37 @@ def remap_oscar_credit_card(card):
         'cc_expiry': cc_expiry,
         'cc_cvv': card.ccv,
     }
+
+def retrieve_saved_tokens(django_user=None, customer_code=None):
+    """Returns list of tokens for specified user or customer.
+
+        Only one value is required, but both can be provided to
+        retrieve a more specific list.
+
+        Parameters:
+            django_user (obj): A Django user instance.
+            customer_code (str): A Helcim customer code.
+
+        Returns:
+            obj: A queryset of the retrieve tokens
+
+        Raises:
+            ValueError: Neither a django_user or customer_code was
+                provided.
+    """
+    if django_user and customer_code:
+        return HelcimToken.objects.filter(
+            django_user=django_user,
+            customer_code=customer_code
+        )
+
+    if django_user:
+        return HelcimToken.objects.filter(django_user=django_user)
+
+    if customer_code:
+        return HelcimToken.objects.filter(customer_code=customer_code)
+
+    raise ValueError('A django_user or customer_code code must be specified.')
 
 class BaseCardTransactionBridge():
     """Base class to bridge Oscar and Helcim transactions.
