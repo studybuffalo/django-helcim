@@ -6,6 +6,17 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.3.0 (2018-Nov-18)
+===================
+
+Feature Updates
+---------------
+
+* Added new function to the ``bridge_oscar`` module to retrieve a users
+  saved Helcim tokens (from the Token Vault).
+* Added a new form to the ``bridge_oscar`` module to streamline
+  validating a Helcim token for payment processing by Django Oscar.
+
 0.2.2 (2018-Nov-17)
 ===================
 
