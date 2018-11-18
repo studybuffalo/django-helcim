@@ -13,8 +13,8 @@
    inkscape:version="0.91 r13725"
    sodipodi:docname="discover.svg"
    inkscape:export-filename="E:\My Documents\GitHub\django-helcim\helcim\static\helcim\discover.png"
-   inkscape:export-xdpi="23.68421"
-   inkscape:export-ydpi="23.68421">
+   inkscape:export-xdpi="9"
+   inkscape:export-ydpi="9">
   <svg:metadata
      id="metadata2899">
     <rdf:RDF>
@@ -23,7 +23,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </svg:metadata>
@@ -37,13 +37,13 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1017"
+     inkscape:window-height="1057"
      id="namedview2897"
      showgrid="false"
      inkscape:zoom="0.35921027"
-     inkscape:cx="522.57304"
+     inkscape:cx="106.38227"
      inkscape:cy="190.74271"
-     inkscape:window-x="1912"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      inkscape:current-layer="svg3187"
