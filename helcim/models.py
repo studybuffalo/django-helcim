@@ -241,7 +241,7 @@ class HelcimToken(models.Model):
 
             # If found, return the path to the static file image
             if finders.find(image_path):
-                return image
+                return image_path
 
         # Return placeholder image
         return 'helcim/placeholder.png'
