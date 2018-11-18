@@ -53,6 +53,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid4, editable=False, primary_key=True, verbose_name='ID')),
                 ('token', models.CharField(help_text='The Helcim card token number', max_length=23)),
                 ('token_f4l4', models.CharField(help_text='The first & last four digits of the credit card number', max_length=8)),
+                ('cc_type', models.CharField(blank=True, help_text='The credit card type', max_length=32, null=True)),
                 ('date_added', models.DateTimeField(auto_now_add=True, help_text='Date and time this token was added to database')),
                 ('customer_code', models.CharField(blank=True, help_text='The Helcim customer code', max_length=16, null=True)),
                 ('django_user', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE, related_name='tokens', to=settings.AUTH_USER_MODEL)),
