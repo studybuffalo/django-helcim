@@ -26,3 +26,7 @@ sandbox/static/*
 *.egg-info
 dist/
 build/
+
+# File for testing API connection/requests
+# (ignored because contains API credentials)
+api_testing.py
