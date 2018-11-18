@@ -219,3 +219,8 @@ class HelcimToken(models.Model):
         unique_together = (
             'token', 'token_f4l4', 'customer_code', 'django_user'
         )
+
+    @property
+    def display_as_card_number(self):
+        """Displays token_f4l4 as a 16 character credit card number."""
+        return '{}********{}'.format(self.token_f4l4[:4], self.token_f4l4[-4:])
