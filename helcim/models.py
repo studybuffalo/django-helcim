@@ -2,6 +2,7 @@
 from uuid import uuid4
 
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles import finders
 from django.db import models
 
 
@@ -47,14 +48,14 @@ class HelcimTransaction(models.Model):
         auto_now_add=True,
         help_text='Date and time this transaction was recorded in database',
     )
-    transaction_types = (
+    TRANSACTION_TYPES = (
         ('s', 'purchase (sale)'),
         ('p', 'pre-authorization'),
         ('c', 'capture'),
         ('r', 'refund'),
     )
     transaction_type = models.CharField(
-        choices=transaction_types,
+        choices=TRANSACTION_TYPES,
         help_text='The type of transaction',
         max_length=1,
     )
@@ -191,6 +192,12 @@ class HelcimToken(models.Model):
         help_text='The first & last four digits of the credit card number',
         max_length=8
     )
+    cc_type = models.CharField(
+        blank=True,
+        help_text='The credit card type',
+        max_length=32,
+        null=True,
+    )
     date_added = models.DateTimeField(
         auto_now_add=True,
         help_text='Date and time this token was added to database',
@@ -224,3 +231,27 @@ class HelcimToken(models.Model):
     def display_as_card_number(self):
         """Displays token_f4l4 as a 16 character credit card number."""
         return '{}********{}'.format(self.token_f4l4[:4], self.token_f4l4[-4:])
+
+    @property
+    def get_credit_card_png(self):
+        """Returns a path to a credit card .png for this token."""
+        # Look for an image for this credit card
+        image = finders.find('helcim/{}.png'.format(self.cc_type.lower()))
+
+        # Return credit card or the placeholder image
+        if image:
+            return image
+
+        return 'helcim/placeholder.png'
+
+    @property
+    def get_credit_card_svg(self):
+        """Returns a path to a credit card .svg for this token."""
+        # Look for an image for this credit card
+        image = finders.find('helcim/{}.svg'.format(self.cc_type.lower()))
+
+        # Return credit card or the placeholder image
+        if image:
+            return image
+
+        return 'helcim/placeholder.svg'
