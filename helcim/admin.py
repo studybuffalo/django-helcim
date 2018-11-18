@@ -49,7 +49,8 @@ class HelcimTokenAdmin(admin.ModelAdmin):
         'token_f4l4',
         'date_added',
         'customer_code',
-        'django_user'
+        'django_user',
+        'cc_type',
     ]
 
     fields = MODEL_FIELDS
@@ -62,6 +63,7 @@ class HelcimTokenAdmin(admin.ModelAdmin):
         'customer_code',
         'token',
         'token_f4l4',
+        'cc_type',
     ]
 
 # Only register admin models if enabled in settings
