@@ -236,22 +236,26 @@ class HelcimToken(models.Model):
     def get_credit_card_png(self):
         """Returns a path to a credit card .png for this token."""
         # Look for an image for this credit card
-        image = finders.find('helcim/{}.png'.format(self.cc_type.lower()))
+        if self.cc_type:
+            image_path = 'helcim/{}.svg'.format(self.cc_type.lower())
 
-        # Return credit card or the placeholder image
-        if image:
-            return image
+            # If found, return the path to the static file image
+            if finders.find(image_path):
+                return image
 
+        # Return placeholder image
         return 'helcim/placeholder.png'
 
     @property
     def get_credit_card_svg(self):
         """Returns a path to a credit card .svg for this token."""
         # Look for an image for this credit card
-        image = finders.find('helcim/{}.svg'.format(self.cc_type.lower()))
+        if self.cc_type:
+            image_path = 'helcim/{}.svg'.format(self.cc_type.lower())
 
-        # Return credit card or the placeholder image
-        if image:
-            return image
+            # If found, return the path to the static file image
+            if finders.find(image_path):
+                return image_path
 
+        # Return placeholder image
         return 'helcim/placeholder.svg'
