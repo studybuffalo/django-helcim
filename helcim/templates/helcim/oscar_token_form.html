@@ -1,3 +1,5 @@
+{% load static %}
+
 <form method="post" action="{% url 'checkout:preview' %}">
   {% csrf_token %}
   <input type="hidden" name="token" value="{{ token.id }}">
