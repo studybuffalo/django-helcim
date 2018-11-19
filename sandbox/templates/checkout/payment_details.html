@@ -2,6 +2,23 @@
 
 {% load i18n %}
 
+{% block extrahead %}
+<style>
+  .saved-card {
+    display: inline-block;
+  }
+
+    .saved-card image {
+      display: block;
+      margin: 10px 0;
+    }
+
+    .saved-card > div {
+      margin: 10px 0;
+    }
+</style>
+{% endblock %}
+
 {% block payment_details %}
   <!-- Saved Cards Form -->
   {% if token_vault and saved_tokens %}
