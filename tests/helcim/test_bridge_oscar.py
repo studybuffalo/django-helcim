@@ -140,7 +140,7 @@ def test_remap_oscar_credit_card_full():
 
 def test_base_card_bridge_formats_details():
     transaction = bridge_oscar.BaseCardTransactionBridge(
-        '1', '2', MockCreditCard(), {'first_name': '3'}
+        '1', '2', card=MockCreditCard(), billing_address={'first_name': '3'}
     )
 
     assert 'order_number' in transaction.transaction_details
@@ -163,7 +163,7 @@ def test_base_card_bridge_formats_details():
 
 def test_base_card_bridge_formats_details_without_billing_address():
     transaction = bridge_oscar.BaseCardTransactionBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     assert len(transaction.transaction_details) == 6
@@ -179,7 +179,7 @@ def test_base_card_bridge_formats_details_without_billing_address():
 @patch('helcim.bridge_oscar.gateway.Purchase', MockProcessValid)
 def test_purchase_bridge_valid():
     purchase = bridge_oscar.PurchaseBridge(
-        '1', '2', MockCreditCard(), {'first_name': '3'}
+        '1', '2', card=MockCreditCard(), billing_address={'first_name': '3'}
     )
 
     try:
@@ -192,7 +192,7 @@ def test_purchase_bridge_valid():
 @patch('helcim.bridge_oscar.gateway.Purchase', MockProcessHelcimError)
 def test_purchase_bridge_helcim_error():
     purchase = bridge_oscar.PurchaseBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -205,7 +205,7 @@ def test_purchase_bridge_helcim_error():
 @patch('helcim.bridge_oscar.gateway.Purchase', MockProcessProcessingError)
 def test_purchase_bridge_processing_error():
     purchase = bridge_oscar.PurchaseBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -218,7 +218,7 @@ def test_purchase_bridge_processing_error():
 @patch('helcim.bridge_oscar.gateway.Purchase', MockProcessPaymentError)
 def test_purchase_bridge_payment_error():
     purchase = bridge_oscar.PurchaseBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -231,7 +231,7 @@ def test_purchase_bridge_payment_error():
 @patch('helcim.bridge_oscar.gateway.Purchase', MockProcessDjangoError)
 def test_purchase_bridge_django_error():
     purchase = bridge_oscar.PurchaseBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     purchase_instance = purchase.process()
@@ -241,7 +241,7 @@ def test_purchase_bridge_django_error():
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessValid)
 def test_preauthorize_bridge_valid():
     preauth = bridge_oscar.PreauthorizeBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -254,7 +254,7 @@ def test_preauthorize_bridge_valid():
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessHelcimError)
 def test_preauthorize_bridge_helcim_error():
     preauth = bridge_oscar.PreauthorizeBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -267,7 +267,7 @@ def test_preauthorize_bridge_helcim_error():
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessProcessingError)
 def test_preauthorize_bridge_processing_error():
     preauth = bridge_oscar.PreauthorizeBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -280,7 +280,7 @@ def test_preauthorize_bridge_processing_error():
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessPaymentError)
 def test_preauthorize_bridge_payment_error():
     preauth = bridge_oscar.PreauthorizeBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -293,7 +293,7 @@ def test_preauthorize_bridge_payment_error():
 @patch('helcim.bridge_oscar.gateway.Preauthorize', MockProcessDjangoError)
 def test_preauthorize_bridge_django_error():
     preauthorize = bridge_oscar.PreauthorizeBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     preauthorize_instance = preauthorize.process()
@@ -303,7 +303,7 @@ def test_preauthorize_bridge_django_error():
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessValid)
 def test_refund_bridge_valid():
     refund = bridge_oscar.RefundBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -316,7 +316,7 @@ def test_refund_bridge_valid():
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessHelcimError)
 def test_refund_bridge_helcim_error():
     refund = bridge_oscar.RefundBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -329,7 +329,7 @@ def test_refund_bridge_helcim_error():
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessProcessingError)
 def test_refund_bridge_processing_error():
     refund = bridge_oscar.RefundBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -342,7 +342,7 @@ def test_refund_bridge_processing_error():
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessPaymentError)
 def test_refund_bridge_payment_error():
     refund = bridge_oscar.RefundBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -355,7 +355,7 @@ def test_refund_bridge_payment_error():
 @patch('helcim.bridge_oscar.gateway.Refund', MockProcessDjangoError)
 def test_refund_bridge_django_error():
     refund = bridge_oscar.RefundBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     refund_instance = refund.process()
@@ -365,7 +365,7 @@ def test_refund_bridge_django_error():
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessValid)
 def test_verification_bridge_valid():
     verification = bridge_oscar.VerificationBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -378,7 +378,7 @@ def test_verification_bridge_valid():
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessHelcimError)
 def test_verification_bridge_helcim_error():
     verification = bridge_oscar.VerificationBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -391,7 +391,7 @@ def test_verification_bridge_helcim_error():
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessProcessingError)
 def test_verification_bridge_processing_error():
     verification = bridge_oscar.VerificationBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -404,7 +404,7 @@ def test_verification_bridge_processing_error():
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessPaymentError)
 def test_verification_bridge_payment_error():
     verification = bridge_oscar.VerificationBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     try:
@@ -417,7 +417,7 @@ def test_verification_bridge_payment_error():
 @patch('helcim.bridge_oscar.gateway.Verification', MockProcessDjangoError)
 def test_verification_bridge_django_error():
     verification = bridge_oscar.VerificationBridge(
-        '1', '2', MockCreditCard()
+        '1', '2', card=MockCreditCard()
     )
 
     verification_instance = verification.process()
