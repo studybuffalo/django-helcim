@@ -29,6 +29,12 @@ to install this package as well::
 
     .. _setup instructions for Django Oscar: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html
 
+Django Helcim also supplies some credit card logos to display with
+saved credit cards. To make use of these you will need to run
+``collectstatic``::
+
+    $ pipenv run python manage.py collectstatic
+
 -------------------------
 Edit your Django settings
 -------------------------

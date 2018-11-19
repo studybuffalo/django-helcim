@@ -14,8 +14,17 @@ Feature Updates
 
 * Added new function to the ``bridge_oscar`` module to retrieve a users
   saved Helcim tokens (from the Token Vault).
-* Added a new form to the ``bridge_oscar`` module to streamline
-  validating a Helcim token for payment processing by Django Oscar.
+* Extended the ``bridge_oscar`` module to streamline validating a
+  Helcim token for payment processing by Django Oscar.
+* Updated sandbox site to demonstrate a workflow that allows a customer
+  to use a saved credit card or enter a new one. Also allows customers
+  to save a credit card for future use.
+* Updated HelcimToken model to:
+  * record credit card type;
+  * display the "first 4 last 4" digits of the credit card number as a
+    16 character string; and
+  * retrieve and display an image for the corresponding credit card
+    type.
 
 0.2.2 (2018-Nov-17)
 ===================
