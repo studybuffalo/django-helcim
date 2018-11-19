@@ -8,6 +8,25 @@ from helcim.models import HelcimToken
 
 LOG = logging.getLogger(__name__)
 
+def retrieve_token_details(token_id, django_user):
+    """Takes a HelcimToken ID and maps details to dictionary."""
+    # Final validation to ensure token exists & belongs to proper user
+    try:
+        token_instance = HelcimToken.objects.get(
+            id=token_id, django_user=django_user
+        )
+    except HelcimToken.DoesNotExist:
+        raise helcim_exceptions.ProcessingError(
+            'Provided token does not belong to specified user/customer'
+        )
+
+    # Validation passed - map model to the dictionary
+    return {
+        'token': token_instance.token,
+        'token_f4l4': token_instance.token_f4l4,
+        'customer_code': token_instance.customer_code,
+    }
+
 def remap_oscar_billing_address(address):
     """Remaps Oscar billing address dictionary to Helcim dictionary.
 
@@ -107,7 +126,7 @@ class BaseCardTransactionBridge():
                 card token.
     """
     def __init__(
-            self, order_number, amount, card, billing_address=None,
+            self, order_number, amount, token_id, card, billing_address=None,
             save_token=False, django_user=None
     ):
         transaction_details = {
@@ -115,12 +134,18 @@ class BaseCardTransactionBridge():
             'amount': amount,
         }
 
-        if billing_address:
-            transaction_details.update(
-                remap_oscar_billing_address(billing_address)
-            )
+        if token_id:
+            transaction_details.update(retrieve_token_details(
+                token_id, django_user
+            ))
 
-        transaction_details.update(remap_oscar_credit_card(card))
+        if billing_address:
+            transaction_details.update(remap_oscar_billing_address(
+                billing_address
+            ))
+
+        if card:
+            transaction_details.update(remap_oscar_credit_card(card))
 
         self.transaction_details = transaction_details
         self.save_token = save_token

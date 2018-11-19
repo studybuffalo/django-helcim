@@ -79,7 +79,7 @@ TO_API_FIELDS = {
     'shipping_street_2': Field('shipping_street2', 's'),
     'tax_details': Field('taxDetails', 's'),
     'test': Field('test', 'b'),
-    'token': Field('cardToken', 's', 23, 23),
+    'token': Field('cardToken', 's', 22, 23),
     'token_f4l4': Field('cardF4L4', 's', 8, 8),
     'token_f4l4_skip': Field('cardF4L4Skip', 'b'),
     'transaction_id': Field('transactionId', 'i', 0),

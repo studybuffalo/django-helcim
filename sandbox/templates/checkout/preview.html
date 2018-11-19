@@ -23,6 +23,10 @@
 {% endblock %}
 
 {% block hiddenforms %}
-  {{ bankcard_form.as_p }}
-  {{ billing_address_form.as_p }}
+  {% if token_id %}
+    <input type="hidden" name="token-id" value="{{ token_id }}">
+  {% else %}
+    {{ bankcard_form.as_p }}
+    {{ billing_address_form.as_p }}
+  {% endif %}
 {% endblock %}

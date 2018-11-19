@@ -10,6 +10,7 @@ from oscar.apps.payment import (
 )
 
 from helcim import bridge_oscar
+from helcim.models import HelcimToken
 
 from applications.checkout import forms as custom_forms
 
@@ -42,36 +43,59 @@ class PaymentDetailsView(views.PaymentDetailsView):
     def post(self, request, *args, **kwargs):
         """Makes the POST request that moves between views.
 
-        If POST has an 'action' of 'place_order' the payment processing
-        can begin (call 'do_place_order').
+            If POST has an 'action' of 'place_order' the payment
+            processing can begin (call 'do_place_order').
 
-        If POST has no 'action' this would be an attempt to move to the
-        preview screen. A set of forms needs to be valid to proceed
-        (either the 'saved_card_token_form' or both the 'bankcard_form'
-        and 'billing_address_form'). If not, return the forms with the
-        error messages.
+            If POST has no 'action' this would be an attempt to move to
+            thepreview screen. The payment details (token or credit
+            card) must be valid to proceed. If not, return to the
+            payment page to display any error messages and allow
+            resubmission.
         """
-        # Need to work out handling of bank card vs. token here
-        # May find help here:
-        # https://github.com/sdonk/oscar-sagepay/blob/master/code/sagepay/views.py
-
         # Check if payment can be processed
         if request.POST.get('action', None) == 'place_order':
             return self.do_place_order(request)
 
-        # TODO: Handle both new card and old card validation here
+        # Not a payment POST - will need to validate payment details
+        token_id = request.POST.get('token-id', None)
 
-        # Check if forms are valid and preview screen can be displayed
+        # Token present - validate and return preview
+        if token_id:
+            token_instance = HelcimToken.objects.filter(id=token_id).first()
+
+            # If no instance, this is invalid
+            if not token_instance:
+                self.preview = False
+
+                # Reload the payment page with the errors
+                messages.warning(
+                    request,
+                    (
+                        'There was an issue retrieving the saved credit card '
+                        'information. You may retry the card again or '
+                        're-enter the details below.'
+                    )
+                )
+                return self.render_to_response(self.get_context_data)
+
+            # Instance found - can move to preview
+            return self.render_preview(
+                request,
+                token_id=token_id,
+            )
+
+        # No token present - validate credit card information
         bankcard_form = oscar_payment_forms.BankcardForm(request.POST)
-        billing_address_form = custom_forms.BillingAddressForm(request.POST)
+        address_form = custom_forms.BillingAddressForm(request.POST)
 
-        if not (bankcard_form.is_valid() and billing_address_form.is_valid()):
+        # Check that bank card data is valid
+        if not (bankcard_form.is_valid() and address_form.is_valid()):
             self.preview = False
 
-            # Reload the form content for the user
+            # Reload the payment page with the errors
             context = self.get_context_data(
                 bankcard_form=bankcard_form,
-                billing_address_form=billing_address_form,
+                billing_address_form=address_form,
             )
 
             return self.render_to_response(context)
@@ -80,56 +104,87 @@ class PaymentDetailsView(views.PaymentDetailsView):
         return self.render_preview(
             request,
             bankcard_form=bankcard_form,
-            billing_address_form=billing_address_form,
+            billing_address_form=address_form,
         )
 
     def do_place_order(self, request):
-        """Helper method to check that hiddens forms were not modified."""
-        # Need to work out handling of bank card vs. token here
-        # May find help here:
-        # https://github.com/sdonk/oscar-sagepay/blob/master/code/sagepay/views.py
+        """Re-validates payments details and sends for processing.
 
-        # saved_card_token_form here (probably throw this into the bridge module)
-        bankcard_form = oscar_payment_forms.BankcardForm(request.POST)
-        billing_address_form = custom_forms.BillingAddressForm(request.POST)
+            Payment details are hidden on the preview page. They are
+            re-validated to ensure no tampering and then added to the
+            order details for actual payment processing.
+        """
+        token_id = request.POST.get('token-id', None)
 
-        # Require either set of forms to be valid; token supercedes
-        # entered card data
-        if not all([
-                bankcard_form.is_valid(),
-                billing_address_form.is_valid()
-        ]):
-            # Forms now have errors, return to payment page
-            messages.error(request, "Invalid submission")
-            return HttpResponseRedirect(reverse('checkout:payment-details'))
+        # Token takes precedence over any other payment methods
+        if token_id:
+            token_instance = HelcimToken.objects.filter(id=token_id).first()
 
-        # Submit the order along with the required payment details
-        # (these will be passed along for payment processing)
-        submission = self.build_submission()
-        submission['payment_kwargs']['bankcard'] = bankcard_form.bankcard
-        submission['payment_kwargs']['billing_address'] = (
-            billing_address_form.cleaned_data
-        )
-        # Can we add a token field to payment_kwargs to pass through?
+            if not token_instance:
+                # Issue with token now, return to payment page
+                messages.error(request, 'Invalid submission')
+                return HttpResponseRedirect(
+                    reverse('checkout:payment-details')
+                )
+
+            # Add token_id to order details
+            submission = self.build_submission()
+            submission['payment_kwargs']['token_id'] = token_id
+        else:
+            bankcard_form = oscar_payment_forms.BankcardForm(request.POST)
+            address_form = custom_forms.BillingAddressForm(request.POST)
+
+            # Confirm no errors since payment page
+            if not (bankcard_form.is_valid() and address_form.is_valid()):
+                # Forms now have errors, return to payment page
+                messages.error(request, 'Invalid submission')
+                return HttpResponseRedirect(
+                    reverse('checkout:payment-details')
+                )
+
+            # Add bank card information to order details
+            submission = self.build_submission()
+            submission['payment_kwargs']['bankcard'] = bankcard_form.bankcard
+            submission['payment_kwargs']['billing_address'] = (
+                address_form.cleaned_data
+            )
+
         return self.submit(**submission)
 
     def handle_payment(self, order_number, total, **kwargs):
         """Submit payment details to the Helcim Commerce API."""
-        # Need to work out a "universal" handling of CC vs. token
+        # Extract all payment details
+        token_id = kwargs.get('token_id', None)
+        card_details = kwargs.get('bankcard', None)
+        billing_address = kwargs.get('billing_address', None)
+
+        if billing_address:
+            save_token = billing_address.get('save_card', False)
+        else:
+            save_token = False
+
         # Make a purchase request to the Helcim Commerce API
         purchase = bridge_oscar.PurchaseBridge(
             order_number=order_number,
             amount=total.incl_tax,
-            card=kwargs['bankcard'],
-            billing_address=kwargs['billing_address'],
-            save_token=kwargs['billing_address'].get('save_card', False),
+            token_id=token_id,
+            card=card_details,
+            billing_address=billing_address,
+            save_token=save_token,
             django_user=self.request.user,
         )
-        purchase.process()
+        purchase_instance, token_instance = purchase.process()
+
+        if token_instance:
+            payment_source = token_instance.cc_type
+        elif purchase_instance.cc_type:
+            payment_source = purchase_instance.cc_type
+        else:
+            payment_source = 'credit card'
 
         # Record payment source and event
         source_type, _ = oscar_payment_models.SourceType.objects.get_or_create(
-            name='Helcim'
+            name=payment_source
         )
 
         source = source_type.sources.model(
