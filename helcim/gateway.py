@@ -741,6 +741,7 @@ def identify_redact_fields():
             'settings': 'HELCIM_REDACT_CC_EXPIRY',
             'fields': [
                 {'api': 'cardExpiry', 'python': 'cc_expiry'},
+                {'api': 'expiryDate', 'python': 'cc_expiry'},
             ]
         },
         'cvv': {

@@ -535,14 +535,14 @@ def test_redact_data_cc_expiry():
     base = gateway.BaseRequest()
     base.response = {
         'raw_request': 'cardExpiry=a',
-        'raw_response': '<cardExpiry>a</cardExpiry>',
+        'raw_response': '<cardExpiry>a</cardExpiry><expiryDate>b</expiryDate>',
         'cc_expiry': 'a',
     }
     base.redact_data()
 
     assert base.redacted_response['raw_request'] == 'cardExpiry=REDACTED'
     assert base.redacted_response['raw_response'] == (
-        '<cardExpiry>REDACTED</cardExpiry>'
+        '<cardExpiry>REDACTED</cardExpiry><expiryDate>REDACTED</expiryDate>'
     )
     assert base.redacted_response['cc_expiry'] is None
 
