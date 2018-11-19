@@ -126,8 +126,8 @@ class BaseCardTransactionBridge():
                 card token.
     """
     def __init__(
-            self, order_number, amount, token_id, card, billing_address=None,
-            save_token=False, django_user=None
+            self, order_number, amount, token_id=None, card=None,
+            billing_address=None, save_token=False, django_user=None
     ):
         transaction_details = {
             'order_number': order_number,
