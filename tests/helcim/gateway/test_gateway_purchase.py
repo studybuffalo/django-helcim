@@ -78,7 +78,6 @@ def test_process_error_response_purchase():
     else:
         assert False
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
@@ -87,6 +86,9 @@ def test_process_error_response_purchase():
 @patch(
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
+)
+@patch.dict(
+    'helcim.bridge_oscar.gateway.SETTINGS', {'enable_token_vault': True}
 )
 def test_process_with_save_token_enabled():
     details = {
@@ -103,11 +105,13 @@ def test_process_with_save_token_enabled():
 
     assert isinstance(token, MockDjangoModel)
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
     MockDjangoModel
+)
+@patch.dict(
+    'helcim.bridge_oscar.gateway.SETTINGS', {'enable_token_vault': False}
 )
 def test_process_with_save_token_disabled():
     details = {

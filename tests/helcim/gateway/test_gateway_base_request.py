@@ -5,8 +5,6 @@ from unittest.mock import patch
 
 import requests
 
-from django.conf import settings
-from django.core import exceptions as django_exceptions
 from django.db import IntegrityError
 from django.test import override_settings
 
@@ -152,11 +150,9 @@ def test_set_api_details_argument():
     assert 'terminal_id' in base.api
     assert base.api['terminal_id'] == '98765432'
 
-@override_settings(
-    HELCIM_API_URL='1',
-    HELCIM_ACCOUNT_ID='2',
-    HELCIM_API_TOKEN='3',
-    HELCIM_TERMINAL_ID='4'
+@patch.dict(
+    'helcim.gateway.SETTINGS',
+    {'api_url': '1', 'account_id': '2', 'api_token': '3', 'terminal_id': '4',}
 )
 def test_set_api_details_settings():
     base = gateway.BaseRequest()
@@ -171,49 +167,12 @@ def test_set_api_details_settings():
     assert base.api['terminal_id'] == '4'
 
 @override_settings(HELCIM_API_URL=1)
+@patch.dict('helcim.gateway.SETTINGS', {'api_url': '1'})
 def test_set_api_details_argument_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
     assert 'url' in base.api
     assert base.api['url'] == 'https://www.test.com'
-
-@override_settings()
-def test_set_api_details_no_account_id():
-    del settings.HELCIM_ACCOUNT_ID
-
-    try:
-        gateway.BaseRequest()
-    except django_exceptions.ImproperlyConfigured as error:
-        assert True
-        assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
-    else:
-        assert False
-
-@override_settings()
-def test_set_api_details_no_api_token():
-    del settings.HELCIM_API_TOKEN
-
-    try:
-        gateway.BaseRequest()
-    except django_exceptions.ImproperlyConfigured as error:
-        assert True
-        assert str(error) == 'You must define a HELCIM_API_TOKEN setting'
-    else:
-        assert False
-
-@override_settings()
-def test_set_api_details_none():
-    del settings.HELCIM_API_URL
-    del settings.HELCIM_ACCOUNT_ID
-    del settings.HELCIM_API_TOKEN
-    del settings.HELCIM_TERMINAL_ID
-
-    try:
-        gateway.BaseRequest()
-    except django_exceptions.ImproperlyConfigured:
-        assert True
-    else:
-        assert False
 
 def test_configure_test_transaction_in_data():
     base = gateway.BaseRequest(api_details=API_DETAILS)
@@ -224,7 +183,7 @@ def test_configure_test_transaction_in_data():
     assert 'test' in base.cleaned
     assert base.cleaned['test'] is True
 
-@override_settings(HELCIM_API_TEST=False)
+@patch.dict('helcim.gateway.SETTINGS', {'api_test': False})
 def test_configure_test_transaction_data_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
     base.cleaned = {'test': True}
@@ -233,22 +192,13 @@ def test_configure_test_transaction_data_overrides_settings():
 
     assert base.cleaned['test'] is True
 
-@override_settings(HELCIM_API_TEST=True)
+@patch.dict('helcim.gateway.SETTINGS', {'api_test': True})
 def test_configure_test_transaction_setting():
     base = gateway.BaseRequest(api_details=API_DETAILS)
 
     base.configure_test_transaction()
 
     assert base.cleaned['test'] is True
-
-@override_settings()
-def test_configure_test_transaction_not_set():
-    del settings.HELCIM_API_TEST
-    base = gateway.BaseRequest(api_details=API_DETAILS)
-
-    base.configure_test_transaction()
-
-    assert 'test' not in base.cleaned
 
 def test_identify_redact_fields_defaults():
     fields = gateway.identify_redact_fields()
@@ -264,7 +214,7 @@ def test_identify_redact_fields_defaults():
     assert fields['mag']['redact'] is True
     assert fields['mag_enc']['redact'] is True
 
-@override_settings(HELCIM_REDACT_ALL=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_all': True})
 def test_identify_redact_fields_redact_all_true():
     fields = gateway.identify_redact_fields()
 
@@ -277,7 +227,7 @@ def test_identify_redact_fields_redact_all_true():
     assert fields['mag']['redact'] is True
     assert fields['mag_enc']['redact'] is True
 
-@override_settings(HELCIM_REDACT_ALL=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_all': False})
 def test_identify_redact_fields_redact_all_false():
     fields = gateway.identify_redact_fields()
 
@@ -290,108 +240,115 @@ def test_identify_redact_fields_redact_all_false():
     assert fields['mag']['redact'] is False
     assert fields['mag_enc']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_NAME=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_name': True})
 def test_identify_redact_fields_redact_name_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['name']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_NAME=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_name': False})
 def test_identify_redact_fields_redact_name_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['name']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_NUMBER=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_number': True})
 def test_identify_redact_fields_redact_number_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['number']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_NUMBER=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_number': False})
 def test_identify_redact_fields_redact_number_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['number']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_EXPIRY=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_expiry': True})
 def test_identify_redact_fields_redact_expiry_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['expiry']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_EXPIRY=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_expiry': False})
 def test_identify_redact_fields_redact_expiry_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['expiry']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_CVV=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_cvv': True})
 def test_identify_redact_fields_redact_cvv_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['cvv']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_CVV=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_cvv': False})
 def test_identify_redact_fields_redact_cvv_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['cvv']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_TYPE=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_type': True})
 def test_identify_redact_fields_redact_type_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['type']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_TYPE=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_type': False})
 def test_identify_redact_fields_redact_type_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['type']['redact'] is False
 
-@override_settings(HELCIM_REDACT_TOKEN=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_token': True})
 def test_identify_redact_fields_redact_token_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['token']['redact'] is True
 
-@override_settings(HELCIM_REDACT_TOKEN=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_token': False})
 def test_identify_redact_fields_redact_token_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['token']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_MAGNETIC=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_magnetic': True})
 def test_identify_redact_fields_redact_mag_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['mag']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_MAGNETIC=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_magnetic': False})
 def test_identify_redact_fields_redact_mag_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['mag']['redact'] is False
 
-@override_settings(HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_magnetic_encrypted': True})
 def test_identify_redact_fields_redact_mag_enc_true():
     fields = gateway.identify_redact_fields()
 
     assert fields['mag_enc']['redact'] is True
 
-@override_settings(HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=False)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_magnetic_encrypted': False})
 def test_identify_redact_fields_redact_mag_enc_false():
     fields = gateway.identify_redact_fields()
 
     assert fields['mag_enc']['redact'] is False
 
-@override_settings(
-    HELCIM_REDACT_ALL=True, HELCIM_REDACT_CC_NAME=False,
-    HELCIM_REDACT_CC_NUMBER=False, HELCIM_REDACT_CC_EXPIRY=False,
-    HELCIM_REDACT_CC_CVV=False, HELCIM_REDACT_CC_TYPE=False,
-    HELCIM_REDACT_TOKEN=False, HELCIM_REDACT_CC_MAGNETIC=False,
-    HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=True
+@patch.dict(
+    'helcim.gateway.SETTINGS',
+    {
+        'redact_all': True,
+        'redact_cc_name': False,
+        'redact_cc_number': False,
+        'redact_cc_expiry': False,
+        'redact_cc_cvv': False,
+        'redact_cc_type': False,
+        'redact_token': False,
+        'redact_cc_magnetic': False,
+        'redact_cc_magnetic_encrypted': True,
+    }
 )
 def test_identify_redact_fields_redact_all_true_overrides():
     fields = gateway.identify_redact_fields()
@@ -405,10 +362,19 @@ def test_identify_redact_fields_redact_all_true_overrides():
     assert fields['mag']['redact'] is True
     assert fields['mag_enc']['redact'] is True
 
-@override_settings(
-    HELCIM_REDACT_ALL=False, HELCIM_REDACT_CC_NAME=True,
-    HELCIM_REDACT_CC_NUMBER=True, HELCIM_REDACT_CC_EXPIRY=True,
-    HELCIM_REDACT_CC_TYPE=True, HELCIM_REDACT_TOKEN=True
+@patch.dict(
+    'helcim.gateway.SETTINGS',
+    {
+        'redact_all': False,
+        'redact_cc_name': True,
+        'redact_cc_number': True,
+        'redact_cc_expiry': True,
+        'redact_cc_cvv': True,
+        'redact_cc_type': True,
+        'redact_token': True,
+        'redact_cc_magnetic': True,
+        'redact_cc_magnetic_encrypted': True,
+    }
 )
 def test_identify_redact_fields_redact_all_false_overrides():
     fields = gateway.identify_redact_fields()
@@ -498,7 +464,7 @@ def test_redact_field_only_redacts_specified_details():
     )
     assert base.redacted_response['cc_name'] is 'a'
 
-@override_settings(HELCIM_REDACT_CC_NAME=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_name': True})
 def test_redact_data_cc_name():
     base = gateway.BaseRequest()
     base.response = {
@@ -514,7 +480,7 @@ def test_redact_data_cc_name():
     )
     assert base.redacted_response['cc_name'] is None
 
-@override_settings(HELCIM_REDACT_CC_NUMBER=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_number': True})
 def test_redact_data_cc_number():
     base = gateway.BaseRequest()
     base.response = {
@@ -530,7 +496,7 @@ def test_redact_data_cc_number():
     )
     assert base.redacted_response['cc_number'] is None
 
-@override_settings(HELCIM_REDACT_CC_EXPIRY=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_expiry': True})
 def test_redact_data_cc_expiry():
     base = gateway.BaseRequest()
     base.response = {
@@ -546,7 +512,7 @@ def test_redact_data_cc_expiry():
     )
     assert base.redacted_response['cc_expiry'] is None
 
-@override_settings(HELCIM_REDACT_CC_TYPE=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_type': True})
 def test_redact_data_cc_type():
     base = gateway.BaseRequest()
     base.response = {
@@ -562,7 +528,7 @@ def test_redact_data_cc_type():
     )
     assert base.redacted_response['cc_type'] is None
 
-@override_settings(HELCIM_REDACT_TOKEN=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_token': True})
 def test_redact_data_token():
     base = gateway.BaseRequest()
     base.response = {
@@ -584,7 +550,7 @@ def test_redact_data_token():
     assert base.redacted_response['token'] is None
     assert base.redacted_response['token_f4l4'] is None
 
-@override_settings(HELCIM_REDACT_CC_NAME=True)
+@patch.dict('helcim.gateway.SETTINGS', {'redact_cc_name': True})
 def test_redact_data_partial():
     base = gateway.BaseRequest()
     base.response = {
