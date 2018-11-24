@@ -1,7 +1,7 @@
 """Tests for the token functions in the Gateway module."""
 from unittest.mock import patch
 
-from helcim import bridge_oscar, exceptions as helcim_exceptions, models
+from helcim import gateway, exceptions as helcim_exceptions, models
 
 
 class MockHelcimToken():
@@ -18,13 +18,19 @@ class MockHelcimTokenDoesNotExist():
     def __init__(self, id=None, django_user=None):
         raise models.HelcimToken.DoesNotExist
 
+class MockHelcimTokenFilter():
+    """Mock of the HelcimToken filter function."""
+    def __init__(self, django_user=None, customer_code=None):
+        self.django_user = django_user
+        self.customer_code = customer_code
+
 @patch(
     'helcim.bridge_oscar.gateway.models.HelcimToken.objects.get',
     MockHelcimToken
 )
 def test_retrieve_token_details_valid():
     """Tests that dictionary is properly built."""
-    token_details = bridge_oscar.retrieve_token_details('1', '2')
+    token_details = gateway.retrieve_token_details('1', '2')
 
     assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
     assert token_details['token_f4l4'] == '11114444'
@@ -37,10 +43,32 @@ def test_retrieve_token_details_valid():
 def test_retrieve_token_details_invalid():
     """Tests that dictionary is properly built."""
     try:
-        bridge_oscar.retrieve_token_details('1', '2')
+        gateway.retrieve_token_details('1', '2')
     except helcim_exceptions.ProcessingError:
         assert True
     else:
         assert False
 
-# TODO: Add tests for retrieve_saved_tokens
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.filter',
+    MockHelcimTokenFilter
+)
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+def test_retrieve_saved_tokens_by_django_user():
+    """Tests that tokens can be retrieved for a Django user."""
+    tokens = gateway.retrieve_saved_tokens('1')
+
+    assert tokens.django_user == '1'
+    assert tokens.customer_code is None
+
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.filter',
+    MockHelcimTokenFilter
+)
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'helcim'})
+def test_retrieve_saved_tokens_by_customer_code():
+    """Tests that tokens can be retrieved for a customer code."""
+    tokens = gateway.retrieve_saved_tokens('1')
+
+    assert tokens.django_user is None
+    assert tokens.customer_code == '1'
