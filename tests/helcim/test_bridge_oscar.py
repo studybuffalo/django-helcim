@@ -5,20 +5,8 @@ from unittest.mock import patch
 
 from oscar.apps.payment import exceptions as oscar_exceptions
 
-from helcim import bridge_oscar, exceptions as helcim_exceptions, models
+from helcim import bridge_oscar, exceptions as helcim_exceptions
 
-
-class MockHelcimToken():
-    # pylint: disable=redefined-builtin, unused-argument
-    def __init__(self, id=None, django_user=None):
-        self.token = 'abcdefghijklmnopqrstuvw'
-        self.token_f4l4 = '11114444'
-        self.customer_code = 'CST0001'
-
-class MockHelcimTokenDoesNotExist():
-    # pylint: disable=redefined-builtin, unused-argument
-    def __init__(self, id=None, django_user=None):
-        raise models.HelcimToken.DoesNotExist
 
 class MockProcessValid():
     def process(self):
