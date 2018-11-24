@@ -2,9 +2,6 @@
 # pylint: disable=missing-docstring, protected-access
 from unittest.mock import patch
 
-from django.conf import settings
-from django.test import override_settings
-
 from helcim import gateway
 
 
@@ -81,23 +78,6 @@ def test_determine_save_token_status_disabled_user_no():
     status = transaction._determine_save_token_status(False)
 
     assert status is False
-
-# TODO: Move this into the settings module
-# @override_settings()
-# def test_determine_save_token_status_not_specified():
-#     del settings.HELCIM_ENABLE_TOKEN_VAULT
-#     details = {
-#         'token': 'abcdefghijklmnopqrstuvw',
-#         'customer_code': 'CST1000',
-#         'token_f4l4': '11119999',
-#     }
-
-#     transaction = gateway.BaseCardTransaction(
-#         api_details=API_DETAILS, **details
-#     )
-#     status = transaction._determine_save_token_status(True)
-
-#     assert status is False
 
 def test_determine_card_details_token():
     details = {

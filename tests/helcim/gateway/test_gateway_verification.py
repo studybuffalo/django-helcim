@@ -3,8 +3,6 @@
 
 from unittest.mock import patch
 
-from django.test import override_settings
-
 from helcim import exceptions as helcim_exceptions, gateway
 
 
