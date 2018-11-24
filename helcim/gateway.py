@@ -927,10 +927,7 @@ def retrieve_saved_tokens(customer):
         Returns:
             obj: A queryset of the retrieved tokens
     """
-    # Determine what identifier is used for tokens
-    customer_reference = SETTINGS['token_vault_identifier']
-
-    if customer_reference == 'helcim':
+    if SETTINGS['token_vault_identifier'] == 'helcim':
         tokens = models.HelcimToken.objects.filter(customer_code=customer)
     else:
         tokens = models.HelcimToken.objects.filter(django_user=customer)
