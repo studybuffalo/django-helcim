@@ -771,7 +771,7 @@ def identify_redact_fields():
     }
 
     # HELCIM_REDACT_ALL overrides all other settings
-    if SETTINGS['redact_all']:
+    if SETTINGS['redact_all'] is not None:
         if SETTINGS['redact_all'] is True:
             for key in redact_fields:
                 redact_fields[key]['redact'] = True
