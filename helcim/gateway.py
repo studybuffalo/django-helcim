@@ -4,6 +4,7 @@ These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application.
 """
 from calendar import monthrange
+import copy
 from datetime import datetime
 import re
 
@@ -220,7 +221,7 @@ class BaseRequest():
             may also redact other fields.
         """
         # Copy the response data to the redacted file for updating
-        self.redacted_response = {**self.response}
+        self.redacted_response = copy.deepcopy(self.response)
 
         # Remove any API content
         self._redact_api_data()
