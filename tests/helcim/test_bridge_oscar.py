@@ -50,10 +50,10 @@ class MockCreditCard():
         self.expiry_date = expiry
         self.ccv = ccv
 
-def mock_gateway_retrieve_token_details(token_id, customer):
+def mock_retrieve_token_details(token_id, customer):
     return {'token_id': token_id, 'customer': customer}
 
-def mock_gateway_retrieve_saved_tokens(customer):
+def mock_retrieve_saved_tokens(customer):
     return {'customer': customer}
 
 def test_remap_oscar_billing_address_patial():
@@ -173,6 +173,40 @@ def test_base_card_bridge_formats_details_without_billing_address():
     assert len(transaction.transaction_details) == 5
     assert 'amount' in transaction.transaction_details
     assert transaction.transaction_details['amount'] == '1'
+    assert 'cc_name' in transaction.transaction_details
+    assert 'cc_number' in transaction.transaction_details
+    assert 'cc_expiry' in transaction.transaction_details
+    assert 'cc_cvv' in transaction.transaction_details
+
+@patch(
+    'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
+)
+def test_base_card_bridge_provided_token_details_and_django_user():
+    transaction = bridge_oscar.BaseCardTransactionBridge(
+        '1', token_id='2', django_user='3'
+    )
+    assert transaction.transaction_details['token_id'] == '2'
+    assert transaction.transaction_details['customer'] == '3'
+
+@patch(
+    'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
+)
+@patch.dict(
+    'helcim.bridge_oscar.gateway.SETTINGS',
+    {'token_vault_identifier': 'helcim'}
+)
+def test_base_card_bridge_provided_token_details_and_customer_code():
+    transaction = bridge_oscar.BaseCardTransactionBridge(
+        '1', token_id='2', customer_code='3'
+    )
+    assert transaction.transaction_details['token_id'] == '2'
+    assert transaction.transaction_details['customer'] == '3'
+
+def test_base_card_bridge_provided_card_details():
+    transaction = bridge_oscar.BaseCardTransactionBridge(
+        '1', card=MockCreditCard()
+    )
+
     assert 'cc_name' in transaction.transaction_details
     assert 'cc_number' in transaction.transaction_details
     assert 'cc_expiry' in transaction.transaction_details
@@ -440,7 +474,7 @@ def test_capture_bridge_django_error():
 
 @patch(
     'helcim.bridge_oscar.gateway.retrieve_token_details',
-    mock_gateway_retrieve_token_details
+    mock_retrieve_token_details
 )
 def test_retrieve_token_details_shortcut():
     """Tests that retrieve_token_details shortcut works."""
@@ -451,7 +485,7 @@ def test_retrieve_token_details_shortcut():
 
 @patch(
     'helcim.bridge_oscar.gateway.retrieve_saved_tokens',
-    mock_gateway_retrieve_saved_tokens
+    mock_retrieve_saved_tokens
 )
 def test_retrieve_saved_tokens_shortcut():
     """Tests that retrieve_saved_tokens shortcut works."""
