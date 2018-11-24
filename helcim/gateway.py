@@ -109,17 +109,17 @@ class BaseRequest():
         """Redacts API data and updates redacted_response attribute."""
         if 'raw_request' in self.redacted_response:
             self.redacted_response['raw_request'] = re.sub(
-                r'(accountId=.+?)(&|$)',
+                r'(accountId=.*?)(&|$)',
                 r'accountId=REDACTED\g<2>',
                 self.redacted_response['raw_request']
             )
             self.redacted_response['raw_request'] = re.sub(
-                r'(apiToken=.+?)(&|$)',
+                r'(apiToken=.*?)(&|$)',
                 r'apiToken=REDACTED\g<2>',
                 self.redacted_response['raw_request']
             )
             self.redacted_response['raw_request'] = re.sub(
-                r'(terminalId=.+?)(&|$)',
+                r'(terminalId=.*?)(&|$)',
                 r'terminalId=REDACTED\g<2>',
                 self.redacted_response['raw_request']
             )
@@ -139,7 +139,7 @@ class BaseRequest():
         # Redacts the raw_request data (if present)
         if self.redacted_response.get('raw_request', None):
             self.redacted_response['raw_request'] = re.sub(
-                r'({}=.+?)(&|$)'.format(api_name),
+                r'({}=.*?)(&|$)'.format(api_name),
                 r'{}=REDACTED\g<2>'.format(api_name),
                 self.redacted_response['raw_request']
             )
