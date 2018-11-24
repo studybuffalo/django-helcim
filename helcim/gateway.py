@@ -537,15 +537,25 @@ class BaseCardTransaction(BaseRequest):
                 obj: The HelcimToken model instance, or ``None`` (if
                     model not created).
         """
-        # TODO: use the settings to determine which reference to use
-        # Check that required data is available in response
         token = self.response.get('token', None)
         token_f4l4 = self.response.get('token_f4l4', None)
 
+        # Ensure there is a customer code (can't use token without one)
+        try:
+            customer_code = self.response['customer_code']
+        except KeyError:
+            raise helcim_exceptions.ProcessingError(
+                'Unable to save token - customer code not provided'
+            )
+
+        # Ensures a django user is available if it is the identifier
+        if SETTINGS['token_vault_identifier'] != 'helcim':
+            if self.django_user is None:
+                raise helcim_exceptions.ProcessingError(
+                    'Unable to save token - user reference not provided'
+                )
 
         if token and token_f4l4:
-            customer_code = self.response.get('customer_code', None)
-
             token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
                 token_f4l4=token_f4l4,
