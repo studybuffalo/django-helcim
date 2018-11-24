@@ -1,11 +1,9 @@
 """Integration tests between Gateway and Model modules."""
 # pylint: disable=missing-docstring
 from datetime import datetime
+from unittest.mock import patch
 
 import pytest
-
-from django.contrib.auth import get_user_model
-from django.test import override_settings
 
 from helcim import exceptions as helcim_exceptions, gateway, models
 
@@ -53,25 +51,10 @@ def test_save_transaction_invalid_data_type_handling():
     else:
         assert False
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
 @pytest.mark.django_db
-def test_save_token_saves_to_model():
-    count = models.HelcimToken.objects.all().count()
-
-    base = gateway.BaseCardTransaction(save_token=True)
-    base.response = {
-        'token': 'abcdefghijklmnopqrstuvw',
-        'customer_code': 'CST1000',
-        'token_f4l4': '11119999',
-    }
-    base.save_token_to_vault()
-
-    assert count + 1 == models.HelcimToken.objects.all().count()
-
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
-@pytest.mark.django_db
-def test_save_token_saves_to_model_with_user():
-    user = get_user_model().objects.create_user(
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': True})
+def test_save_token_saves_to_model(django_user_model):
+    user = django_user_model.objects.create_user(
         username='user', password='password'
     )
     count = models.HelcimToken.objects.all().count()
@@ -79,31 +62,51 @@ def test_save_token_saves_to_model_with_user():
     base = gateway.BaseCardTransaction(save_token=True, django_user=user)
     base.response = {
         'token': 'abcdefghijklmnopqrstuvw',
-        'customer_code': 'CST1000',
         'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
     }
     base.save_token_to_vault()
 
     assert count + 1 == models.HelcimToken.objects.all().count()
 
-
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
 @pytest.mark.django_db
-def test_save_token_handles_duplicate_token():
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': True})
+def test_save_token_saves_to_model_with_user(django_user_model):
+    user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
+    count = models.HelcimToken.objects.all().count()
+
+    base = gateway.BaseCardTransaction(save_token=True, django_user=user)
+    base.response = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+    base.save_token_to_vault()
+
+    assert count + 1 == models.HelcimToken.objects.all().count()
+
+@pytest.mark.django_db
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': True})
+def test_save_token_handles_duplicate_token(django_user_model):
+    user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
     first_instance = models.HelcimToken.objects.create(
         token='abcdefghijklmnopqrstuvw',
-        customer_code='CST1000',
         token_f4l4='11119999',
-        django_user=None,
+        customer_code='CST1000',
+        django_user=user,
     )
 
     count = models.HelcimToken.objects.all().count()
 
-    base = gateway.BaseCardTransaction(save_token=True)
+    base = gateway.BaseCardTransaction(save_token=True, django_user=user)
     base.response = {
         'token': 'abcdefghijklmnopqrstuvw',
-        'customer_code': 'CST1000',
         'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
     }
     second_instance = base.save_token_to_vault()
 

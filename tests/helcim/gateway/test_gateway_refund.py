@@ -90,16 +90,19 @@ def test_process_error_response_refund():
 @patch.dict(
     'helcim.bridge_oscar.gateway.SETTINGS', {'enable_token_vault': True}
 )
-def test_process_with_save_token_enabled():
+def test_process_with_save_token_enabled(django_user_model):
     details = {
         'amount': 100.00,
         'token': 'abcdefghijklmnopqrstuvw',
         'token_f4l4': '11119999',
         'customer_code': 'CST1000',
     }
+    user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
 
     refund = gateway.Refund(
-        api_details=API_DETAILS, save_token=True, **details
+        api_details=API_DETAILS, save_token=True, django_user=user, **details
     )
     _, token = refund.process()
 
