@@ -62,7 +62,10 @@ class MockCreditCard():
         self.expiry_date = expiry
         self.ccv = ccv
 
-@patch('helcim.bridge_oscar.HelcimToken.objects.get', MockHelcimToken)
+@patch(
+    'helcim.bridge_oscar.gateway.models.HelcimToken.objects.get',
+    MockHelcimToken
+)
 def test_retrieve_token_details_valid():
     """Tests that dictionary is properly built."""
     token_details = bridge_oscar.retrieve_token_details('1', '2')
@@ -72,7 +75,8 @@ def test_retrieve_token_details_valid():
     assert token_details['customer_code'] == 'CST0001'
 
 @patch(
-    'helcim.bridge_oscar.HelcimToken.objects.get', MockHelcimTokenDoesNotExist
+    'helcim.bridge_oscar.gateway.models.HelcimToken.objects.get',
+    MockHelcimTokenDoesNotExist
 )
 def test_retrieve_token_details_invalid():
     """Tests that dictionary is properly built."""

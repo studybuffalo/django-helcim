@@ -4,45 +4,8 @@ import logging
 from oscar.apps.payment import exceptions as oscar_exceptions
 
 from helcim import exceptions as helcim_exceptions, gateway
-from helcim.models import HelcimToken
 
 LOG = logging.getLogger(__name__)
-
-# TODO: see if the token functions should be moved into gateway?
-
-# TODO: see if the gateway module can collect all settings to more
-# clearly set defaults
-
-# TODO: when settings moved, rework any tests checking defaults
-# (can test that a proper default is set rather than testing the function
-# works with no setting specified)
-
-def retrieve_token_details(token_id, customer):
-    """Takes a HelcimToken ID and maps details to dictionary."""
-    # Final validation to ensure token exists & belongs to proper user
-    try:
-        # Determine what identifier is used for tokens
-        customer_reference = gateway.SETTINGS['token_vault_identifier']
-
-        if customer_reference == 'helcim':
-            token_instance = HelcimToken.objects.get(
-                id=token_id, customer_code=customer
-            )
-        else:
-            token_instance = HelcimToken.objects.get(
-                id=token_id, django_user=customer
-            )
-    except HelcimToken.DoesNotExist:
-        raise helcim_exceptions.ProcessingError(
-            'Unable to retrieve token details for specified customer.'
-        )
-
-    # Validation passed - map model to the dictionary
-    return {
-        'token': token_instance.token,
-        'token_f4l4': token_instance.token_f4l4,
-        'customer_code': token_instance.customer_code,
-    }
 
 def remap_oscar_billing_address(address):
     """Remaps Oscar billing address dictionary to Helcim dictionary.
@@ -97,27 +60,6 @@ def remap_oscar_credit_card(card):
         'cc_expiry': cc_expiry,
         'cc_cvv': card.ccv,
     }
-
-def retrieve_saved_tokens(customer):
-    """Returns list of tokens for specified customer.
-
-        Parameters:
-            customer: Either a a Django user instance or a Helcim
-                customer code. The reference used is determined by the
-                ``HELCIM_TOKEN_VAULT_IDENTIFIER`` setting.
-
-        Returns:
-            obj: A queryset of the retrieved tokens
-    """
-    # Determine what identifier is used for tokens
-    customer_reference = gateway.SETTINGS['token_vault_identifier']
-
-    if customer_reference == 'helcim':
-        tokens = HelcimToken.objects.filter(customer_code=customer)
-    else:
-        tokens = HelcimToken.objects.filter(django_user=customer)
-
-    return tokens
 
 class BaseCardTransactionBridge():
     """Base class to bridge Oscar and Helcim transactions.
@@ -336,3 +278,11 @@ class CaptureBridge():
             return None
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
+
+def retrieve_token_details(token_id, customer):
+    """Shortcut for token detail retrieval through bridge module."""
+    return gateway.retrieve_token_details(token_id, customer)
+
+def retrieve_saved_tokens(customer):
+    """Shortcut for token retrieval through bridge module."""
+    return gateway.retrieve_saved_tokens(customer)

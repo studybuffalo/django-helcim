@@ -889,4 +889,52 @@ def determine_helcim_settings():
         'token_vault_identifier': token_vault_identifier,
     }
 
+def retrieve_token_details(token_id, customer):
+    """Takes a HelcimToken ID and maps details to dictionary."""
+    # Final validation to ensure token exists & belongs to proper user
+    try:
+        # Determine what identifier is used for tokens
+        customer_reference = SETTINGS['token_vault_identifier']
+
+        if customer_reference == 'helcim':
+            token_instance = models.HelcimToken.objects.get(
+                id=token_id, customer_code=customer
+            )
+        else:
+            token_instance = models.HelcimToken.objects.get(
+                id=token_id, django_user=customer
+            )
+    except models.HelcimToken.DoesNotExist:
+        raise helcim_exceptions.ProcessingError(
+            'Unable to retrieve token details for specified customer.'
+        )
+
+    # Validation passed - map model to the dictionary
+    return {
+        'token': token_instance.token,
+        'token_f4l4': token_instance.token_f4l4,
+        'customer_code': token_instance.customer_code,
+    }
+
+def retrieve_saved_tokens(customer):
+    """Returns list of tokens for specified customer.
+
+        Parameters:
+            customer: Either a a Django user instance or a Helcim
+                customer code. The reference used is determined by the
+                ``HELCIM_TOKEN_VAULT_IDENTIFIER`` setting.
+
+        Returns:
+            obj: A queryset of the retrieved tokens
+    """
+    # Determine what identifier is used for tokens
+    customer_reference = SETTINGS['token_vault_identifier']
+
+    if customer_reference == 'helcim':
+        tokens = models.HelcimToken.objects.filter(customer_code=customer)
+    else:
+        tokens = models.HelcimToken.objects.filter(django_user=customer)
+
+    return tokens
+
 SETTINGS = determine_helcim_settings()
