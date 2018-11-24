@@ -8,16 +8,33 @@ from helcim.models import HelcimToken
 
 LOG = logging.getLogger(__name__)
 
-def retrieve_token_details(token_id, django_user):
+# TODO: see if the token functions should be moved into gateway?
+
+# TODO: see if the gateway module can collect all settings to more
+# clearly set defaults
+
+# TODO: when settings moved, rework any tests checking defaults
+# (can test that a proper default is set rather than testing the function
+# works with no setting specified)
+
+def retrieve_token_details(token_id, customer):
     """Takes a HelcimToken ID and maps details to dictionary."""
     # Final validation to ensure token exists & belongs to proper user
     try:
-        token_instance = HelcimToken.objects.get(
-            id=token_id, django_user=django_user
-        )
+        # Determine what identifier is used for tokens
+        customer_reference = gateway.SETTINGS['token_vault_identifier']
+
+        if customer_reference == 'helcim':
+            token_instance = HelcimToken.objects.get(
+                id=token_id, customer_code=customer
+            )
+        else:
+            token_instance = HelcimToken.objects.get(
+                id=token_id, django_user=customer
+            )
     except HelcimToken.DoesNotExist:
         raise helcim_exceptions.ProcessingError(
-            'Provided token does not belong to specified user/customer'
+            'Unable to retrieve token details for specified customer.'
         )
 
     # Validation passed - map model to the dictionary
@@ -81,36 +98,26 @@ def remap_oscar_credit_card(card):
         'cc_cvv': card.ccv,
     }
 
-def retrieve_saved_tokens(django_user=None, customer_code=None):
-    """Returns list of tokens for specified user or customer.
-
-        Only one value is required, but both can be provided to
-        retrieve a more specific list.
+def retrieve_saved_tokens(customer):
+    """Returns list of tokens for specified customer.
 
         Parameters:
-            django_user (obj): A Django user instance.
-            customer_code (str): A Helcim customer code.
+            customer: Either a a Django user instance or a Helcim
+                customer code. The reference used is determined by the
+                ``HELCIM_TOKEN_VAULT_IDENTIFIER`` setting.
 
         Returns:
-            obj: A queryset of the retrieve tokens
-
-        Raises:
-            ValueError: Neither a django_user or customer_code was
-                provided.
+            obj: A queryset of the retrieved tokens
     """
-    if django_user and customer_code:
-        return HelcimToken.objects.filter(
-            django_user=django_user,
-            customer_code=customer_code
-        )
+    # Determine what identifier is used for tokens
+    customer_reference = gateway.SETTINGS['token_vault_identifier']
 
-    if django_user:
-        return HelcimToken.objects.filter(django_user=django_user)
+    if customer_reference == 'helcim':
+        tokens = HelcimToken.objects.filter(customer_code=customer)
+    else:
+        tokens = HelcimToken.objects.filter(django_user=customer)
 
-    if customer_code:
-        return HelcimToken.objects.filter(customer_code=customer_code)
-
-    raise ValueError('A django_user or customer_code code must be specified.')
+    return tokens
 
 class BaseCardTransactionBridge():
     """Base class to bridge Oscar and Helcim transactions.
