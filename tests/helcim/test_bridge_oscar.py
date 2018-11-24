@@ -62,30 +62,11 @@ class MockCreditCard():
         self.expiry_date = expiry
         self.ccv = ccv
 
-@patch(
-    'helcim.bridge_oscar.gateway.models.HelcimToken.objects.get',
-    MockHelcimToken
-)
-def test_retrieve_token_details_valid():
-    """Tests that dictionary is properly built."""
-    token_details = bridge_oscar.retrieve_token_details('1', '2')
+def mock_gateway_retrieve_token_details(token_id, customer):
+    return {'token_id': token_id, 'customer': customer}
 
-    assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
-    assert token_details['token_f4l4'] == '11114444'
-    assert token_details['customer_code'] == 'CST0001'
-
-@patch(
-    'helcim.bridge_oscar.gateway.models.HelcimToken.objects.get',
-    MockHelcimTokenDoesNotExist
-)
-def test_retrieve_token_details_invalid():
-    """Tests that dictionary is properly built."""
-    try:
-        bridge_oscar.retrieve_token_details('1', '2')
-    except helcim_exceptions.ProcessingError:
-        assert True
-    else:
-        assert False
+def mock_gateway_retrieve_saved_tokens(customer):
+    return {'customer': customer}
 
 def test_remap_oscar_billing_address_patial():
     address = {
@@ -174,10 +155,6 @@ def test_remap_oscar_credit_card_full():
     assert remapped['cc_number'] == '1234'
     assert remapped['cc_expiry'] == '0118'
     assert remapped['cc_cvv'] == 100
-
-# TODO WRITE THIS TEST
-def test_retrieve_saved_tokens():
-    pass
 
 def test_base_card_bridge_formats_details():
     transaction = bridge_oscar.BaseCardTransactionBridge(
@@ -472,3 +449,24 @@ def test_capture_bridge_django_error():
     capture_instance = capture.process()
 
     assert capture_instance is None
+
+@patch(
+    'helcim.bridge_oscar.gateway.retrieve_token_details',
+    mock_gateway_retrieve_token_details
+)
+def test_retrieve_token_details_shortcut():
+    """Tests that retrieve_token_details shortcut works."""
+    token_details = bridge_oscar.retrieve_token_details('1', '2')
+
+    assert token_details['token_id'] == '1'
+    assert token_details['customer'] == '2'
+
+@patch(
+    'helcim.bridge_oscar.gateway.retrieve_saved_tokens',
+    mock_gateway_retrieve_saved_tokens
+)
+def test_retrieve_saved_tokens_shortcut():
+    """Tests that retrieve_saved_tokens shortcut works."""
+    token_details = bridge_oscar.retrieve_saved_tokens('1')
+
+    assert token_details['customer'] == '1'
