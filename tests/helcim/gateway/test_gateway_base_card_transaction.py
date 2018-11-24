@@ -2,7 +2,7 @@
 # pylint: disable=missing-docstring, protected-access
 from unittest.mock import patch
 
-from helcim import gateway
+from helcim import gateway, exceptions as helcim_exceptions
 
 
 class MockDjangoModel():
@@ -320,10 +320,9 @@ def test_save_token():
     }
 
     transaction = gateway.BaseCardTransaction(
-        api_details=API_DETAILS, **details
+        api_details=API_DETAILS, django_user=1, **details
     )
     transaction.response = details
-    transaction.django_user = 1
     transaction.redact_data()
     token_entry = transaction.save_token_to_vault()
 
@@ -364,10 +363,32 @@ def test_save_token_missing_token_f4l4():
     # Checks that all proper fields ended up getting passed to model
     assert token_entry is None
 
+def test_save_token_missing_customer_code():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+    }
+
+    transaction = gateway.BaseCardTransaction(
+        api_details=API_DETAILS, **details
+    )
+    transaction.response = details
+    transaction.redact_data()
+
+    try:
+        transaction.save_token_to_vault()
+    except helcim_exceptions.ProcessingError as error:
+        assert str(error) == (
+            'Unable to save token - customer code not provided'
+        )
+    else:
+        assert False
+
 @patch(
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
 def test_save_token_with_django_user():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -386,6 +407,28 @@ def test_save_token_with_django_user():
     assert token_entry.data['token_f4l4'] == '11119999'
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] == 1
+
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+def test_save_token_with_django_user_not_provided():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    transaction = gateway.BaseCardTransaction(
+        api_details=API_DETAILS, **details
+    )
+    transaction.response = details
+
+    try:
+        transaction.save_token_to_vault()
+    except helcim_exceptions.ProcessingError as error:
+        assert str(error) == (
+            'Unable to save token - user reference not provided'
+        )
+    else:
+        assert False
 
 @patch(
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
