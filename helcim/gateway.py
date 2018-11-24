@@ -11,7 +11,7 @@ import pytz
 import requests
 import xmltodict
 
-from django.conf import settings
+from django.conf import settings as django_settings
 from django.core import exceptions as django_exceptions
 from django.db import IntegrityError
 
@@ -186,35 +186,18 @@ class BaseRequest():
             api_details['token'] = details.get('token')
             api_details['terminal_id'] = details.get('terminal_id')
 
-        # Checks for URL in settings; if not found uses default
+        # For any missing values, use values/defaults from settings
         if api_details['url'] is None:
-            api_details['url'] = getattr(
-                settings, 'HELCIM_API_URL', 'https://secure.myhelcim.com/api/'
-            )
+            api_details['url'] = SETTINGS['api_url']
 
-        # Checks for account ID in settings; raises error if not found
         if api_details['account_id'] is None:
-            if hasattr(settings, 'HELCIM_ACCOUNT_ID'):
-                api_details['account_id'] = settings.HELCIM_ACCOUNT_ID
-            else:
-                raise django_exceptions.ImproperlyConfigured(
-                    'You must define a HELCIM_ACCOUNT_ID setting'
-                )
+            api_details['account_id'] = SETTINGS['account_id']
 
-        # Check for API token; raises error if not found
         if api_details['token'] is None:
-            if hasattr(settings, 'HELCIM_API_TOKEN'):
-                api_details['token'] = settings.HELCIM_API_TOKEN
-            else:
-                raise django_exceptions.ImproperlyConfigured(
-                    'You must define a HELCIM_API_TOKEN setting'
-                )
+            api_details['token'] = SETTINGS['api_token']
 
-        # Check for terminal ID (optional)
         if api_details['terminal_id'] is None:
-            api_details['terminal_id'] = getattr(
-                settings, 'HELCIM_TERMINAL_ID', None
-            )
+            api_details['terminal_id'] = SETTINGS['terminal_id']
 
         return api_details
 
@@ -226,8 +209,8 @@ class BaseRequest():
             Django settings file, the POST data takes precedence.
         """
 
-        if 'test' not in self.cleaned and hasattr(settings, 'HELCIM_API_TEST'):
-            self.cleaned['test'] = settings.HELCIM_API_TEST
+        if 'test' not in self.cleaned and SETTINGS['api_test']:
+            self.cleaned['test'] = SETTINGS['api_test']
 
     def redact_data(self):
         """Removes sensitive and identifiable data.
@@ -237,7 +220,7 @@ class BaseRequest():
             may also redact other fields.
         """
         # Copy the response data to the redacted file for updating
-        self.redacted_response = self.response
+        self.redacted_response = {**self.response}
 
         # Remove any API content
         self._redact_api_data()
@@ -468,7 +451,7 @@ class BaseCardTransaction(BaseRequest):
                 bool: Whether a token should be saved.
         """
         # Check if vault is enabled in settings
-        vault_enabled = getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False)
+        vault_enabled = SETTINGS['enable_token_vault']
 
         # If yes, check if user requested save
         if vault_enabled:
@@ -553,9 +536,11 @@ class BaseCardTransaction(BaseRequest):
                 obj: The HelcimToken model instance, or ``None`` (if
                     model not created).
         """
+        # TODO: use the settings to determine which reference to use
         # Check that required data is available in response
         token = self.response.get('token', None)
         token_f4l4 = self.response.get('token_f4l4', None)
+
 
         if token and token_f4l4:
             customer_code = self.response.get('customer_code', None)
@@ -563,6 +548,7 @@ class BaseCardTransaction(BaseRequest):
             token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
                 token_f4l4=token_f4l4,
+                cc_type=self.response.get('cc_type', None),
                 customer_code=customer_code,
                 django_user=self.django_user,
             )
@@ -593,6 +579,7 @@ class Purchase(BaseCardTransaction):
             }
         )
         self.post(purchase_data)
+
         purchase = self.save_transaction('s')
 
         if self.save_token:
@@ -723,59 +710,59 @@ def identify_redact_fields():
     """
     redact_fields = {
         'name': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_NAME',
+            'redact': None,
+            'settings': 'redact_cc_name',
             'fields': [
                 {'api': 'cardHolderName', 'python': 'cc_name'},
             ]
         },
         'number': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_NUMBER',
+            'redact': None,
+            'settings': 'redact_cc_number',
             'fields': [
                 {'api': 'cardNumber', 'python': 'cc_number'},
             ]
         },
         'expiry': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_EXPIRY',
+            'redact': None,
+            'settings': 'redact_cc_expiry',
             'fields': [
                 {'api': 'cardExpiry', 'python': 'cc_expiry'},
                 {'api': 'expiryDate', 'python': 'cc_expiry'},
             ]
         },
         'cvv': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_CVV',
+            'redact': None,
+            'settings': 'redact_cc_cvv',
             'fields': [
                 {'api': 'cardCVV', 'python': 'cc_cvv'},
             ]
         },
         'type': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_TYPE',
+            'redact': None,
+            'settings': 'redact_cc_type',
             'fields': [
                 {'api': 'cardType', 'python': 'cc_type'},
             ]
         },
         'token': {
-            'redact': False,
-            'settings': 'HELCIM_REDACT_TOKEN',
+            'redact': None,
+            'settings': 'redact_token',
             'fields': [
                 {'api': 'cardToken', 'python': 'token'},
                 {'api': 'cardF4L4', 'python': 'token_f4l4'},
             ]
         },
         'mag': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_MAGNETIC',
+            'redact': None,
+            'settings': 'redact_cc_magnetic',
             'fields': [
                 {'api': 'cardMag', 'python': 'mag'},
             ]
         },
         'mag_enc': {
-            'redact': True,
-            'settings': 'HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED',
+            'redact': None,
+            'settings': 'redact_cc_magnetic_encrypted',
             'fields': [
                 {'api': 'cardMagEnc', 'python': 'mag_enc'},
                 {'api': 'serialNumber', 'python': 'mang_enc_serial_number'},
@@ -784,8 +771,8 @@ def identify_redact_fields():
     }
 
     # HELCIM_REDACT_ALL overrides all other settings
-    if hasattr(settings, 'HELCIM_REDACT_ALL'):
-        if settings.HELCIM_REDACT_ALL is True:
+    if SETTINGS['redact_all']:
+        if SETTINGS['redact_all'] is True:
             for key in redact_fields:
                 redact_fields[key]['redact'] = True
         else:
@@ -795,8 +782,100 @@ def identify_redact_fields():
     # Otherwise, assess each field individually
     else:
         for key, field in redact_fields.items():
-            redact_fields[key]['redact'] = getattr(
-                settings, field['settings'], field['redact']
-            )
+            redact_fields[key]['redact'] = SETTINGS[field['settings']]
 
     return redact_fields
+
+def determine_helcim_settings():
+    """Collects all possible django-helcim settings for easy use.
+
+        Performs basic validation of required settings and assigns
+        defaults where applicable.
+
+        Returns:
+            dict: Summary of all possible django-helcim settings.
+    """
+    # API SETTINGS
+    # -------------------------------------------------------------------------
+    # Required settings
+    try:
+        account_id = getattr(django_settings, 'HELCIM_ACCOUNT_ID')
+    except AttributeError:
+        raise django_exceptions.ImproperlyConfigured(
+            'You must define a HELCIM_ACCOUNT_ID setting'
+        )
+
+    try:
+        api_token = getattr(django_settings, 'HELCIM_API_TOKEN')
+    except AttributeError:
+        raise django_exceptions.ImproperlyConfigured(
+            'You must define a HELCIM_API_TOKEN setting'
+        )
+
+    # Other settings
+    api_url = getattr(
+        django_settings, 'HELCIM_API_URL', 'https://secure.myhelcim.com/api/'
+    )
+    terminal_id = getattr(django_settings, 'HELCIM_TERMINAL_ID', '')
+    api_test = getattr(django_settings, 'HELCIM_API_TEST', None)
+
+    # REDACTION SETTINGS
+    # -------------------------------------------------------------------------
+    redact_all = getattr(django_settings, 'HELCIM_REDACT_ALL', None)
+    redact_cc_name = getattr(django_settings, 'HELCIM_REDACT_CC_NAME', True)
+    redact_cc_number = getattr(
+        django_settings, 'HELCIM_REDACT_CC_NUMBER', True
+    )
+    redact_cc_expiry = getattr(
+        django_settings, 'HELCIM_REDACT_CC_EXPIRY', True
+    )
+    redact_cc_cvv = getattr(django_settings, 'HELCIM_REDACT_CC_CVV', True)
+    redact_cc_type = getattr(django_settings, 'HELCIM_REDACT_CC_TYPE', True)
+    redact_cc_magnetic = getattr(
+        django_settings, 'HELCIM_REDACT_CC_MAGNETIC', True
+    )
+    redact_cc_magnetic_encrypted = getattr(
+        django_settings, 'HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED', True
+    )
+    redact_token = getattr(django_settings, 'HELCIM_REDACT_TOKEN', False)
+
+    # TRANSACTION FUNCTIONALITY SETTINGS
+    # -------------------------------------------------------------------------
+    enable_transaction_capture = getattr(
+        django_settings, 'HELCIM_ENABLE_TRANSACTION_CAPTURE', False
+    )
+    enable_transaction_refund = getattr(
+        django_settings, 'HELCIM_ENABLE_TRANSACTION_REFUND', False
+    )
+
+    # TOKEN VAULT SETTINGS
+    # -------------------------------------------------------------------------
+    enable_token_vault = getattr(
+        django_settings, 'HELCIM_ENABLE_TOKEN_VAULT', False
+    )
+    token_vault_identifier = getattr(
+        django_settings, 'HELCIM_TOKEN_VAULT_IDENTIFIER', 'django'
+    )
+
+    return {
+        'api_url': api_url,
+        'account_id': account_id,
+        'api_token': api_token,
+        'terminal_id': terminal_id,
+        'api_test': api_test,
+        'redact_all': redact_all,
+        'redact_cc_name': redact_cc_name,
+        'redact_cc_number': redact_cc_number,
+        'redact_cc_expiry': redact_cc_expiry,
+        'redact_cc_cvv': redact_cc_cvv,
+        'redact_cc_type': redact_cc_type,
+        'redact_cc_magnetic': redact_cc_magnetic,
+        'redact_cc_magnetic_encrypted': redact_cc_magnetic_encrypted,
+        'redact_token': redact_token,
+        'enable_transaction_capture': enable_transaction_capture,
+        'enable_transaction_refund': enable_transaction_refund,
+        'enable_token_vault': enable_token_vault,
+        'token_vault_identifier': token_vault_identifier,
+    }
+
+SETTINGS = determine_helcim_settings()
