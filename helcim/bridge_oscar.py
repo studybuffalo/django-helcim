@@ -73,19 +73,27 @@ class BaseCardTransactionBridge():
                 in the token vault or not.
             django_user (obj): The user to associate with the saved
                 card token.
+            customer_code (str): The Helcim customer code to associate
+                with the saved card token.
     """
     def __init__(
             self, amount, token_id=None, card=None,
-            billing_address=None, save_token=False, django_user=None
+            billing_address=None, save_token=False, django_user=None,
+            customer_code=None
     ):
         transaction_details = {
             'amount': amount,
         }
 
         if token_id:
-            transaction_details.update(retrieve_token_details(
-                token_id, django_user
-            ))
+            if gateway.SETTINGS['token_vault_identifier'] == 'helcim':
+                transaction_details.update(retrieve_token_details(
+                    token_id, customer_code
+                ))
+            else:
+                transaction_details.update(retrieve_token_details(
+                    token_id, django_user
+                ))
 
         if billing_address:
             transaction_details.update(remap_oscar_billing_address(
@@ -280,9 +288,17 @@ class CaptureBridge():
             raise oscar_exceptions.GatewayError(str(error))
 
 def retrieve_token_details(token_id, customer):
-    """Shortcut for token detail retrieval through bridge module."""
+    """Shortcut for retrieve_token_details from the Gateway module.
+
+        Added as a convenience to allow access to core functions via
+        the bridge module exclusively.
+    """
     return gateway.retrieve_token_details(token_id, customer)
 
 def retrieve_saved_tokens(customer):
-    """Shortcut for token retrieval through bridge module."""
+    """Shortcut for retrieve_saved_tokens from the Gateway module.
+
+        Added as a convenience to allow access to core functions via
+        the bridge module exclusively.
+    """
     return gateway.retrieve_saved_tokens(customer)
