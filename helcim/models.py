@@ -237,7 +237,7 @@ class HelcimToken(models.Model):
         """Returns a path to a credit card .png for this token."""
         # Look for an image for this credit card
         if self.cc_type:
-            image_path = 'helcim/{}.svg'.format(self.cc_type.lower())
+            image_path = 'helcim/{}.png'.format(self.cc_type.lower())
 
             # If found, return the path to the static file image
             if finders.find(image_path):
