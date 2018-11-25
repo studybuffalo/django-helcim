@@ -107,7 +107,6 @@ def test_process_with_save_token_enabled(django_user_model):
 
     assert isinstance(token, MockDjangoModel)
 
-#@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
