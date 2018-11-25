@@ -1,9 +1,8 @@
 """URLs to integrate with django-oscar."""
 # pylint: disable=line-too-long
-from django.conf import settings
 from django.conf.urls import url
 
-from helcim import views
+from helcim import gateway, views
 
 urlpatterns = [
     url(
@@ -19,7 +18,7 @@ urlpatterns = [
 ]
 
 # Only add these views if token vault is enabled
-if getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False):
+if gateway.SETTINGS['enable_token_vault']:
     urlpatterns += [
         url(
             r'^tokens/$',
