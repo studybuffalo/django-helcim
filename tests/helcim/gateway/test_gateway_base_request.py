@@ -6,7 +6,6 @@ from unittest.mock import patch
 import requests
 
 from django.db import IntegrityError
-from django.test import override_settings
 
 from helcim import exceptions as helcim_exceptions, gateway
 
@@ -166,7 +165,6 @@ def test_set_api_details_settings():
     assert 'terminal_id' in base.api
     assert base.api['terminal_id'] == '4'
 
-@override_settings(HELCIM_API_URL=1)
 @patch.dict('helcim.gateway.SETTINGS', {'api_url': '1'})
 def test_set_api_details_argument_overrides_settings():
     base = gateway.BaseRequest(api_details=API_DETAILS)
