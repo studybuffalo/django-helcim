@@ -257,7 +257,7 @@ def process_api_response(response, raw_request=None, raw_response=None):
                 # String Field
                 if api_field.field_type == 's':
                     processed[new_name] = (
-                        '' if field_value is None else str(field_value)
+                        None if field_value is None else str(field_value)
                     )
 
                 # Decimal Field
