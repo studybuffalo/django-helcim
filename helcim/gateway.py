@@ -574,9 +574,8 @@ class Purchase(BaseCardTransaction):
         """Makes a purchase request.
 
             Returns:
-                purchase (obj): The saved HelcimTransaction model
-                    instance.
-                token (obj): The saved HelcimToken model.
+                tuple: The saved HelcimTransaction model
+                    instance and HelcimToken model.
         """
         self.validate_fields()
         self.configure_test_transaction()
