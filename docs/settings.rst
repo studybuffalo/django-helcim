@@ -225,3 +225,19 @@ Determines which reference is used to associate a Helcim token to a
 specific customer. ``django`` will associate tokens with the logged
 in user and ``helcim`` will associate tokens with the returned
 ``customerCode``.
+
+-------------------
+Admin Functionality
+-------------------
+
+A read-only admin view is available to assist with viewing data or
+debugging.
+
+``HELCIM_ENABLE_ADMIN``
+=============================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, will register the read-only admin views.

@@ -1,7 +1,7 @@
 """Admin settings for Helcim Commerce API transactions."""
-from django.conf import settings
 from django.contrib import admin
 
+from helcim.gateway import SETTINGS
 from helcim.models import HelcimTransaction, HelcimToken
 
 class HelcimTransactionAdmin(admin.ModelAdmin):
@@ -67,6 +67,6 @@ class HelcimTokenAdmin(admin.ModelAdmin):
     ]
 
 # Only register admin models if enabled in settings
-if getattr(settings, 'HELCIM_INCLUDE_ADMIN', False):
+if SETTINGS['enable_admin']:
     admin.site.register(HelcimTransaction, HelcimTransactionAdmin)
     admin.site.register(HelcimToken, HelcimTokenAdmin)

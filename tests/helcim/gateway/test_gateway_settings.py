@@ -13,13 +13,14 @@ from helcim.gateway import determine_helcim_settings
     HELCIM_REDACT_CC_TYPE=11, HELCIM_REDACT_CC_MAGNETIC=12,
     HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=13, HELCIM_REDACT_TOKEN=14,
     HELCIM_ENABLE_TRANSACTION_CAPTURE=15, HELCIM_ENABLE_TRANSACTION_REFUND=16,
-    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_TOKEN_VAULT_IDENTIFIER=18
+    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_TOKEN_VAULT_IDENTIFIER=18,
+    HELCIM_ENABLE_ADMIN=19,
 )
 def test_determine_helcim_settings_all_settings_provided():
     """Tests that dictionary contains all expected values."""
     helcim_settings = determine_helcim_settings()
 
-    assert len(helcim_settings) == 18
+    assert len(helcim_settings) == 19
     assert helcim_settings['account_id'] == 1
     assert helcim_settings['api_token'] == 2
     assert helcim_settings['api_url'] == 3
@@ -38,6 +39,7 @@ def test_determine_helcim_settings_all_settings_provided():
     assert helcim_settings['enable_transaction_refund'] == 16
     assert helcim_settings['enable_token_vault'] == 17
     assert helcim_settings['token_vault_identifier'] == 18
+    assert helcim_settings['enable_admin'] == 19
 
 @override_settings()
 def test_determine_helcim_settings_missing_account_id():
@@ -83,10 +85,11 @@ def test_determine_helcim_settings_defaults():
     del settings.HELCIM_ENABLE_TRANSACTION_REFUND
     del settings.HELCIM_ENABLE_TOKEN_VAULT
     del settings.HELCIM_TOKEN_VAULT_IDENTIFIER
+    del settings.HELCIM_ENABLE_ADMIN
 
     helcim_settings = determine_helcim_settings()
 
-    assert len(helcim_settings) == 18
+    assert len(helcim_settings) == 19
     assert helcim_settings['api_url'] == 'https://secure.myhelcim.com/api/'
     assert helcim_settings['terminal_id'] == ''
     assert helcim_settings['api_test'] is None
@@ -103,6 +106,7 @@ def test_determine_helcim_settings_defaults():
     assert helcim_settings['enable_transaction_refund'] is False
     assert helcim_settings['enable_token_vault'] is False
     assert helcim_settings['token_vault_identifier'] == 'django'
+    assert helcim_settings['enable_admin'] is False
 
 # TODO: Move this into the settings module
 # @override_settings()

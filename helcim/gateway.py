@@ -868,6 +868,12 @@ def determine_helcim_settings():
         django_settings, 'HELCIM_TOKEN_VAULT_IDENTIFIER', 'django'
     )
 
+    # ADMIN SETTINGS
+    # -------------------------------------------------------------------------
+    enable_admin = getattr(
+        django_settings, 'HELCIM_ENABLE_ADMIN', False
+    )
+
     return {
         'api_url': api_url,
         'account_id': account_id,
@@ -887,6 +893,7 @@ def determine_helcim_settings():
         'enable_transaction_refund': enable_transaction_refund,
         'enable_token_vault': enable_token_vault,
         'token_vault_identifier': token_vault_identifier,
+        'enable_admin': enable_admin,
     }
 
 def retrieve_token_details(token_id, customer):
