@@ -6,7 +6,6 @@ import pytest
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
-from django.test import override_settings
 from django.urls import reverse
 
 from helcim import exceptions, models
@@ -213,7 +212,7 @@ def test_transaction_detail_get_context_capture_enabled_missing(admin_client):
 
     assert response.context['capture_enabled'] is False
 
-@override_settings(HELCIM_ENABLE_TRANSACTION_CAPTURE=False)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': False})
 @pytest.mark.django_db
 def test_transaction_detail_get_context_capture_enabled_false(admin_client):
     """Tests that capture_enabled flag is false when explicitly set."""
@@ -229,7 +228,7 @@ def test_transaction_detail_get_context_capture_enabled_false(admin_client):
 
     assert response.context['capture_enabled'] is False
 
-@override_settings(HELCIM_ENABLE_TRANSACTION_CAPTURE=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': True})
 @pytest.mark.django_db
 def test_transaction_detail_get_context_capture_enabled_true(admin_client):
     """Tests that capture_enabled flag is true when explicitly set."""
@@ -260,7 +259,7 @@ def test_transaction_detail_get_context_refund_enabled_missing(admin_client):
 
     assert response.context['refund_enabled'] is False
 
-@override_settings(HELCIM_ENABLE_TRANSACTION_REFUND=False)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': False})
 @pytest.mark.django_db
 def test_transaction_detail_get_context_refund_enabled_false(admin_client):
     """Tests that refund_enabled flag is false when explicitly set."""
@@ -276,7 +275,7 @@ def test_transaction_detail_get_context_refund_enabled_false(admin_client):
 
     assert response.context['refund_enabled'] is False
 
-@override_settings(HELCIM_ENABLE_TRANSACTION_REFUND=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': True})
 @pytest.mark.django_db
 def test_transaction_detail_get_context_refund_enabled_true(admin_client):
     """Tests that refund_enabled flag is true when explicitly set."""
@@ -309,10 +308,10 @@ def test_transaction_detail_post_no_action(admin_client):
     assert response.status_code == 400
     assert response.content == b'Unrecognized transaction action'
 
-@override_settings(HELCIM_TRANSACTIONS_READ_ONLY=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': False})
 @pytest.mark.django_db
-def test_transaction_detail_post_read_only_redirect(admin_client):
-    """Tests POST handling when read only is True."""
+def test_transaction_detail_post_no_capture_redirect(admin_client):
+    """Tests that view redirects on POST when capture not enabled."""
     # Create transaction
     transaction = create_transaction('s')
 
@@ -321,14 +320,14 @@ def test_transaction_detail_post_read_only_redirect(admin_client):
             'helcim_transaction_detail',
             kwargs={'transaction_id': transaction.id}
         ),
-        {},
+        {'action': 'capture'},
     )
     assert response.status_code == 302
 
-@override_settings(HELCIM_TRANSACTIONS_READ_ONLY=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': False})
 @pytest.mark.django_db
-def test_transaction_detail_post_read_only_message(admin_client):
-    """Tests POST handling when read only is True."""
+def test_transaction_detail_post_no_capture_message(admin_client):
+    """Tests error message on POST when capture not enabled."""
     # Create transaction
     transaction = create_transaction('s')
 
@@ -337,7 +336,7 @@ def test_transaction_detail_post_read_only_message(admin_client):
             'helcim_transaction_detail',
             kwargs={'transaction_id': transaction.id}
         ),
-        {},
+        {'action': 'capture'},
         follow=True
     )
 
@@ -345,10 +344,49 @@ def test_transaction_detail_post_read_only_message(admin_client):
 
     assert response.status_code == 200
     assert messages[0].tags == 'error'
-    assert messages[0].message == 'Transactions cannot be modified'
+    assert messages[0].message == 'Transactions cannot be captured'
+
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': False})
+@pytest.mark.django_db
+def test_transaction_detail_post_no_refund_redirect(admin_client):
+    """Tests that view redirects on POST when refund not enabled."""
+    # Create transaction
+    transaction = create_transaction('s')
+
+    response = admin_client.post(
+        reverse(
+            'helcim_transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        ),
+        {'action': 'refund'},
+    )
+    assert response.status_code == 302
+
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': False})
+@pytest.mark.django_db
+def test_transaction_detail_post_no_refund_message(admin_client):
+    """Tests error message on POST when refund not enabled."""
+    # Create transaction
+    transaction = create_transaction('s')
+
+    response = admin_client.post(
+        reverse(
+            'helcim_transaction_detail',
+            kwargs={'transaction_id': transaction.id}
+        ),
+        {'action': 'refund'},
+        follow=True
+    )
+
+    messages = [message for message in get_messages(response.wsgi_request)]
+
+    assert response.status_code == 200
+    assert messages[0].tags == 'error'
+    assert messages[0].message == 'Transactions cannot be refunded'
 
 @pytest.mark.django_db
 @patch('helcim.gateway.Refund', MockRefund)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': True})
 def test_transaction_detail_post_refund_action(admin_client):
     """Tests POST handling of valid Refund."""
     # Create transaction
@@ -371,6 +409,7 @@ def test_transaction_detail_post_refund_action(admin_client):
 
 @pytest.mark.django_db
 @patch('helcim.gateway.Refund', MockRefundError)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_refund': True})
 def test_transaction_refund_error(admin_client):
     """Tests handling of RefundErrors during refunds."""
     # Create transaction
@@ -393,6 +432,7 @@ def test_transaction_refund_error(admin_client):
 
 @pytest.mark.django_db
 @patch('helcim.gateway.Capture', MockCapture)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': True})
 def test_transaction_detail_post_capture_action(admin_client):
     """Tests POST handling of valid Capture."""
     # Create transaction
@@ -415,6 +455,7 @@ def test_transaction_detail_post_capture_action(admin_client):
 
 @pytest.mark.django_db
 @patch('helcim.gateway.Capture', MockCaptureError)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_transaction_capture': True})
 def test_transaction_capture_error(admin_client):
     """Tests handling of PaymentErrors during capture."""
     # Create transaction
