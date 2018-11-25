@@ -1,10 +1,11 @@
 """Custom forms to override Django Oscar defaults."""
 # pylint: disable=invalid-name, missing-docstring, protected-access
 from django import forms
-from django.conf import settings
 
 from oscar.core.loading import get_class, get_model
 from oscar.forms.mixins import PhoneNumberMixin
+
+from helcim.bridge_oscar import SETTINGS
 
 
 AbstractAddressForm = get_class('address.forms', 'AbstractAddressForm')
@@ -18,7 +19,7 @@ class BillingAddressForm(PhoneNumberMixin, AbstractAddressForm):
         self.set_country_queryset()
 
         # Add a "save card" option if Token vault is enabled
-        if getattr(settings, 'HELCIM_ENABLE_TOKEN_VAULT', False):
+        if SETTINGS['enable_token_vault']:
             self.fields['save_card'] = forms.BooleanField(
                 label='Save credit card details to this account',
                 required=False,

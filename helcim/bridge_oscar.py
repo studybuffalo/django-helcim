@@ -287,6 +287,12 @@ class CaptureBridge():
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
 
+
+# SHORTCUT FUNCTIONS AND DICTIONARIES
+# -----------------------------------------------------------------------------
+# These functions/dictionaries are provided as a convenience shortcut to allow
+# access to main functions via the bridge module.
+
 def retrieve_token_details(token_id, customer):
     """Shortcut for retrieve_token_details from the Gateway module.
 
@@ -302,3 +308,5 @@ def retrieve_saved_tokens(customer):
         the bridge module exclusively.
     """
     return gateway.retrieve_saved_tokens(customer)
+
+SETTINGS = gateway.SETTINGS

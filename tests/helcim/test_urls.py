@@ -3,10 +3,9 @@ from importlib import reload
 from unittest.mock import patch
 import pytest
 
-from django.conf import settings
 from django.urls import reverse
 
-from helcim import gateway, urls
+from helcim import urls
 
 
 @pytest.mark.django_db

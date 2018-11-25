@@ -1,5 +1,4 @@
 """Views for the Helcim checkout."""
-from django.conf import settings
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -31,9 +30,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
         )
 
         # Add details regarding saved credit card tokens
-        context['token_vault'] = getattr(
-            settings, 'HELCIM_ENABLE_TOKEN_VAULT', False
-        )
+        context['token_vault'] = bridge_oscar.SETTINGS['enable_token_vault']
         context['saved_tokens'] = bridge_oscar.retrieve_saved_tokens(
             self.request.user
         )
@@ -151,7 +148,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
         return self.submit(**submission)
 
-    def handle_payment(self, order_number, total, **kwargs):
+    def handle_payment(self, total, **kwargs):
         """Submit payment details to the Helcim Commerce API."""
         # Extract all payment details
         token_id = kwargs.get('token_id', None)
@@ -165,7 +162,6 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
         # Make a purchase request to the Helcim Commerce API
         purchase = bridge_oscar.PurchaseBridge(
-            order_number=order_number,
             amount=total.incl_tax,
             token_id=token_id,
             card=card_details,
