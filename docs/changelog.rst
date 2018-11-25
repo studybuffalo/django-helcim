@@ -5,6 +5,14 @@ Changelog
 ----------------
 Version 0 (Beta)
 ----------------
+0.3.1 (2018-Nov-25)
+===================
+
+Bug Fixes
+---------
+
+* Fixed bug where Helcim Commerce API may return a blank response
+  for a string field, resulting in coersion of ``None`` to ``'None'``.
 
 0.3.0 (2018-Nov-24)
 ===================

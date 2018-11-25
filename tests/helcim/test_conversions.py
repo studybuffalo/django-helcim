@@ -371,6 +371,22 @@ def test_process_api_response_string_field():
     assert response['cc_number'] == '1111********9999'
     assert isinstance(response['cc_number'], str)
 
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_STRING)
+def test_process_api_response_string_field_none():
+    """Tests that string field can handle a None response."""
+    api_response = {
+        'response': 1,
+        'responseMessage': 'Transaction successful.',
+        'notice': '',
+        'transaction': {
+            'cardNumber': None,
+        }
+    }
+
+    response = conversions.process_api_response(api_response)
+
+    assert response['cc_number'] is None
+
 @patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_API_FIELDS_DECIMAL)
 def test_process_api_response_decimal_field():
     api_response = {
