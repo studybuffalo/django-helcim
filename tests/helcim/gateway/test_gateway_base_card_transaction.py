@@ -2,10 +2,7 @@
 # pylint: disable=missing-docstring, protected-access
 from unittest.mock import patch
 
-from django.conf import settings
-from django.test import override_settings
-
-from helcim import gateway
+from helcim import gateway, exceptions as helcim_exceptions
 
 
 class MockDjangoModel():
@@ -22,7 +19,7 @@ API_DETAILS = {
     'terminal_id': '98765432',
 }
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': True})
 def test_determine_save_token_status_enabled_user_yes():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -37,7 +34,7 @@ def test_determine_save_token_status_enabled_user_yes():
 
     assert status is True
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': True})
 def test_determine_save_token_status_enabled_user_no():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -52,7 +49,7 @@ def test_determine_save_token_status_enabled_user_no():
 
     assert status is False
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': False})
 def test_determine_save_token_status_disabled_user_yes():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -67,7 +64,7 @@ def test_determine_save_token_status_disabled_user_yes():
 
     assert status is False
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_token_vault': False})
 def test_determine_save_token_status_disabled_user_no():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -79,22 +76,6 @@ def test_determine_save_token_status_disabled_user_no():
         api_details=API_DETAILS, **details
     )
     status = transaction._determine_save_token_status(False)
-
-    assert status is False
-
-@override_settings()
-def test_determine_save_token_status_not_specified():
-    del settings.HELCIM_ENABLE_TOKEN_VAULT
-    details = {
-        'token': 'abcdefghijklmnopqrstuvw',
-        'customer_code': 'CST1000',
-        'token_f4l4': '11119999',
-    }
-
-    transaction = gateway.BaseCardTransaction(
-        api_details=API_DETAILS, **details
-    )
-    status = transaction._determine_save_token_status(True)
 
     assert status is False
 
@@ -339,10 +320,9 @@ def test_save_token():
     }
 
     transaction = gateway.BaseCardTransaction(
-        api_details=API_DETAILS, **details
+        api_details=API_DETAILS, django_user=1, **details
     )
     transaction.response = details
-    transaction.django_user = 1
     transaction.redact_data()
     token_entry = transaction.save_token_to_vault()
 
@@ -375,19 +355,14 @@ def test_save_token_missing_token_f4l4():
     }
 
     transaction = gateway.BaseCardTransaction(
-        api_details=API_DETAILS, **details
+        api_details=API_DETAILS, django_user=1, **details
     )
     transaction.response = details
-    transaction.django_user = 1
     token_entry = transaction.save_token_to_vault()
 
     # Checks that all proper fields ended up getting passed to model
     assert token_entry is None
 
-@patch(
-    'helcim.gateway.models.HelcimToken.objects.get_or_create',
-    mock_get_or_create_created
-)
 def test_save_token_missing_customer_code():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -398,20 +373,69 @@ def test_save_token_missing_customer_code():
         api_details=API_DETAILS, **details
     )
     transaction.response = details
-    transaction.django_user = 1
-    token_entry = transaction.save_token_to_vault()
+    transaction.redact_data()
 
-    # Checks that all proper fields ended up getting passed to model
-    assert token_entry.data['token'] == 'abcdefghijklmnopqrstuvw'
-    assert token_entry.data['token_f4l4'] == '11119999'
-    assert token_entry.data['customer_code'] is None
-    assert token_entry.data['django_user'] == 1
+    try:
+        transaction.save_token_to_vault()
+    except helcim_exceptions.ProcessingError as error:
+        assert str(error) == (
+            'Unable to save token - customer code not provided'
+        )
+    else:
+        assert False
 
 @patch(
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-def test_save_token_missing_django_user():
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+def test_save_token_with_django_user():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    transaction = gateway.BaseCardTransaction(
+        api_details=API_DETAILS, django_user=1, **details
+    )
+    transaction.response = details
+    token_entry = transaction.save_token_to_vault()
+
+    # Checks that all proper fields ended up getting passed to model
+    assert token_entry.data['token'] == 'abcdefghijklmnopqrstuvw'
+    assert token_entry.data['token_f4l4'] == '11119999'
+    assert token_entry.data['customer_code'] == 'CST1000'
+    assert token_entry.data['django_user'] == 1
+
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+def test_save_token_with_django_user_not_provided():
+    details = {
+        'token': 'abcdefghijklmnopqrstuvw',
+        'token_f4l4': '11119999',
+        'customer_code': 'CST1000',
+    }
+
+    transaction = gateway.BaseCardTransaction(
+        api_details=API_DETAILS, **details
+    )
+    transaction.response = details
+
+    try:
+        transaction.save_token_to_vault()
+    except helcim_exceptions.ProcessingError as error:
+        assert str(error) == (
+            'Unable to save token - user reference not provided'
+        )
+    else:
+        assert False
+
+@patch(
+    'helcim.gateway.models.HelcimToken.objects.get_or_create',
+    mock_get_or_create_created
+)
+@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'helcim'})
+def test_save_token_with_customer_code():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
         'token_f4l4': '11119999',

@@ -171,12 +171,12 @@ number.
     to turn off the vault, use the ``HELCIM_ENABLE_TOKEN_VAULT``
     setting.
 
-------------------------
-Additional Functionality
-------------------------
+-------------------------------
+HelcimTransaction Functionality
+-------------------------------
 
 These settings allow you to enable or disable additional functionality
-with django-helcim.
+with the HelcimTransaction model.
 
 
 ``HELCIM_ENABLE_TRANSACTION_CAPTURE``
@@ -199,6 +199,10 @@ If set to ``True``, will allow you to capture transactions from the
 If set to ``True``, will allow you to refund transactions from the
 ``HelcimTransactionDetailView``.
 
+--------------------------------
+Helcim Token Vault Functionality
+--------------------------------
+
 ``HELCIM_ENABLE_TOKEN_VAULT``
 =============================
 
@@ -209,3 +213,31 @@ If set to ``True``, will allow you to refund transactions from the
 If set to ``True``, enables the Helcim card token vault. This stores
 the card token returned from the Helcim Commerce API, along with the
 customer code. The token will also be associated to the logged in user.
+
+``HELCIM_TOKEN_VAULT_IDENTIFIER``
+=================================
+
+**Required:** ``False``
+
+**Default (string):** ``django``
+
+Determines which reference is used to associate a Helcim token to a
+specific customer. ``django`` will associate tokens with the logged
+in user and ``helcim`` will associate tokens with the returned
+``customerCode``.
+
+-------------------
+Admin Functionality
+-------------------
+
+A read-only admin view is available to assist with viewing data or
+debugging.
+
+``HELCIM_ENABLE_ADMIN``
+=============================
+
+**Required:** ``False``
+
+**Default (boolean):** ``False``
+
+If set to ``True``, will register the read-only admin views.

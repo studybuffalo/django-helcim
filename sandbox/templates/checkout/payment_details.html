@@ -2,11 +2,40 @@
 
 {% load i18n %}
 
+{% block extrahead %}
+<style>
+  .saved-card {
+    display: inline-block;
+  }
+
+    .saved-card image {
+      display: block;
+      margin: 10px 0;
+    }
+
+    .saved-card > div {
+      margin: 10px 0;
+    }
+</style>
+{% endblock %}
+
 {% block payment_details %}
+  <!-- Saved Cards Form -->
+  {% if token_vault and saved_tokens %}
+    <div class="well">
+      <h2>Saved credit cards</h2>
+
+      {% for token in saved_tokens %}
+        {% include 'helcim/oscar_token_form.html' with token=token csrf_token=csrf_token only %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Enter new card form -->
   <div class="well">
+    <h2>Enter new credit card</h2>
     <form method="post" action="{% url 'checkout:preview' %}" class="form-stacked">
       {% csrf_token %}
-
       <h3>{% trans "Credit Card Details" %}</h3>
       {% include "partials/form_fields.html" with form=bankcard_form %}
 

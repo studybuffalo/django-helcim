@@ -8,4 +8,4 @@ class HelcimShop(Shop):
     """Extending Django-Oscar shop to include Helcim payments"""
     checkout_app = checkout_app
 
-application = HelcimShop()
+application = HelcimShop() # pylint: disable=invalid-name

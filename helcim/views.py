@@ -1,5 +1,4 @@
 """Views for Helcim Commerce API transactions."""
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
@@ -29,31 +28,24 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(TransactionDetailView, self).get_context_data(**kwargs)
 
-        # Check if transaction capture is enabled
-        context['capture_enabled'] = getattr(
-            settings, 'HELCIM_ENABLE_TRANSACTION_CAPTURE', False
-        )
-
-        # Check if transaction refund is enabled
-        context['refund_enabled'] = getattr(
-            settings, 'HELCIM_ENABLE_TRANSACTION_REFUND', False
-        )
+        # Check which actions are enabled
+        settings = gateway.SETTINGS
+        context['capture_enabled'] = settings['enable_transaction_capture']
+        context['refund_enabled'] = settings['enable_transaction_refund']
 
         return context
 
     def post(self, request, *args, **kwargs):
         """Handles any capture and refund requests."""
-        # Add setting to enable or disable this functionality
-        read_only = getattr(
-            settings, 'HELCIM_TRANSACTIONS_READ_ONLY', False
-        )
+        # Determines which action was submitted
+        action = request.POST.get('action', None)
 
-        # Checks if this is setup as a read-only transaction
-        if read_only:
+        if action == 'refund':
+            if gateway.SETTINGS['enable_transaction_refund']:
+                return self.refund()
+
             transaction = self.get_object()
-            messages.error(
-                self.request, 'Transactions cannot be modified'
-            )
+            messages.error(self.request, 'Transactions cannot be refunded')
 
             return HttpResponseRedirect(
                 reverse(
@@ -62,14 +54,19 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
                 )
             )
 
-        # Determines which action was submitted
-        action = request.POST.get('action', None)
-
-        if action == 'refund':
-            return self.refund()
-
         if action == 'capture':
-            return self.capture()
+            if gateway.SETTINGS['enable_transaction_capture']:
+                return self.capture()
+
+            transaction = self.get_object()
+            messages.error(self.request, 'Transactions cannot be captured')
+
+            return HttpResponseRedirect(
+                reverse(
+                    'helcim_transaction_detail',
+                    kwargs={'transaction_id': transaction.id}
+                )
+            )
 
         # Action not found - return bad request
         return HttpResponseBadRequest('Unrecognized transaction action')

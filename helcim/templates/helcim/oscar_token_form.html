@@ -1,0 +1,11 @@
+{% load static %}
+
+<form method="post" action="{% url 'checkout:preview' %}" class="saved-card well">
+  {% csrf_token %}
+  <image src="{% static token.get_credit_card_svg %}" alt="{{ token.cc_type }}" height="50" width="100">
+  <div><strong>{{ token.display_as_card_number }}</strong></div>
+  <input type="hidden" name="token-id" value="{{ token.id }}">
+  <div>
+    <button type="submit" class="btn btn-large btn-primary">Use this card</button>
+  </div>
+</form>

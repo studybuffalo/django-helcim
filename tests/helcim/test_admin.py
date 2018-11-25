@@ -1,8 +1,8 @@
 """Test for the Django admin models."""
 from importlib import reload
+from unittest.mock import patch
 
 from django.contrib import admin
-from django.test import override_settings
 
 from helcim import admin as helcim_admin
 from helcim.admin import HelcimTransactionAdmin, HelcimTokenAdmin
@@ -37,7 +37,7 @@ def test_token_admin_fields_match_model():
 
     assert sorted(field_names) == sorted(admin_fields)
 
-@override_settings(HELCIM_INCLUDE_ADMIN=True)
+@patch.dict('helcim.gateway.SETTINGS', {'enable_admin': True})
 def test_admin_included_when_settings_specified():
     """Tests that admin is loaded when included in settings."""
     # pylint: disable=protected-access
@@ -61,8 +61,7 @@ def test_admin_included_when_settings_specified():
         admin.site._registry.pop(HelcimToken)
         assert True
 
-@override_settings(HELCIM_INCLUDE_ADMIN=False)
-def test_admin_excluded_when_settings_implictly_exclude():
+def test_admin_excluded_when_not_included():
     """Tests that admin is not loaded when settings set to false."""
     # pylint: disable=protected-access
     reload(helcim_admin)

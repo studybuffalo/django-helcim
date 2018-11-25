@@ -63,7 +63,6 @@ TO_API_FIELDS = {
     'mag': Field('cardMag', 's'),
     'mag_enc': Field('cardMagEnc', 's'),
     'mag_enc_serial_number': Field('serialNumber', 's'),
-    'order_number': Field('orderNumber', 's'),
     'product_id': Field('productId', 'i', 1),
     'shipping_business_name': Field('shipping_businessName', 's'),
     'shipping_city': Field('shipping_city', 's'),
@@ -79,7 +78,7 @@ TO_API_FIELDS = {
     'shipping_street_2': Field('shipping_street2', 's'),
     'tax_details': Field('taxDetails', 's'),
     'test': Field('test', 'b'),
-    'token': Field('cardToken', 's', 23, 23),
+    'token': Field('cardToken', 's', 22, 23),
     'token_f4l4': Field('cardF4L4', 's', 8, 8),
     'token_f4l4_skip': Field('cardF4L4Skip', 'b'),
     'transaction_id': Field('transactionId', 'i', 0),
@@ -203,6 +202,8 @@ def process_request_fields(api, cleaned, additional=None):
     # Combine with the additional data
     if additional:
         request_data.update(additional)
+
+    # TODO: Decide what happens with fields not in the TO_API_FIELDS dictionary
 
     return request_data
 

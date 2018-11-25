@@ -19,7 +19,11 @@ setup(
     platforms=['linux', 'windows'],
     packages=find_packages(exclude=['sandbox*', 'tests*']),
     package_data={
-        'helcim': ['templates/helcim/*.html'],
+        'helcim': [
+            'templates/helcim/*.html',
+            'static/helcim/*.svg',
+            'static/helcim/*.png',
+        ],
     },
     project_urls={
         'Documentation': 'https://django-helcim.readthedocs.io/en/latest/',

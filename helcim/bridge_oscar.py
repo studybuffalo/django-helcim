@@ -73,22 +73,35 @@ class BaseCardTransactionBridge():
                 in the token vault or not.
             django_user (obj): The user to associate with the saved
                 card token.
+            customer_code (str): The Helcim customer code to associate
+                with the saved card token.
     """
     def __init__(
-            self, order_number, amount, card, billing_address=None,
-            save_token=False, django_user=None
+            self, amount, token_id=None, card=None,
+            billing_address=None, save_token=False, django_user=None,
+            customer_code=None
     ):
         transaction_details = {
-            'order_number': order_number,
             'amount': amount,
         }
 
-        if billing_address:
-            transaction_details.update(
-                remap_oscar_billing_address(billing_address)
-            )
+        if token_id:
+            if gateway.SETTINGS['token_vault_identifier'] == 'helcim':
+                transaction_details.update(retrieve_token_details(
+                    token_id, customer_code
+                ))
+            else:
+                transaction_details.update(retrieve_token_details(
+                    token_id, django_user
+                ))
 
-        transaction_details.update(remap_oscar_credit_card(card))
+        if billing_address:
+            transaction_details.update(remap_oscar_billing_address(
+                billing_address
+            ))
+
+        if card:
+            transaction_details.update(remap_oscar_credit_card(card))
 
         self.transaction_details = transaction_details
         self.save_token = save_token
@@ -273,3 +286,27 @@ class CaptureBridge():
             return None
         except helcim_exceptions.HelcimError as error:
             raise oscar_exceptions.GatewayError(str(error))
+
+
+# SHORTCUT FUNCTIONS AND DICTIONARIES
+# -----------------------------------------------------------------------------
+# These functions/dictionaries are provided as a convenience shortcut to allow
+# access to main functions via the bridge module.
+
+def retrieve_token_details(token_id, customer):
+    """Shortcut for retrieve_token_details from the Gateway module.
+
+        Added as a convenience to allow access to core functions via
+        the bridge module exclusively.
+    """
+    return gateway.retrieve_token_details(token_id, customer)
+
+def retrieve_saved_tokens(customer):
+    """Shortcut for retrieve_saved_tokens from the Gateway module.
+
+        Added as a convenience to allow access to core functions via
+        the bridge module exclusively.
+    """
+    return gateway.retrieve_saved_tokens(customer)
+
+SETTINGS = gateway.SETTINGS

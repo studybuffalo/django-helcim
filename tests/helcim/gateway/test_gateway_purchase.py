@@ -2,8 +2,6 @@
 # pylint: disable=missing-docstring, protected-access
 from unittest.mock import patch
 
-from django.test import override_settings
-
 from helcim import exceptions as helcim_exceptions, gateway
 
 
@@ -78,7 +76,6 @@ def test_process_error_response_purchase():
     else:
         assert False
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=True)
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
@@ -88,26 +85,34 @@ def test_process_error_response_purchase():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-def test_process_with_save_token_enabled():
+@patch.dict(
+    'helcim.bridge_oscar.gateway.SETTINGS', {'enable_token_vault': True}
+)
+def test_process_with_save_token_enabled(django_user_model):
     details = {
         'amount': 100.00,
         'token': 'abcdefghijklmnopqrstuvw',
         'token_f4l4': '11119999',
         'customer_code': 'CST1000',
     }
+    user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
 
     purchase = gateway.Purchase(
-        api_details=API_DETAILS, save_token=True, **details
+        api_details=API_DETAILS, save_token=True, django_user=user, **details
     )
     _, token = purchase.process()
 
     assert isinstance(token, MockDjangoModel)
 
-@override_settings(HELCIM_ENABLE_TOKEN_VAULT=False)
 @patch('helcim.gateway.requests.post', MockPostResponse)
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
     MockDjangoModel
+)
+@patch.dict(
+    'helcim.bridge_oscar.gateway.SETTINGS', {'enable_token_vault': False}
 )
 def test_process_with_save_token_disabled():
     details = {
