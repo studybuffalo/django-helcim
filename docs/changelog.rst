@@ -13,12 +13,15 @@ Feature Updates
 ---------------
 
 * Added new functions to ``gateway`` module to:
+
   * retrieve a user's saved Helcim tokens;
   * retrieve details of a single Helcim token; and
   * manage settings (this will verify that any required settings
     declared and will provide defaults for all other settings as
     appropriate).
+
 * Extended the ``bridge_oscar`` module to:
+
   * streamline validating a Helcim token for payment processing by
     Django Oscar;
   * handle whether a token should be associated with a ``django_user``
@@ -26,11 +29,13 @@ Feature Updates
   * provide convenience shortcut functions/dictionaries to
     the ``bridge_oscar`` module to access functionality in
     the ``gateway`` module.
+
 * Updated the ``TO_API`` dictionary to remove ``order_number`` (not
   recognized by the Helcim Commerce API).
 * Updated sandbox site to demonstrate a workflow that makes use of the
   Token Vault.
 * Updated HelcimToken model to:
+
   * record credit card type;
   * display the "first 4 last 4" digits of the credit card number as a
     16 character string; and
