@@ -148,7 +148,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
         return self.submit(**submission)
 
-    def handle_payment(self, total, **kwargs):
+    def handle_payment(self, order_number, total, **kwargs): # pylint: disable=unused-argument
         """Submit payment details to the Helcim Commerce API."""
         # Extract all payment details
         token_id = kwargs.get('token_id', None)
