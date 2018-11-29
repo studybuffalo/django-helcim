@@ -12,7 +12,7 @@ Bug Fixes
 ---------
 
 * Fixed bug where Helcim Commerce API may return a blank response
-  for a string field, resulting in coersion of ``None`` to ``'None'``.
+  for a string field, resulting in coercion of ``None`` to ``'None'``.
 
 0.3.0 (2018-Nov-24)
 ===================
