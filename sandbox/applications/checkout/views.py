@@ -44,7 +44,7 @@ class PaymentDetailsView(views.PaymentDetailsView):
             processing can begin (call 'do_place_order').
 
             If POST has no 'action' this would be an attempt to move to
-            thepreview screen. The payment details (token or credit
+            the preview screen. The payment details (token or credit
             card) must be valid to proceed. If not, return to the
             payment page to display any error messages and allow
             resubmission.
