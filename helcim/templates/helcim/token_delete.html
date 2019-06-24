@@ -25,5 +25,6 @@
 <form method="POST">
   {% csrf_token %}
   <input type="submit" value="Delete">
-  <a href="{% url 'helcim_token_list' %}">Cancel</a>
+  <a href="/tokens/">Cancel</a>
+  <!-- TODO: Figure out why this can't be hardcoded -->
 </form>

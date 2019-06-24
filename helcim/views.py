@@ -136,7 +136,9 @@ class TokenDeleteView(PermissionRequiredMixin, generic.DeleteView):
     pk_url_kwarg = 'token_id'
     context_object_name = 'token'
     success_message = 'Token successfully deleted.'
-    success_url = reverse_lazy('helcim_token_list')
+    # TODO: Figure out why this is not working anymore
+    #success_url = reverse_lazy('helcim_token_list')
+    success_url = '/tokens/'
     template_name = 'helcim/token_delete.html'
 
     def delete(self, request, *args, **kwargs):
