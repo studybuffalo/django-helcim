@@ -570,7 +570,6 @@ def test_token_delete_200_if_authorized(client, django_user_model):
     # Login and test response
     client.login(username='user', password='password')
 
-
     response = client.get(reverse(
         'helcim_token_delete',
         kwargs={'token_id': token.id}
