@@ -37,7 +37,7 @@ setup(
         'xmltodict>=0.11',
     ],
     extras_require={
-        'oscar': ['django-oscar>=1.5,<2.1']
+        'oscar': ['django-oscar>=1.6,<2.1']
     },
     tests_require=[
         'pytest==5.0.1',
