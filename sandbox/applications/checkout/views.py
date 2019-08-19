@@ -13,6 +13,7 @@ from helcim.models import HelcimToken
 
 from applications.checkout import forms as custom_forms
 
+
 class PaymentDetailsView(views.PaymentDetailsView):
     """Collects and processes payment details."""
     def get_context_data(self, **kwargs):
