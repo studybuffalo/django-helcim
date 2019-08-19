@@ -71,7 +71,8 @@ INSTALLED_APPS = (
     # Oscar Apps
     'oscar',
     'oscar.apps.analytics',
-    'oscar.apps.checkout',
+    #'oscar.apps.checkout',
+    'applications.checkout.apps.CheckoutConfig',
     'oscar.apps.address',
     'oscar.apps.shipping',
     'oscar.apps.catalogue',
