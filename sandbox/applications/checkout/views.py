@@ -16,6 +16,9 @@ from applications.checkout import forms as custom_forms
 
 class PaymentDetailsView(views.PaymentDetailsView):
     """Collects and processes payment details."""
+    template_name = 'helcim/oscar/checkout/payment_details.html'
+    template_name_preview = 'helcim/oscar/checkout/preview.html'
+
     def get_context_data(self, **kwargs):
         """Add additional data for payment processing."""
         context = super(PaymentDetailsView, self).get_context_data(**kwargs)
@@ -32,29 +35,20 @@ class PaymentDetailsView(views.PaymentDetailsView):
 
         # Add details regarding saved credit card tokens
         context['token_vault'] = bridge_oscar.SETTINGS['enable_token_vault']
-        context['saved_tokens'] = bridge_oscar.retrieve_saved_tokens(
-            self.request.user
-        )
+
+        if self.request.user.is_anonymous is False:
+            context['saved_tokens'] = bridge_oscar.retrieve_saved_tokens(
+                self.request.user
+            )
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        """Makes the POST request that moves between views.
+    def handle_payment_details_submission(self, request):
+        """Overriding method to handle initial payment data entry.
 
-            If POST has an 'action' of 'place_order' the payment
-            processing can begin (call 'do_place_order').
-
-            If POST has no 'action' this would be an attempt to move to
-            the preview screen. The payment details (token or credit
-            card) must be valid to proceed. If not, return to the
-            payment page to display any error messages and allow
-            resubmission.
+            If valid data is entered, proceed to preview page,
+            otherwise re-render payment form with errors.
         """
-        # Check if payment can be processed
-        if request.POST.get('action', None) == 'place_order':
-            return self.do_place_order(request)
-
-        # Not a payment POST - will need to validate payment details
         token_id = request.POST.get('token-id', None)
 
         # Token present - validate and return preview
@@ -105,12 +99,12 @@ class PaymentDetailsView(views.PaymentDetailsView):
             billing_address_form=address_form,
         )
 
-    def do_place_order(self, request):
-        """Re-validates payments details and sends for processing.
+    def handle_place_order_submission(self, request):
+        """Overriding method to handle order submission.
 
-            Payment details are hidden on the preview page. They are
-            re-validated to ensure no tampering and then added to the
-            order details for actual payment processing.
+            First, revalidates the payment information:
+                - If valid, proceed with order submission
+                - If invalid, re-render the payment form
         """
         token_id = request.POST.get('token-id', None)
 
