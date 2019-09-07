@@ -1,0 +1,50 @@
+{% extends 'oscar/checkout/payment_details.html' %}
+
+{% load i18n %}
+
+{% block extrahead %}
+<style>
+  .saved-card {
+    display: inline-block;
+  }
+    .saved-card image {
+      display: block;
+      margin: 10px 0;
+    }
+    .saved-card > div {
+      margin: 10px 0;
+    }
+</style>
+{% endblock %}
+
+{% block payment_details %}
+  <!-- Saved Cards Form -->
+  {% if token_vault and saved_tokens %}
+    <div class="well">
+      <h2>Saved credit cards</h2>
+
+      {% for token in saved_tokens %}
+        {% include 'helcim/oscar/checkout/token_form.html' with token=token csrf_token=csrf_token only %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Enter new card form -->
+  <div class="well">
+    <h2>Enter new credit card</h2>
+    <form method="post" action="{% url 'checkout:preview' %}" class="form-stacked">
+      {% csrf_token %}
+      <h3>{% trans "Credit Card Details" %}</h3>
+      {% include "oscar/partials/form_fields.html" with form=bankcard_form %}
+
+      <h3>{% trans "Billing address" %}</h3>
+      {% include "oscar/partials/form_fields.html" with form=billing_address_form %}
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-large btn-primary">
+          {% trans "Continue" %}
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
