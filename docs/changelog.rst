@@ -5,6 +5,16 @@ Changelog
 ----------------
 Version 0 (Beta)
 ----------------
+
+0.4.0 (2019-Sep-07)
+===================
+
+Feature Updates
+---------------
+
+* Updating the Oscar components for Oscar 2.0 compatibility.
+* Sandbox updated to accomodate Oscar changes.
+
 0.3.1 (2018-Nov-25)
 ===================
 
