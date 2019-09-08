@@ -1,12 +1,7 @@
-"""Apps configuration for the Helcim checkout."""
-from oscar.apps.checkout import app
-
-from applications.checkout import views
+"""Custom Checkout Application."""
+import oscar.apps.checkout.apps as apps
 
 
-class CheckoutApplication(app.CheckoutApplication):
-    """Extended Django-Oscar checkout application."""
-    payment_details_view = views.PaymentDetailsView
-
-
-application = CheckoutApplication() # pylint: disable=invalid-name
+class CheckoutConfig(apps.CheckoutConfig):
+    """App configuration for custom checkout."""
+    name = 'applications.checkout'

@@ -15,12 +15,15 @@ django-oscar = "*"  # https://github.com/django-oscar/django-oscar
 django-environ = "*"  # https://github.com/joke2k/django-environ
 django-debug-toolbar = "*"  # https://github.com/jazzband/django-debug-toolbar
 #pycountry = "*"  # https://pypi.org/project/pycountry/
+sorl-thumbnail = "*"  # https://github.com/jazzband/sorl-thumbnail
+
 # Code quality
 # ------------------------------------------------------------------------------
 coverage = "*"  # https://github.com/nedbat/coveragepy
 pylint = "*"  # https://github.com/PyCQA/pylint/
 pylint-django = "*"  # https://github.com/PyCQA/pylint-django
 restructuredtext-lint = "*"  # https://github.com/twolfson/restructuredtext-lint
+
 # Testing
 # ------------------------------------------------------------------------------
 pytest = "*"  # https://github.com/pytest-dev/pytest
@@ -29,10 +32,12 @@ pytest-django = "*"  # https://pytest-django.readthedocs.io/en/latest/
 tox = "==3.7.0"  # https://github.com/tox-dev/tox/
 tox-pipenv = "*"  # https://github.com/tox-dev/tox-pipenv
 tox-travis = "*"  # https://github.com/tox-dev/tox-travis
+
 # Package Documentation
 # ------------------------------------------------------------------------------
 sphinx = "*"  # https://github.com/sphinx-doc/sphinx
 sphinx_rtd_theme = "*"  # https://github.com/rtfd/sphinx_rtd_theme
+
 # Package Distribution
 # ------------------------------------------------------------------------------
 setuptools = "*"  # https://pypi.org/project/setuptools/#description
