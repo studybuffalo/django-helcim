@@ -214,11 +214,11 @@
         },
         "django-oscar": {
             "hashes": [
-                "sha256:1c4ef6fc07e81f68e93585f5fd86fab860ad1d437ca4e9ae732b860ba52c0dd2",
-                "sha256:74c92322ceef2f8bea0453fa74e9dbe0f4545d7fa6713e5c230fa7d469935d1a"
+                "sha256:83b0c12667b28c5d462d01a4de3b525365efde770d510fef84a1060f790a51de",
+                "sha256:f5a0d772f292bccb5bedb4326b1c899e3379b06423522a168a48b87cb24c53e5"
             ],
             "index": "pypi",
-            "version": "==2.0.2"
+            "version": "==2.0.3"
         },
         "django-phonenumber-field": {
             "hashes": [
@@ -699,10 +699,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:94d2a64582150f503a294b3b8889413e7e56d6043473d6a5672d46185b043902",
-                "sha256:fca09992116d6dc3ad9789cf601a254081eb40d5c14c1863ab6cd10e15c2cb26"
+                "sha256:9de4722323451eb7818deb0161d9d5523465353a6707a9f500d97ee42919b902",
+                "sha256:c1d677f3a85fa291b34bdf8f770f877119b9754b32673699653556f85e2c2f13"
             ],
-            "version": "==4.37.0"
+            "version": "==4.38.0"
         },
         "twine": {
             "hashes": [
