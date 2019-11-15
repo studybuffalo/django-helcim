@@ -1,5 +1,5 @@
 """Tests for the Helcim models module."""
-# pylint: disable=missing-docstring
+# pylint: disable=missing-docstring, invalid-name
 import pytest
 
 from helcim import models
