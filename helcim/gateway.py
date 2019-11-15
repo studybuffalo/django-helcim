@@ -560,7 +560,7 @@ class BaseCardTransaction(BaseRequest):
             token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
                 token_f4l4=token_f4l4,
-                cc_expiry=cc_expiry,
+                cc_expiry=self.convert_expiry_to_date(cc_expiry),
                 cc_type=self.response.get('cc_type', None),
                 customer_code=customer_code,
                 django_user=self.django_user,
