@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.5.0 (2019-Nov-14)
+===================
+
+Feature Updates
+---------------
+
+* Adding CC expiry to token model and saving details with token.
+* Updating related_name of token model to reduce naming conflicts.
+
 0.4.0 (2019-Sep-07)
 ===================
 
