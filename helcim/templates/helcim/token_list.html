@@ -19,6 +19,8 @@
         <th>{% trans "User account" %}</th>
         <th>{% trans "Token" %}</th>
         <th>{% trans "Token F4L4" %}</th>
+        <th>{% trans "Cardholder name" %}</th>
+        <th>{% trans "Card expiry" %}</th>
         <th>{% trans "Card type" %}</th>
         <th></th>
       </tr>
@@ -31,6 +33,8 @@
           <td>{{ token.django_user }}</td>
           <td>{{ token.token }}</td>
           <td>{{ token.token_f4l4 }}</td>
+          <td>{{ token.cc_name }}</td>
+          <td>{{ token.cc_expiry }}</td>
           <td>{{ token.cc_type }}</td>
           <td>
             <a href="{% url 'helcim_token_delete' token.id %}">

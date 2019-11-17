@@ -148,8 +148,8 @@ class BaseRequest():
         # Redacts the raw_response data (if present)
         if self.redacted_response.get('raw_response', None):
             self.redacted_response['raw_response'] = re.sub(
-                r'<{}>.*</{}>'.format(api_name, api_name),
-                r'<{}>REDACTED</{}>'.format(api_name, api_name),
+                r'<{0}>.*</{0}>'.format(api_name),
+                r'<{0}>REDACTED</{0}>'.format(api_name),
                 self.redacted_response['raw_response']
             )
 
@@ -218,7 +218,8 @@ class BaseRequest():
 
             By default will redact API fields and populate
             redacted_response attribute. Depending on Django settings,
-            may also redact other fields.
+            may also redact other fields in the formated and raw
+            response.
         """
         # Copy the response data to the redacted file for updating
         self.redacted_response = copy.deepcopy(self.response)
@@ -233,6 +234,12 @@ class BaseRequest():
             if redact_field['redact']:
                 for field in redact_field['fields']:
                     self._redact_field(field['api'], field['python'])
+
+        if fields['name']['redact']:
+            self.response['cc_name'] = None
+
+        if fields['expiry']['redact']:
+            self.response['cc_expiry'] = None
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
@@ -277,7 +284,7 @@ class BaseRequest():
                 obj: the expiry as a datetime object.
         """
 
-        year = int(expiry[2:])
+        year = 2000 + int(expiry[2:])
         month = int(expiry[:2])
         day = monthrange(year, month)[1]
 
@@ -539,6 +546,11 @@ class BaseCardTransaction(BaseRequest):
         """
         token = self.response.get('token', None)
         token_f4l4 = self.response.get('token_f4l4', None)
+        cc_name = self.response.get('cc_name', None)
+        raw_expiry = self.response.get('cc_expiry', None)
+        cc_expiry = (
+            self.convert_expiry_to_date(raw_expiry) if raw_expiry else None
+        )
 
         # Ensure there is a customer code (can't use token without one)
         try:
@@ -559,6 +571,8 @@ class BaseCardTransaction(BaseRequest):
             token_instance, _ = models.HelcimToken.objects.get_or_create(
                 token=token,
                 token_f4l4=token_f4l4,
+                cc_name=cc_name,
+                cc_expiry=cc_expiry,
                 cc_type=self.response.get('cc_type', None),
                 customer_code=customer_code,
                 django_user=self.django_user,

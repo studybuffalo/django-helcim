@@ -642,7 +642,7 @@ def test_convert_expiry_to_date():
 
     expiry = base.convert_expiry_to_date('0118')
 
-    assert expiry == datetime(18, 1, 31).date()
+    assert expiry == datetime(2018, 1, 31).date()
 
 def test_create_model_arguments_partial():
     base = gateway.BaseRequest()
@@ -712,7 +712,7 @@ def test_create_model_arguments_full():
     assert arguments['currency'] == 'h'
     assert arguments['cc_name'] == 'i'
     assert arguments['cc_number'] == 'j'
-    assert arguments['cc_expiry'] == datetime(20, 6, 30).date()
+    assert arguments['cc_expiry'] == datetime(2020, 6, 30).date()
     assert arguments['cc_type'] == 'k'
     assert arguments['token'] == 'l'
     assert arguments['token_f4l4'] == 'm'
