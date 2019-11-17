@@ -86,14 +86,9 @@ class BaseCardTransactionBridge():
         }
 
         if token_id:
-            if gateway.SETTINGS['token_vault_identifier'] == 'helcim':
-                transaction_details.update(retrieve_token_details(
-                    token_id, customer_code
-                ))
-            else:
-                transaction_details.update(retrieve_token_details(
-                    token_id, django_user
-                ))
+            transaction_details.update(retrieve_token_details(
+                token_id, django_user, customer_code
+            ))
 
         if billing_address:
             transaction_details.update(remap_oscar_billing_address(
@@ -293,20 +288,22 @@ class CaptureBridge():
 # These functions/dictionaries are provided as a convenience shortcut to allow
 # access to main functions via the bridge module.
 
-def retrieve_token_details(token_id, customer):
+def retrieve_token_details(token_id, django_user=None, customer_code=None):
     """Shortcut for retrieve_token_details from the Gateway module.
 
         Added as a convenience to allow access to core functions via
         the bridge module exclusively.
     """
-    return gateway.retrieve_token_details(token_id, customer)
+    return gateway.retrieve_token_details(token_id, django_user, customer_code)
 
-def retrieve_saved_tokens(customer):
+def retrieve_saved_tokens(django_user=None, customer_code=None):
     """Shortcut for retrieve_saved_tokens from the Gateway module.
 
         Added as a convenience to allow access to core functions via
         the bridge module exclusively.
     """
-    return gateway.retrieve_saved_tokens(customer)
+    return gateway.retrieve_saved_tokens(
+        django_user=django_user, customer_code=customer_code
+    )
 
 SETTINGS = gateway.SETTINGS
