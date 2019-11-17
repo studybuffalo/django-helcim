@@ -13,7 +13,7 @@ from helcim.gateway import determine_helcim_settings
     HELCIM_REDACT_CC_TYPE=11, HELCIM_REDACT_CC_MAGNETIC=12,
     HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=13, HELCIM_REDACT_TOKEN=14,
     HELCIM_ENABLE_TRANSACTION_CAPTURE=15, HELCIM_ENABLE_TRANSACTION_REFUND=16,
-    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_TOKEN_VAULT_IDENTIFIER=18,
+    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_ASSOCIATE_USER=18,
     HELCIM_ENABLE_ADMIN=19,
 )
 def test_determine_helcim_settings_all_settings_provided():
@@ -38,7 +38,7 @@ def test_determine_helcim_settings_all_settings_provided():
     assert helcim_settings['enable_transaction_capture'] == 15
     assert helcim_settings['enable_transaction_refund'] == 16
     assert helcim_settings['enable_token_vault'] == 17
-    assert helcim_settings['token_vault_identifier'] == 18
+    assert helcim_settings['associate_user'] == 18
     assert helcim_settings['enable_admin'] == 19
 
 @override_settings()
@@ -84,7 +84,7 @@ def test_determine_helcim_settings_defaults():
     del settings.HELCIM_ENABLE_TRANSACTION_CAPTURE
     del settings.HELCIM_ENABLE_TRANSACTION_REFUND
     del settings.HELCIM_ENABLE_TOKEN_VAULT
-    del settings.HELCIM_TOKEN_VAULT_IDENTIFIER
+    del settings.HELCIM_ASSOCIATE_USER
     del settings.HELCIM_ENABLE_ADMIN
 
     helcim_settings = determine_helcim_settings()
@@ -105,71 +105,5 @@ def test_determine_helcim_settings_defaults():
     assert helcim_settings['enable_transaction_capture'] is False
     assert helcim_settings['enable_transaction_refund'] is False
     assert helcim_settings['enable_token_vault'] is False
-    assert helcim_settings['token_vault_identifier'] == 'django'
+    assert helcim_settings['associate_user'] is True
     assert helcim_settings['enable_admin'] is False
-
-# TODO: Move this into the settings module
-# @override_settings()
-# def test_determine_save_token_status_not_specified():
-#     del settings.HELCIM_ENABLE_TOKEN_VAULT
-#     details = {
-#         'token': 'abcdefghijklmnopqrstuvw',
-#         'customer_code': 'CST1000',
-#         'token_f4l4': '11119999',
-#     }
-
-#     transaction = gateway.BaseCardTransaction(
-#         api_details=API_DETAILS, **details
-#     )
-#     status = transaction._determine_save_token_status(True)
-
-#     assert status is False
-
-
-# TODO: Move this into a new test for setting generations
-# @override_settings()
-# def test_set_api_details_no_account_id():
-#     del settings.HELCIM_ACCOUNT_ID
-
-#     try:
-#         gateway.BaseRequest()
-#     except django_exceptions.ImproperlyConfigured as error:
-#         assert True
-#         assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
-#     else:
-#         assert False
-
-# @override_settings()
-# def test_set_api_details_no_api_token():
-#     del settings.HELCIM_API_TOKEN
-
-#     try:
-#         gateway.BaseRequest()
-#     except django_exceptions.ImproperlyConfigured as error:
-#         assert True
-#         assert str(error) == 'You must define a HELCIM_API_TOKEN setting'
-#     else:
-#         assert False
-
-# @override_settings()
-# def test_set_api_details_none():
-#     del settings.HELCIM_API_URL
-#     del settings.HELCIM_ACCOUNT_ID
-#     del settings.HELCIM_API_TOKEN
-#     del settings.HELCIM_TERMINAL_ID
-
-#     try:
-#         gateway.BaseRequest()
-#     except django_exceptions.ImproperlyConfigured:
-#         assert True
-#     else:
-#         assert False
-
-# @override_settings()
-# def test_configure_test_transaction_not_set():
-#     del settings.HELCIM_API_TEST
-#     base = gateway.BaseRequest(api_details=API_DETAILS)
-
-#     base.configure_test_transaction()
-
-#     assert 'test' not in base.cleaned

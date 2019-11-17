@@ -50,11 +50,18 @@ class MockCreditCard():
         self.expiry_date = expiry
         self.ccv = ccv
 
-def mock_retrieve_token_details(token_id, customer):
-    return {'token_id': token_id, 'customer': customer}
+def mock_retrieve_token_details(token_id, django_user=None, customer_code=None): # pylint: disable=line-too-long
+    return {
+        'token_id': token_id,
+        'django_user': django_user,
+        'customer_code': customer_code,
+    }
 
-def mock_retrieve_saved_tokens(customer):
-    return {'customer': customer}
+def mock_retrieve_saved_tokens(django_user=None, customer_code=None):
+    return {
+        'django_user': django_user,
+        'customer_code': customer_code,
+    }
 
 def test_remap_oscar_billing_address_patial():
     address = {
@@ -181,26 +188,24 @@ def test_base_card_bridge_formats_details_without_billing_address():
 @patch(
     'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
 )
+@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'associate_user': True})
 def test_base_card_bridge_provided_token_details_and_django_user():
     transaction = bridge_oscar.BaseCardTransactionBridge(
         '1', token_id='2', django_user='3'
     )
     assert transaction.transaction_details['token_id'] == '2'
-    assert transaction.transaction_details['customer'] == '3'
+    assert transaction.transaction_details['django_user'] == '3'
 
 @patch(
     'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
 )
-@patch.dict(
-    'helcim.bridge_oscar.gateway.SETTINGS',
-    {'token_vault_identifier': 'helcim'}
-)
+@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'associate_user': False})
 def test_base_card_bridge_provided_token_details_and_customer_code():
     transaction = bridge_oscar.BaseCardTransactionBridge(
         '1', token_id='2', customer_code='3'
     )
     assert transaction.transaction_details['token_id'] == '2'
-    assert transaction.transaction_details['customer'] == '3'
+    assert transaction.transaction_details['customer_code'] == '3'
 
 def test_base_card_bridge_provided_card_details():
     transaction = bridge_oscar.BaseCardTransactionBridge(
@@ -478,10 +483,10 @@ def test_capture_bridge_django_error():
 )
 def test_retrieve_token_details_shortcut():
     """Tests that retrieve_token_details shortcut works."""
-    token_details = bridge_oscar.retrieve_token_details('1', '2')
+    token_details = bridge_oscar.retrieve_token_details('1', customer_code='2')
 
     assert token_details['token_id'] == '1'
-    assert token_details['customer'] == '2'
+    assert token_details['customer_code'] == '2'
 
 @patch(
     'helcim.bridge_oscar.gateway.retrieve_saved_tokens',
@@ -489,6 +494,6 @@ def test_retrieve_token_details_shortcut():
 )
 def test_retrieve_saved_tokens_shortcut():
     """Tests that retrieve_saved_tokens shortcut works."""
-    token_details = bridge_oscar.retrieve_saved_tokens('1')
+    token_details = bridge_oscar.retrieve_saved_tokens(customer_code='1')
 
-    assert token_details['customer'] == '1'
+    assert token_details['customer_code'] == '1'

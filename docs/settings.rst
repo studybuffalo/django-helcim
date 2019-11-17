@@ -172,7 +172,7 @@ number.
     setting.
 
 -------------------------------
-HelcimTransaction Functionality
+Helcim Transaction Functionality
 -------------------------------
 
 These settings allow you to enable or disable additional functionality
@@ -214,18 +214,6 @@ If set to ``True``, enables the Helcim card token vault. This stores
 the card token returned from the Helcim Commerce API, along with the
 customer code. The token will also be associated to the logged in user.
 
-``HELCIM_TOKEN_VAULT_IDENTIFIER``
-=================================
-
-**Required:** ``False``
-
-**Default (string):** ``django``
-
-Determines which reference is used to associate a Helcim token to a
-specific customer. ``django`` will associate tokens with the logged
-in user and ``helcim`` will associate tokens with the returned
-``customerCode``.
-
 -------------------
 Admin Functionality
 -------------------
@@ -234,10 +222,26 @@ A read-only admin view is available to assist with viewing data or
 debugging.
 
 ``HELCIM_ENABLE_ADMIN``
-=============================
+=======================
 
 **Required:** ``False``
 
 **Default (boolean):** ``False``
 
 If set to ``True``, will register the read-only admin views.
+
+--------------
+Other Settings
+--------------
+
+``HELCIM_ASSOCIATE_USER``
+=========================
+
+**Required:** ``False``
+
+**Default (boolean):** ``True``
+
+Specifies whether a django user model should be associated to
+``HelcimTransaction`` and ``HelcimToken`` model instances. By default,
+the logged in user is added to all transactions and tokens. This
+can be turned off by setting this to ``False``.
