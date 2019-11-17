@@ -47,6 +47,7 @@ class HelcimTokenAdmin(admin.ModelAdmin):
     MODEL_FIELDS = [
         'token',
         'token_f4l4',
+        'cc_name',
         'cc_expiry',
         'date_added',
         'customer_code',
@@ -64,6 +65,7 @@ class HelcimTokenAdmin(admin.ModelAdmin):
         'customer_code',
         'token',
         'token_f4l4',
+        'cc_name',
         'cc_expiry',
         'cc_type',
     ]
