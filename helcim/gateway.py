@@ -148,8 +148,8 @@ class BaseRequest():
         # Redacts the raw_response data (if present)
         if self.redacted_response.get('raw_response', None):
             self.redacted_response['raw_response'] = re.sub(
-                r'<{}>.*</{}>'.format(api_name, api_name),
-                r'<{}>REDACTED</{}>'.format(api_name, api_name),
+                r'<{0}>.*</{0}>'.format(api_name),
+                r'<{0}>REDACTED</{0}>'.format(api_name),
                 self.redacted_response['raw_response']
             )
 
@@ -540,7 +540,9 @@ class BaseCardTransaction(BaseRequest):
         token = self.response.get('token', None)
         token_f4l4 = self.response.get('token_f4l4', None)
         raw_expiry = self.response.get('cc_expiry', None)
-        cc_expiry = self.convert_expiry_to_date(raw_expiry) if raw_expiry else None
+        cc_expiry = (
+            self.convert_expiry_to_date(raw_expiry) if raw_expiry else None
+        )
 
         # Ensure there is a customer code (can't use token without one)
         try:
