@@ -339,7 +339,7 @@ def test_save_token():
     assert token_entry.data['cc_name'] == 'Test Name'
     assert token_entry.data['cc_expiry'] == date(year=2020, month=1, day=31)
     assert token_entry.data['customer_code'] == 'CST1000'
-    assert token_entry.data['django_user'] == 1
+    assert token_entry.data['django_user'] is None
 
 def test_save_token_missing_token():
     details = {
@@ -397,7 +397,7 @@ def test_save_token_missing_customer_code():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
 def test_save_token_with_django_user():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -417,7 +417,7 @@ def test_save_token_with_django_user():
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] == 1
 
-@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'django'})
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
 def test_save_token_with_django_user_not_provided():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -433,9 +433,7 @@ def test_save_token_with_django_user_not_provided():
     try:
         transaction.save_token_to_vault()
     except helcim_exceptions.ProcessingError as error:
-        assert str(error) == (
-            'Unable to save token - user reference not provided'
-        )
+        assert str(error) == 'Required Django user reference not provided.'
     else:
         assert False
 
@@ -443,7 +441,7 @@ def test_save_token_with_django_user_not_provided():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-@patch.dict('helcim.gateway.SETTINGS', {'token_vault_identifier': 'helcim'})
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': False})
 def test_save_token_with_customer_code():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',

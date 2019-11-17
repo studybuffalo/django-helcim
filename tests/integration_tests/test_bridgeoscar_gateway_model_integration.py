@@ -7,6 +7,8 @@ import pytest
 from helcim import bridge_oscar, exceptions, models
 
 
+pytestmark = pytest.mark.django_db # pylint: disable=invalid-name
+
 def create_token(
         django_user=None, customer_code='1',
         token='abcdefghijklmnopqrstuvw', token_f4l4='11114444'
@@ -59,7 +61,6 @@ class MockCreditCard():
         self.expiry_date = expiry
         self.ccv = ccv
 
-@pytest.mark.django_db
 def test_retrieve_token_details_valid(django_user_model):
     """Tests that retrieve_token_details properly populates dictionary."""
     # Create user and login
@@ -68,105 +69,64 @@ def test_retrieve_token_details_valid(django_user_model):
     )
 
     # Create tokens to test against
-    token_instance = create_token(django_user,)
-    create_token(django_user, '1', 'zyxwvutsrqponmlkjihgfed', '99996666')
+    token_instance = create_token(django_user=django_user, customer_code='1')
+    create_token(django_user, '2', 'zyxwvutsrqponmlkjihgfed', '99996666')
 
     # Retrieve details
     token_details = bridge_oscar.retrieve_token_details(
-        token_instance.id, django_user
+        token_instance.id, django_user=django_user, customer_code='1'
     )
 
     assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
     assert token_details['token_f4l4'] == '11114444'
     assert token_details['customer_code'] == '1'
 
-@patch.dict(
-    'helcim.bridge_oscar.gateway.SETTINGS',
-    {'token_vault_identifier': 'django',}
-)
-@pytest.mark.django_db
-def test_retrieve_token_details_valid_django_identifier(django_user_model):
-    """Tests that function works for Django identifier."""
+def test_retrieve_token_details_valid_user_missing_customer_code(django_user_model): # pylint: disable=line-too-long
+    """Tests that function returns error when customer code is missing."""
     # Create user and login
     django_user = django_user_model.objects.create_user(
         username='user', password='password'
     )
-    token_instance = create_token(django_user)
-
-    token_details = bridge_oscar.retrieve_token_details(
-        token_instance.id, django_user
-    )
-
-    assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
-
-@patch.dict(
-    'helcim.bridge_oscar.gateway.SETTINGS',
-    {'token_vault_identifier': 'django',}
-)
-@pytest.mark.django_db
-def test_retrieve_token_details_invalid_django_identifier(django_user_model):
-    """Tests that function returns error for invalid django identifier."""
-    # Create user and login
-    django_user = django_user_model.objects.create_user(
-        username='user', password='password'
-    )
-    token_instance = create_token(django_user)
+    token_instance = create_token(django_user=django_user, customer_code='1')
 
     try:
         bridge_oscar.retrieve_token_details(
-            token_instance.id, '1'
-        )
-    except exceptions.ProcessingError as error:
-        assert str(error) == (
-            'Provided token does not exist for specified customer.'
-        )
-
-@patch.dict(
-    'helcim.bridge_oscar.gateway.SETTINGS',
-    {'token_vault_identifier': 'helcim',}
-)
-@pytest.mark.django_db
-def test_retrieve_token_details_valid_helcim_identifier(django_user_model):
-    """Tests that function works for Helcim identifier."""
-    # Create user and login
-    django_user = django_user_model.objects.create_user(
-        username='user', password='password'
-    )
-    token_instance = create_token(django_user)
-
-    token_details = bridge_oscar.retrieve_token_details(
-        token_instance.id, '1'
-    )
-
-    assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
-
-@patch.dict(
-    'helcim.bridge_oscar.gateway.SETTINGS',
-    {'token_vault_identifier': 'helcim',}
-)
-@pytest.mark.django_db
-def test_retrieve_token_details_invalid_helcim_identifier(django_user_model):
-    """Tests that function returns error for invalid helcim identifier."""
-    # Create a token for testing
-    django_user = django_user_model.objects.create_user(
-        username='user', password='password'
-    )
-    token_instance = create_token(django_user)
-
-    try:
-        bridge_oscar.retrieve_token_details(
-            token_instance.id, django_user
+            token_instance.id, django_user=django_user,
         )
     except exceptions.ProcessingError as error:
         assert str(error) == (
             'Unable to retrieve token details for specified customer.'
         )
-    else:
-        assert False
 
-@pytest.mark.django_db
+def test_retrieve_token_details_missing_user(django_user_model):
+    """Tests that function returns error for missing user."""
+    # Create user and login
+    django_user = django_user_model.objects.create_user(
+        username='user', password='password'
+    )
+    token_instance = create_token(django_user=django_user, customer_code='1')
+
+    try:
+        bridge_oscar.retrieve_token_details(
+            token_instance.id, customer_code='1'
+        )
+    except exceptions.ProcessingError as error:
+        assert str(error) == (
+            'Unable to retrieve token details for specified customer.'
+        )
+
+def test_retrieve_token_details_valid_customer_code():
+    """Tests that function works for customer code alone."""
+    token_instance = create_token(customer_code='1')
+
+    token_details = bridge_oscar.retrieve_token_details(
+        token_instance.id, customer_code='1'
+    )
+
+    assert token_details['token'] == 'abcdefghijklmnopqrstuvw'
+
 def test_retrieve_token_details_invalid_user(django_user_model):
-    """Tests that retrieve_token_details properly populates dictionary."""
+    """Tests that retrieve_token_details returns error."""
     # Create users
     django_user_1 = django_user_model.objects.create_user(
         username='user1', password='password'
@@ -187,9 +147,8 @@ def test_retrieve_token_details_invalid_user(django_user_model):
     else:
         assert False
 
-@pytest.mark.django_db
-def test_retrieve_saved_tokens_valid(django_user_model):
-    """Tests that retrieve_saved_tokens retrieves tokens properly."""
+def test_retrieve_saved_tokens_with_user_and_customer(django_user_model):
+    """Tests that function works with user and customer code."""
     # Create user and login
     django_user_1 = django_user_model.objects.create_user(
         username='user_1', password='password'
@@ -201,10 +160,13 @@ def test_retrieve_saved_tokens_valid(django_user_model):
     # Create tokens
     create_token(django_user_1, '1', 'abcdefghijklmnopqrstuvw', '11114444')
     create_token(django_user_1, '1', 'zyxwvutsrqponmlkjihgfed', '99996666')
-    create_token(django_user_2, '2', 'aaaaaaaaaaaaaaaaaaaaaaa', '22222222')
+    create_token(django_user_1, '2', 'bbbbbbbbbbbbbbbbbbbbbbb', '55556666')
+    create_token(django_user_2, '3', 'aaaaaaaaaaaaaaaaaaaaaaa', '22222222')
 
     # Retrieve tokens
-    tokens = bridge_oscar.retrieve_saved_tokens(django_user_1)
+    tokens = bridge_oscar.retrieve_saved_tokens(
+        django_user=django_user_1, customer_code='1'
+    )
 
     assert len(tokens) == 2
     assert tokens[0].customer_code == '1'
@@ -212,6 +174,89 @@ def test_retrieve_saved_tokens_valid(django_user_model):
     assert tokens[0].token_f4l4 in ('11114444', '99996666')
     assert tokens[1].token_f4l4 in ('11114444', '99996666')
     assert tokens[0].token_f4l4 != tokens[1].token_f4l4
+
+def test_retrieve_saved_tokens_with_user(django_user_model):
+    """Tests that function works with user alone."""
+    # Create user and login
+    django_user_1 = django_user_model.objects.create_user(
+        username='user_1', password='password'
+    )
+    django_user_2 = django_user_model.objects.create_user(
+        username='user_2', password='password'
+    )
+
+    # Create tokens
+    create_token(django_user_1, '1', 'abcdefghijklmnopqrstuvw', '11114444')
+    create_token(django_user_1, '1', 'zyxwvutsrqponmlkjihgfed', '99996666')
+    create_token(django_user_1, '2', 'bbbbbbbbbbbbbbbbbbbbbbb', '55556666')
+    create_token(django_user_2, '3', 'aaaaaaaaaaaaaaaaaaaaaaa', '22222222')
+
+    # Retrieve tokens
+    tokens = bridge_oscar.retrieve_saved_tokens(django_user=django_user_1)
+
+    assert len(tokens) == 3
+    assert tokens[0].customer_code in ('1', '2')
+    assert tokens[1].customer_code in ('1', '2')
+    assert tokens[2].customer_code in ('1', '2')
+    assert tokens[0].token_f4l4 in ('11114444', '99996666', '55556666')
+    assert tokens[1].token_f4l4 in ('11114444', '99996666', '55556666')
+    assert tokens[2].token_f4l4 in ('11114444', '99996666', '55556666')
+    assert tokens[0].token_f4l4 != tokens[1].token_f4l4
+    assert tokens[0].token_f4l4 != tokens[2].token_f4l4
+    assert tokens[1].token_f4l4 != tokens[2].token_f4l4
+
+def test_retrieve_saved_tokens_with_customer(django_user_model):
+    """Tests that function works with customer alone."""
+    # Create user and login
+    django_user_1 = django_user_model.objects.create_user(
+        username='user_1', password='password'
+    )
+    django_user_2 = django_user_model.objects.create_user(
+        username='user_2', password='password'
+    )
+
+    # Create tokens
+    create_token(django_user_1, '1', 'abcdefghijklmnopqrstuvw', '11114444')
+    create_token(django_user_1, '1', 'zyxwvutsrqponmlkjihgfed', '99996666')
+    create_token(None, '1', 'ccccccccccccccccccccccc', '77778888')
+    create_token(django_user_1, '2', 'bbbbbbbbbbbbbbbbbbbbbbb', '55556666')
+    create_token(django_user_2, '3', 'aaaaaaaaaaaaaaaaaaaaaaa', '22222222')
+
+    # Retrieve tokens
+    tokens = bridge_oscar.retrieve_saved_tokens(customer_code='1')
+
+    assert len(tokens) == 3
+    assert tokens[0].customer_code == '1'
+    assert tokens[1].customer_code == '1'
+    assert tokens[2].customer_code == '1'
+    assert tokens[0].token_f4l4 in ('11114444', '99996666', '77778888')
+    assert tokens[1].token_f4l4 in ('11114444', '99996666', '77778888')
+    assert tokens[2].token_f4l4 in ('11114444', '99996666', '77778888')
+    assert tokens[0].token_f4l4 != tokens[1].token_f4l4
+    assert tokens[0].token_f4l4 != tokens[2].token_f4l4
+    assert tokens[1].token_f4l4 != tokens[2].token_f4l4
+
+def test_retrieve_saved_tokens_with_nothing(django_user_model):
+    """Tests that function returns empty queryset with no arguments."""
+    # Create user and login
+    django_user_1 = django_user_model.objects.create_user(
+        username='user_1', password='password'
+    )
+    django_user_2 = django_user_model.objects.create_user(
+        username='user_2', password='password'
+    )
+
+    # Create tokens
+    create_token(django_user_1, '1', 'abcdefghijklmnopqrstuvw', '11114444')
+    create_token(django_user_1, '1', 'zyxwvutsrqponmlkjihgfed', '99996666')
+    create_token(django_user_1, '2', 'bbbbbbbbbbbbbbbbbbbbbbb', '55556666')
+    create_token(django_user_2, '3', 'aaaaaaaaaaaaaaaaaaaaaaa', '22222222')
+
+    # Retrieve tokens
+    tokens = bridge_oscar.retrieve_saved_tokens()
+
+    assert bool(tokens) is False
+    assert list(tokens) == list(models.HelcimToken.objects.none())
 
 @patch(
     'helcim.bridge_oscar.gateway.requests.post',
@@ -226,10 +271,9 @@ def test_retrieve_saved_tokens_valid(django_user_model):
         'redact_cc_expiry': False,
         'redact_cc_type': False,
         'enable_token_vault': True,
-        'token_vault_identifier': 'helcim',
+        'associate_user': False,
     }
 )
-@pytest.mark.django_db
 def test_purchase_bridge_valid_no_redaction():
     """Tests results of purchase bridge with no redaction."""
     credit_card = MockCreditCard(
@@ -271,10 +315,9 @@ def test_purchase_bridge_valid_no_redaction():
     {
         'redact_all': True,
         'enable_token_vault': True,
-        'token_vault_identifier': 'helcim',
+        'associate_user': False,
     }
 )
-@pytest.mark.django_db
 def test_purchase_bridge_valid_redact_sensitive_cc_data():
     """Tests results of purchase bridge with redaction."""
     credit_card = MockCreditCard(

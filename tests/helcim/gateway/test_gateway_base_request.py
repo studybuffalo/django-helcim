@@ -570,6 +570,36 @@ def test_redact_data_partial():
     assert base.redacted_response['cc_name'] is None
     assert base.redacted_response['token'] == 'b'
 
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
+def test_associate_user_reference_enabled_and_valid():
+    """Tests that method returns proper user reference."""
+    base = gateway.BaseRequest()
+    base.django_user = '1'
+    user = base._associate_user_reference()
+
+    assert user == '1'
+
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
+def test_associate_user_reference_enabled_and_invalid():
+    """Tests that method returns error when user not provided."""
+    base = gateway.BaseRequest()
+
+    try:
+        base._associate_user_reference()
+    except helcim_exceptions.ProcessingError as error:
+        assert str(error) == 'Required Django user reference not provided.'
+    else:
+        assert False
+
+@patch.dict('helcim.gateway.SETTINGS', {'associate_user': False})
+def test_associate_user_reference_disabled():
+    """Tests that method returns None."""
+    base = gateway.BaseRequest()
+    base.django_user = '1'
+    user = base._associate_user_reference()
+
+    assert user is None
+
 @patch(
     'helcim.gateway.models.HelcimTransaction.objects.create',
     MockDjangoModel
@@ -650,7 +680,7 @@ def test_create_model_arguments_partial():
 
     arguments = base.create_model_arguments('z')
 
-    assert len(arguments) == 21
+    assert len(arguments) == 22
     assert arguments['raw_request'] is None
     assert arguments['raw_response'] is None
     assert arguments['transaction_success'] is None
@@ -671,6 +701,7 @@ def test_create_model_arguments_partial():
     assert arguments['order_number'] is None
     assert arguments['customer_code'] is None
     assert arguments['transaction_type'] == 'z'
+    assert arguments['django_user'] is None
 
 def test_create_model_arguments_full():
     base = gateway.BaseRequest()
@@ -700,7 +731,7 @@ def test_create_model_arguments_full():
 
     arguments = base.create_model_arguments('z')
 
-    assert len(arguments) == 21
+    assert len(arguments) == 22
     assert arguments['raw_request'] == 'a'
     assert arguments['raw_response'] == 'b'
     assert arguments['transaction_success'] == 'c'
@@ -722,6 +753,7 @@ def test_create_model_arguments_full():
     assert arguments['order_number'] == 'q'
     assert arguments['customer_code'] == 'r'
     assert arguments['transaction_type'] == 'z'
+    assert arguments['django_user'] is None
 
 def test_create_model_arguments_missing_time():
     base = gateway.BaseRequest()
