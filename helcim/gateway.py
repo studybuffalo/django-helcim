@@ -218,7 +218,8 @@ class BaseRequest():
 
             By default will redact API fields and populate
             redacted_response attribute. Depending on Django settings,
-            may also redact other fields.
+            may also redact other fields in the formated and raw
+            response.
         """
         # Copy the response data to the redacted file for updating
         self.redacted_response = copy.deepcopy(self.response)
@@ -233,6 +234,12 @@ class BaseRequest():
             if redact_field['redact']:
                 for field in redact_field['fields']:
                     self._redact_field(field['api'], field['python'])
+
+        if fields['name']['redact']:
+            self.response['cc_name'] = None
+
+        if fields['expiry']['redact']:
+            self.response['cc_expiry'] = None
 
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
