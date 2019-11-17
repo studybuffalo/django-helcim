@@ -29,6 +29,7 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'approval_code',
         'order_number',
         'customer_code',
+        'django_user',
     ]
 
     fields = MODEL_FIELDS
@@ -41,7 +42,9 @@ class HelcimTransactionAdmin(admin.ModelAdmin):
         'transaction_success',
         'amount',
         'customer_code',
+        'django_user'
     ]
+
 class HelcimTokenAdmin(admin.ModelAdmin):
     """Admin class for the HelcimToken model."""
     MODEL_FIELDS = [
