@@ -192,6 +192,12 @@ class HelcimToken(models.Model):
         help_text='The first & last four digits of the credit card number',
         max_length=8
     )
+    cc_name = models.CharField(
+        blank=True,
+        help_text='The cardholder name',
+        max_length=256,
+        null=True,
+    )
     cc_expiry = models.DateField(
         blank=True,
         help_text='The credit card expiry date',

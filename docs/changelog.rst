@@ -12,7 +12,8 @@ Version 0 (Beta)
 Feature Updates
 ---------------
 
-* Adding CC expiry to token model and saving details with token.
+* Adding cardholder name and CC expiry to token model and saving
+  details with token.
 * Updating related_name of token model to reduce naming conflicts.
 
 0.4.0 (2019-Sep-07)

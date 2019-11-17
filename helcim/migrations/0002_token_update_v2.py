@@ -12,6 +12,16 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddField(
             model_name='helcimtoken',
+            name='cc_name',
+            field=models.CharField(
+                blank=True,
+                help_text='The cardholder name',
+                max_length=256,
+                null=True
+            ),
+        ),
+        migrations.AddField(
+            model_name='helcimtoken',
             name='cc_expiry',
             field=models.DateField(
                 blank=True,
