@@ -313,6 +313,10 @@ def test_determine_card_details_mag_encrypted_priority():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
+@patch.dict(
+    'helcim.gateway.SETTINGS',
+    {'redact_cc_name': False, 'redact_cc_expiry': False}
+)
 def test_save_token():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',

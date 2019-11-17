@@ -1,5 +1,5 @@
 """Tests integrations between bridge_oscar-gateway-models."""
-from datetime import datetime
+from datetime import date
 from unittest.mock import patch
 
 import pytest
@@ -235,7 +235,7 @@ def test_purchase_bridge_valid_no_redaction():
     credit_card = MockCreditCard(
         name='Test Person',
         number='1111222233334444',
-        expiry=datetime(2025, 1, 1),
+        expiry=date(2025, 1, 31),
         ccv='100'
     )
     purchase = bridge_oscar.PurchaseBridge(
@@ -250,7 +250,6 @@ def test_purchase_bridge_valid_no_redaction():
     assert isinstance(transaction, models.HelcimTransaction)
     assert transaction.transaction_id == 1111111
     assert transaction.cc_name == 'Test Person'
-    print(transaction.raw_request)
     assert 'amount=200.00' in transaction.raw_request
     assert 'cardHolderName=Test Person' in transaction.raw_request
 
@@ -258,6 +257,8 @@ def test_purchase_bridge_valid_no_redaction():
     assert isinstance(token, models.HelcimToken)
     assert token.token == 'abcdefghijklmnopqrstuvw'
     assert token.token_f4l4 == '11114444'
+    assert token.cc_name == 'Test Person'
+    assert token.cc_expiry == date(2025, 1, 31)
     assert token.cc_type == 'MasterCard'
     assert token.customer_code == 'CST1000'
     assert token.django_user is None
@@ -279,7 +280,7 @@ def test_purchase_bridge_valid_redact_sensitive_cc_data():
     credit_card = MockCreditCard(
         name='Test Person',
         number='1111222233334444',
-        expiry=datetime(2025, 1, 1),
+        expiry=date(2025, 1, 1),
         ccv='100'
     )
     purchase = bridge_oscar.PurchaseBridge(
@@ -313,6 +314,8 @@ def test_purchase_bridge_valid_redact_sensitive_cc_data():
     # Test that token saved to vault properly
     assert token.token == 'abcdefghijklmnopqrstuvw'
     assert token.token_f4l4 == '11114444'
+    assert token.cc_name is None
+    assert token.cc_expiry is None
     assert token.cc_type == 'MasterCard'
     assert token.customer_code == 'CST1000'
     assert token.django_user is None
