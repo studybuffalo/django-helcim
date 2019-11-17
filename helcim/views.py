@@ -35,7 +35,7 @@ class TransactionDetailView(PermissionRequiredMixin, generic.DetailView):
 
         return context
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs): # pylint: disable=unused-argument
         """Handles any capture and refund requests."""
         # Determines which action was submitted
         action = request.POST.get('action', None)
