@@ -6,7 +6,18 @@ Changelog
 Version 0 (Beta)
 ----------------
 
-0.5.0 (2019-Nov-14)
+0.6.0 (2019-Nov-17)
+===================
+
+Feature Updates
+---------------
+
+* Adding a Django user reference to the ``HelcimTransaction`` model.
+* Reworking the settings around associating a user model to the
+  django-helcim models. Now all settings are controlled by the
+  ``HELCIM_ASSOCIATE_USER`` setting.
+
+0.5.0 (2019-Nov-16)
 ===================
 
 Feature Updates
