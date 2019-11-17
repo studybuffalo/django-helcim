@@ -1,5 +1,6 @@
 """Tests for the gateway module."""
 # pylint: disable=missing-docstring, protected-access
+from datetime import date
 from unittest.mock import patch
 
 from helcim import gateway, exceptions as helcim_exceptions
@@ -316,6 +317,7 @@ def test_save_token():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
         'token_f4l4': '11119999',
+        'cc_expiry': '0120',
         'customer_code': 'CST1000',
     }
 
@@ -329,6 +331,7 @@ def test_save_token():
     # Checks that all proper fields ended up getting passed to model
     assert token_entry.data['token'] == 'abcdefghijklmnopqrstuvw'
     assert token_entry.data['token_f4l4'] == '11119999'
+    assert token_entry.data['cc_expiry'] == date(year=2020, month=1, day=31)
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] == 1
 
