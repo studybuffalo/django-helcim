@@ -30,6 +30,7 @@ class BaseRequest():
             - **token** (*str*): Helcim API token.
             - **terminal_id** (*str*): Helcim terminal ID.
 
+        django_user (obj): The Django model for the requesting user.
         **kwargs (dict): Any additional transaction details.
 
     Keyword Arguments:
@@ -99,12 +100,13 @@ class BaseRequest():
         test (bool, optional): Whether this is a test transaction or not.
     """
 
-    def __init__(self, api_details=None, **kwargs):
+    def __init__(self, api_details=None, django_user=None, **kwargs):
         self.api = self.set_api_details(api_details)
         self.details = kwargs
         self.cleaned = {}
         self.response = {}
         self.redacted_response = {}
+        self.django_user = django_user
 
     def _redact_api_data(self):
         """Redacts API data and updates redacted_response attribute."""
@@ -155,6 +157,23 @@ class BaseRequest():
 
         if python_name in self.redacted_response:
             self.redacted_response[python_name] = None
+
+    def _associate_user_reference(self):
+        """Validates and returns appropriate user reference.
+
+            Will confirm a user is available when associate_user is
+            True and then return that user as a refernece. If
+            associate_user is False, will return None.
+        """
+        if SETTINGS['associate_user']:
+            if self.django_user is None:
+                raise helcim_exceptions.ProcessingError(
+                    'Required Django user reference not provided.'
+                )
+
+            return self.django_user
+
+        return None
 
     def set_api_details(self, details):
         """Sets the API details for this transaction.
@@ -326,6 +345,9 @@ class BaseRequest():
         else:
             cc_expiry = None
 
+        # Return proper user reference
+        django_user = self._associate_user_reference()
+
         return {
             'raw_request': response.get('raw_request'),
             'raw_response': response.get('raw_response'),
@@ -348,6 +370,7 @@ class BaseRequest():
             'approval_code': response.get('approval_code'),
             'order_number': response.get('order_number'),
             'customer_code': response.get('customer_code'),
+            'django_user': django_user,
         }
 
     def post(self, post_data=None):
@@ -435,18 +458,15 @@ class BaseRequest():
 
 class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
-    def __init__(self, save_token=False, django_user=None, **kwargs):
+    def __init__(self, save_token=False, **kwargs):
         """Extends BaseRequest to include save_token and django_user.
 
             Parameters:
                 save_token (bool): Whether the user has requested this
                     token to be saved or not.
-                django_user (obj): The Django model for the requesting
-                    user.
         """
         super(BaseCardTransaction, self).__init__(**kwargs)
         self.save_token = self._determine_save_token_status(save_token)
-        self.django_user = django_user
 
     def _determine_save_token_status(self, user_decision):
         """Determines if Helcim card token should be saved.
@@ -560,12 +580,8 @@ class BaseCardTransaction(BaseRequest):
                 'Unable to save token - customer code not provided'
             )
 
-        # Ensures a django user is available if it is the identifier
-        if SETTINGS['token_vault_identifier'] != 'helcim':
-            if self.django_user is None:
-                raise helcim_exceptions.ProcessingError(
-                    'Unable to save token - user reference not provided'
-                )
+        # Retreive proper user reference
+        django_user = self._associate_user_reference()
 
         if token and token_f4l4:
             token_instance, _ = models.HelcimToken.objects.get_or_create(
@@ -575,7 +591,7 @@ class BaseCardTransaction(BaseRequest):
                 cc_expiry=cc_expiry,
                 cc_type=self.response.get('cc_type', None),
                 customer_code=customer_code,
-                django_user=self.django_user,
+                django_user=django_user,
             )
 
             return token_instance
@@ -877,14 +893,17 @@ def determine_helcim_settings():
     enable_token_vault = getattr(
         django_settings, 'HELCIM_ENABLE_TOKEN_VAULT', False
     )
-    token_vault_identifier = getattr(
-        django_settings, 'HELCIM_TOKEN_VAULT_IDENTIFIER', 'django'
-    )
 
     # ADMIN SETTINGS
     # -------------------------------------------------------------------------
     enable_admin = getattr(
         django_settings, 'HELCIM_ENABLE_ADMIN', False
+    )
+
+    # OTHER SETTINGS
+    # -------------------------------------------------------------------------
+    associate_user = getattr(
+        django_settings, 'HELCIM_ASSOCIATE_USER', True
     )
 
     return {
@@ -905,25 +924,19 @@ def determine_helcim_settings():
         'enable_transaction_capture': enable_transaction_capture,
         'enable_transaction_refund': enable_transaction_refund,
         'enable_token_vault': enable_token_vault,
-        'token_vault_identifier': token_vault_identifier,
         'enable_admin': enable_admin,
+        'associate_user': associate_user,
     }
 
-def retrieve_token_details(token_id, customer):
+def retrieve_token_details(token_id, django_user=None, customer_code=None):
     """Takes a HelcimToken ID and maps details to dictionary."""
     # Final validation to ensure token exists & belongs to proper user
     try:
-        # Determine what identifier is used for tokens
-        customer_reference = SETTINGS['token_vault_identifier']
-
-        if customer_reference == 'helcim':
-            token_instance = models.HelcimToken.objects.get(
-                id=token_id, customer_code=customer
-            )
-        else:
-            token_instance = models.HelcimToken.objects.get(
-                id=token_id, django_user=customer
-            )
+        token_instance = models.HelcimToken.objects.get(
+            id=token_id,
+            django_user=django_user,
+            customer_code=customer_code
+        )
     except models.HelcimToken.DoesNotExist:
         raise helcim_exceptions.ProcessingError(
             'Unable to retrieve token details for specified customer.'
@@ -933,25 +946,31 @@ def retrieve_token_details(token_id, customer):
     return {
         'token': token_instance.token,
         'token_f4l4': token_instance.token_f4l4,
+        'django_user': token_instance.django_user,
         'customer_code': token_instance.customer_code,
     }
 
-def retrieve_saved_tokens(customer):
+def retrieve_saved_tokens(django_user=None, customer_code=None):
     """Returns list of tokens for specified customer.
 
         Parameters:
-            customer: Either a a Django user instance or a Helcim
-                customer code. The reference used is determined by the
-                ``HELCIM_TOKEN_VAULT_IDENTIFIER`` setting.
+            django_user (obj): A Django user model instance.
+            customer_code (str): A Helcim customer code.
 
         Returns:
             obj: A queryset of the retrieved tokens
     """
-    if SETTINGS['token_vault_identifier'] == 'helcim':
-        tokens = models.HelcimToken.objects.filter(customer_code=customer)
-    else:
-        tokens = models.HelcimToken.objects.filter(django_user=customer)
+    if django_user and customer_code:
+        return models.HelcimToken.objects.filter(
+            django_user=django_user, customer_code=customer_code
+        )
 
-    return tokens
+    if django_user:
+        return models.HelcimToken.objects.filter(django_user=django_user)
+
+    if customer_code:
+        return models.HelcimToken.objects.filter(customer_code=customer_code)
+
+    return models.HelcimToken.objects.none()
 
 SETTINGS = determine_helcim_settings()
