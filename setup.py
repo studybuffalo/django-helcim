@@ -40,7 +40,7 @@ setup(
         'oscar': ['django-oscar>=1.6,<2.1']
     },
     tests_require=[
-        'pytest==5.3.0',
+        'pytest==5.3.1',
         'pytest-cov==2.8.1',
     ],
     # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
