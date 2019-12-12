@@ -271,11 +271,11 @@
         },
         "django-oscar": {
             "hashes": [
-                "sha256:83b0c12667b28c5d462d01a4de3b525365efde770d510fef84a1060f790a51de",
-                "sha256:f5a0d772f292bccb5bedb4326b1c899e3379b06423522a168a48b87cb24c53e5"
+                "sha256:44672aed6d2c78ac8084d265f22953bd7877b00d1c7964ea702ecaccae26bdcb",
+                "sha256:48f0fba1fcd64f7bb0b0185658999e86e4504b1a0a54b36ecf71c88d85a1f803"
             ],
             "index": "pypi",
-            "version": "==2.0.3"
+            "version": "==2.0.4"
         },
         "django-phonenumber-field": {
             "hashes": [
@@ -368,10 +368,10 @@
         },
         "keyring": {
             "hashes": [
-                "sha256:9b80469783d3f6106bce1d389c6b8b20c8d4d739943b1b8cd0ddc2a45d065f9d",
-                "sha256:ee3d35b7f1ac3cb69e9a1e4323534649d3ab2fea402738a77e4250c152970fed"
+                "sha256:a3f71fc0cf6b74e201e70532879ba1d15db25cb2c7407dce52fe52a6d5fc7b66",
+                "sha256:fc9cadedae35b77141f670f84c10a657147d2e526348698c93dd77f039979729"
             ],
-            "version": "==19.3.0"
+            "version": "==20.0.0"
         },
         "lazy-object-proxy": {
             "hashes": [
@@ -441,10 +441,10 @@
         },
         "more-itertools": {
             "hashes": [
-                "sha256:53ff73f186307d9c8ef17a9600309154a6ae27f25579e80af4db8f047ba14bc2",
-                "sha256:a0ea684c39bc4315ba7aae406596ef191fd84f873d2d2751f84d64e81a7a2d45"
+                "sha256:b84b238cce0d9adad5ed87e745778d20a3f8487d0f0cb8b8a586816c7496458d",
+                "sha256:c833ef592a0324bcc6a60e48440da07645063c453880c9477ceb22490aec1564"
             ],
-            "version": "==8.0.0"
+            "version": "==8.0.2"
         },
         "packaging": {
             "hashes": [
@@ -776,10 +776,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:156a0565f09d1f0ef8242932a0e1302462c93827a87ba7b4423d90f01befe94c",
-                "sha256:c0ffb55959ea5f3eaeece8d2db0651ba9ced9c72f40a6cce3419330256234289"
+                "sha256:895796ea8df435b6f502bf122f2b2034a3d48e6d8ff52175606ac1051b0e3e12",
+                "sha256:e405d16c98fcf30725d0c9d493ed07302a18846b5452de5253030ccd18996f87"
             ],
-            "version": "==4.40.0"
+            "version": "==4.40.1"
         },
         "twine": {
             "hashes": [
