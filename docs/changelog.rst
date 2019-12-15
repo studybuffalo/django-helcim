@@ -6,6 +6,16 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.7.0 (2019-Dec-15)
+===================
+
+Feature Updates
+---------------
+
+* Removing official support for Django 2.1 (has reach end of life).
+* Removing Tox from testing. Too many conflicting issues and CI system
+  can handle this better now.
+
 0.6.0 (2019-Nov-17)
 ===================
 
