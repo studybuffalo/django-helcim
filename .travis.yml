@@ -34,7 +34,7 @@ jobs:
     - python: 3.8
       env: DJANGO="django>=3.0,<3.1" # django 3.0
 env:
-  - PIPENV_VERBOSITY=-1
+  - "PIPENV_VERBOSITY=-1"
 install:
   - pip install pipenv
   # Temporary: some python versions & pip 18.1 have issues with pipenv
