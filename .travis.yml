@@ -3,12 +3,32 @@ sudo: required
 dist: xenial
 jobs:
   include:
+    # Python 3.5 and Django 1.11, 2.1, 2.2
     - python: 3.5
+      env: DJANGO="django>=1.11,<2.0"
+    - python: 3.5
+      env: DJANGO="django>=2.1,<2.2"
+    - python: 3.5
+      env: DJANGO="django>=2.2,<3.0"
+    # Python 3.6 and Django 1.11, 2.1, 2.2, 3.0
+    - python: 3.6
       env: DJANGO="django>=1.11,<2.0" # django 1.11
-    - python: 3.5
+    - python: 3.6
       env: DJANGO="django>=2.1,<2.2" # django 2.1
-    - python: 3.5
+    - python: 3.6
       env: DJANGO="django>=2.2,<3.0" # django 2.2
+    - python: 3.6
+      env: DJANGO="django>=3.0,<3.1" # django 3.0
+    - python: 3.7
+      env: DJANGO="django>=1.11,<2.0" # django 1.11
+    # Python 3.7 and Django 1.11, 2.1, 2.2, 3.0
+    - python: 3.7
+      env: DJANGO="django>=2.1,<2.2" # django 2.1
+    - python: 3.7
+      env: DJANGO="django>=2.2,<3.0" # django 2.2
+    - python: 3.7
+      env: DJANGO="django>=3.0,<3.1" # django 3.0
+    # Python 3.8 and Django 2.2, 3.0
     - python: 3.8
       env: DJANGO="django>=2.2,<3.0" # django 2.2
     - python: 3.8
@@ -22,6 +42,7 @@ install:
   # Fixes issue where package versions may not exist on python version
   # - pipenv update --dev
   # - pipenv install codecov --dev
+  - pipenv install --dev --ignore-pipfile
   - pipenv install $DJANGO
 script:
   - pipenv run pytest --cov=helcim
