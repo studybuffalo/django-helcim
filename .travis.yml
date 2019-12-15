@@ -33,8 +33,6 @@ jobs:
       env: DJANGO="django>=2.2,<3.0"
     - python: 3.8
       env: DJANGO="django>=3.0,<3.1"
-env:
-  - "PIPENV_VERBOSITY=-1"
 install:
   # Need to run update because different python versions may have
   # different dependencies. Once pipenv supports arrayed versions this
