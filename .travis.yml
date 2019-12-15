@@ -40,9 +40,8 @@ install:
   # Temporary: some python versions & pip 18.1 have issues with pipenv
   # - pipenv run python -m pip install -U pip
   # Fixes issue where package versions may not exist on python version
-  # - pipenv update --dev
-  # - pipenv install codecov --dev
-  - pipenv install --dev --ignore-pipfile
+  - pipenv update --dev
+  - pipenv install codecov --dev
   - pipenv install $DJANGO
 script:
   - pipenv run pytest --cov=helcim
