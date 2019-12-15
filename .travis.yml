@@ -6,11 +6,26 @@ python:
   - 3.6
   - 3.7
   - 3.8
+jobs:
+  include:
+    - python: 3.5
+      env: DJANGO="django>=1.11,<2.0"
+    - python: 3.5
+      env: DJANGO="django>=2.1,<2.2"
+    - python: 3.5
+      env: DJANGO="django>=2.2,<3.0"
+    - python: 3.8
+      env: DJANGO="django>=2.2,<3.0"
+    - python: 3.8
+      env: DJANGO="django>=3.0,<3.1"
 install:
   - pip install pipenv
   # Temporary: some python versions & pip 18.1 have issues with pipenv
-  - pipenv run python -m pip install -U pip
+  # - pipenv run python -m pip install -U pip
   # Fixes issue where package versions may not exist on python version
-  - pipenv update --dev
+  # - pipenv update --dev
+  - pipenv install codecov --dev
+  - pipenv install $DJANGO
 script:
-  - pipenv run tox
+  - pipenv run python pytest --cov=helcim
+  - codecov
