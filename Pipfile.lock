@@ -653,11 +653,11 @@
         },
         "sorl-thumbnail": {
             "hashes": [
-                "sha256:8dfe5fda91a5047d1d35a0b9effe7b000764a01d648e15ca076f44e9c34b6dbd",
-                "sha256:d9e3f018d19293824803e4ffead96b19dfcd44fa7987cea392f50436817bef34"
+                "sha256:838e1b7907eec6039471f3604ac1ac9cdb9e8cabecde17330599bca61c28d48c",
+                "sha256:ab42da28892f5aa4d95fb84f1a9f498af3a0535fd27d5cc501b11f87903fe8c4"
             ],
             "index": "pypi",
-            "version": "==12.5.0"
+            "version": "==12.6.2"
         },
         "sphinx": {
             "hashes": [
