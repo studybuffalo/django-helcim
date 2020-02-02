@@ -17,9 +17,9 @@ reports/*
 !reports/.gitkeep
 
 # Sandbox Files
-sandbox/db.sqlite3
-sandbox/media/*
-sandbox/static/*
+sandbox/**/db.sqlite3
+sandbox/**/media/*
+sandbox/**/static/*
 
 # Distribution files
 *.egg-info
