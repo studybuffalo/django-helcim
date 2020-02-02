@@ -397,7 +397,7 @@ def test_save_token_missing_customer_code():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': False})
 def test_save_token_with_django_user():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -417,7 +417,7 @@ def test_save_token_with_django_user():
     assert token_entry.data['customer_code'] == 'CST1000'
     assert token_entry.data['django_user'] == 1
 
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
+@patch.dict('helcim.gateway.SETTINGS', {'alllow_anonymous': False})
 def test_save_token_with_django_user_not_provided():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',
@@ -441,7 +441,7 @@ def test_save_token_with_django_user_not_provided():
     'helcim.gateway.models.HelcimToken.objects.get_or_create',
     mock_get_or_create_created
 )
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': False})
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': True})
 def test_save_token_with_customer_code():
     details = {
         'token': 'abcdefghijklmnopqrstuvw',

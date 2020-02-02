@@ -570,33 +570,33 @@ def test_redact_data_partial():
     assert base.redacted_response['cc_name'] is None
     assert base.redacted_response['token'] == 'b'
 
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
-def test_associate_user_reference_enabled_and_valid():
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': False})
+def test_determine_user_reference_enabled_and_valid():
     """Tests that method returns proper user reference."""
     base = gateway.BaseRequest()
     base.django_user = '1'
-    user = base._associate_user_reference()
+    user = base._determine_user_reference()
 
     assert user == '1'
 
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
-def test_associate_user_reference_enabled_and_invalid():
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': False})
+def test_determine_user_reference_enabled_and_invalid():
     """Tests that method returns error when user not provided."""
     base = gateway.BaseRequest()
 
     try:
-        base._associate_user_reference()
+        base._determine_user_reference()
     except helcim_exceptions.ProcessingError as error:
         assert str(error) == 'Required Django user reference not provided.'
     else:
         assert False
 
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': False})
-def test_associate_user_reference_disabled():
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': True})
+def test_determine_user_reference_disabled():
     """Tests that method returns None."""
     base = gateway.BaseRequest()
     base.django_user = '1'
-    user = base._associate_user_reference()
+    user = base._determine_user_reference()
 
     assert user is None
 

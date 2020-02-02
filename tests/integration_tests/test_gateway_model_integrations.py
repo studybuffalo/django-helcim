@@ -86,7 +86,7 @@ def test_save_token_saves_to_model_with_user(django_user_model):
 
 @patch.dict(
     'helcim.gateway.SETTINGS',
-    {'enable_token_vault': True, 'associate_user': True},
+    {'enable_token_vault': True, 'allow_anonymous': False},
 )
 def test_save_token_handles_duplicate_token_with_associate(django_user_model):
     user = django_user_model.objects.create_user(
@@ -114,7 +114,7 @@ def test_save_token_handles_duplicate_token_with_associate(django_user_model):
 
 @patch.dict(
     'helcim.gateway.SETTINGS',
-    {'enable_token_vault': True, 'associate_user': False},
+    {'enable_token_vault': True, 'allow_anonymous': True},
 )
 def test_save_token_handles_duplicate_token_without_associate():
     first_instance = models.HelcimToken.objects.create(

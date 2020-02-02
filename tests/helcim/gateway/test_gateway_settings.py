@@ -13,7 +13,7 @@ from helcim.gateway import determine_helcim_settings
     HELCIM_REDACT_CC_TYPE=11, HELCIM_REDACT_CC_MAGNETIC=12,
     HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=13, HELCIM_REDACT_TOKEN=14,
     HELCIM_ENABLE_TRANSACTION_CAPTURE=15, HELCIM_ENABLE_TRANSACTION_REFUND=16,
-    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_ASSOCIATE_USER=18,
+    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_ALLOW_ANONYMOUS=18,
     HELCIM_ENABLE_ADMIN=19,
 )
 def test_determine_helcim_settings_all_settings_provided():
@@ -38,7 +38,7 @@ def test_determine_helcim_settings_all_settings_provided():
     assert helcim_settings['enable_transaction_capture'] == 15
     assert helcim_settings['enable_transaction_refund'] == 16
     assert helcim_settings['enable_token_vault'] == 17
-    assert helcim_settings['associate_user'] == 18
+    assert helcim_settings['allow_anonymous'] == 18
     assert helcim_settings['enable_admin'] == 19
 
 @override_settings()
@@ -84,7 +84,7 @@ def test_determine_helcim_settings_defaults():
     del settings.HELCIM_ENABLE_TRANSACTION_CAPTURE
     del settings.HELCIM_ENABLE_TRANSACTION_REFUND
     del settings.HELCIM_ENABLE_TOKEN_VAULT
-    del settings.HELCIM_ASSOCIATE_USER
+    del settings.HELCIM_ALLOW_ANONYMOUS
     del settings.HELCIM_ENABLE_ADMIN
 
     helcim_settings = determine_helcim_settings()
@@ -105,5 +105,5 @@ def test_determine_helcim_settings_defaults():
     assert helcim_settings['enable_transaction_capture'] is False
     assert helcim_settings['enable_transaction_refund'] is False
     assert helcim_settings['enable_token_vault'] is False
-    assert helcim_settings['associate_user'] is True
+    assert helcim_settings['allow_anonymous'] is True
     assert helcim_settings['enable_admin'] is False

@@ -158,22 +158,24 @@ class BaseRequest():
         if python_name in self.redacted_response:
             self.redacted_response[python_name] = None
 
-    def _associate_user_reference(self):
+    def _determine_user_reference(self):
         """Validates and returns appropriate user reference.
 
-            Will confirm a user is available when associate_user is
-            True and then return that user as a reference. If
-            associate_user is False, will return None.
+            Determines if an absent or anonymous user is permitted.
+            Returns an exception if they are provided and not allowed.
         """
-        if SETTINGS['associate_user']:
-            if self.django_user is None:
+        # Handles anonymous/no user situations
+        if SETTINGS['allow_anonymous']:
+            if self.django_user is None or self.django_user.is_anonymous:
+                return None
+        else:
+            if self.django_user is None or self.django_user.is_anonymous:
                 raise helcim_exceptions.ProcessingError(
                     'Required Django user reference not provided.'
                 )
 
-            return self.django_user
-
-        return None
+        # Otherwise can just return the provided user model
+        return self.django_user
 
     def set_api_details(self, details):
         """Sets the API details for this transaction.
@@ -346,7 +348,7 @@ class BaseRequest():
             cc_expiry = None
 
         # Return proper user reference
-        django_user = self._associate_user_reference()
+        django_user = self._determine_user_reference()
 
         return {
             'raw_request': response.get('raw_request'),
@@ -581,7 +583,7 @@ class BaseCardTransaction(BaseRequest):
             )
 
         # Retreive proper user reference
-        django_user = self._associate_user_reference()
+        django_user = self._determine_user_reference()
 
         if token and token_f4l4:
             token_instance, _ = models.HelcimToken.objects.get_or_create(
@@ -902,8 +904,8 @@ def determine_helcim_settings():
 
     # OTHER SETTINGS
     # -------------------------------------------------------------------------
-    associate_user = getattr(
-        django_settings, 'HELCIM_ASSOCIATE_USER', True
+    allow_anonymous = getattr(
+        django_settings, 'HELCIM_ALLOW_ANONYMOUS', True
     )
 
     return {
@@ -925,7 +927,7 @@ def determine_helcim_settings():
         'enable_transaction_refund': enable_transaction_refund,
         'enable_token_vault': enable_token_vault,
         'enable_admin': enable_admin,
-        'associate_user': associate_user,
+        'allow_anonymous': allow_anonymous,
     }
 
 def retrieve_token_details(token_id, django_user=None, customer_code=None):
