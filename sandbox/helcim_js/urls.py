@@ -4,7 +4,8 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include
+from django.urls import include, reverse_lazy
+from django.views.generic import RedirectView
 
 
 urlpatterns = [
@@ -12,6 +13,15 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     # django-helcim URLs
     url(r'^helcim/', include('helcim.urls')),
+    # Example app URLs
+    url(r'^example/', include('example_app.urls', namespace='example')),
+    # Redirect to example app
+    url(
+        r'^$',
+        RedirectView.as_view(
+            permanent=False, url=reverse_lazy('example:home')
+        ),
+    ),
 ]
 
 # Additional URLs if site is run in debug mode

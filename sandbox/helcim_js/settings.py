@@ -47,6 +47,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 USE_TZ = True
 TIME_ZONE = 'UTC'
 LANGUAGE_CODE = 'en-ca'
+LANGUAGES = (
+    ('en-ca', 'English'),
+)
 USE_I18N = True
 USE_L10N = True
 
@@ -66,6 +69,8 @@ INSTALLED_APPS = (
     # External Apps
     'helcim',
     'debug_toolbar',
+    # Project Apps
+    'example_app.apps.ExampleAppConfig',
 )
 
 # DJANGO MIDDLEWARE
