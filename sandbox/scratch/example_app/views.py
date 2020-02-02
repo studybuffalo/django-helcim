@@ -13,8 +13,12 @@ from helcim.models import HelcimTransaction, HelcimToken
 from .forms import PaymentForm
 
 
-class PaymentView(FormView):
+class BasePaymentView(FormView):
     """This view handles payment detail collection and processing.
+
+        It is intended to be extended to allow the specific handling
+        of the payment form, which may change depending on the use
+        case.
 
         Will allow user to enter payment details, review the entered
         information on a confirmation page, then submit the payment.
@@ -112,10 +116,33 @@ class PaymentView(FormView):
     def process_payment(self, request, **kwargs):
         """Moves forward with payment & subscription processing.
 
+            This method needs to be extended to handle the unique
+            requirements of each application.
+
             If forms are invalid will move back to payment details page
             for user to correct errors. This is only expected to happen
             if a user tampers with the hidden inputs.
         """
+        raise NotImplementedError('This method must be overriden.')
+
+    def hide_form(self, form):
+        """Replaces form widgets with hidden inputs.
+            Parameters:
+                form (obj): A form instance.
+            Returns:
+                obj: The modified form instance.
+        """
+        for _, field in form.fields.items():
+            field.widget = HiddenInput()
+
+        return form
+
+class PaymentView(BasePaymentView):
+    """This view handles a basic API purchase call."""
+    form_class = PaymentForm
+
+    def process_payment(self, request, **kwargs):
+        """Moves forward with payment & subscription processing."""
         # Validate payment details again incase anything changed
         payment_form = self.form_class(request.POST)
 
@@ -172,18 +199,6 @@ class PaymentView(FormView):
         kwargs['error'] = True
 
         return self.render_details(request, **kwargs)
-
-    def hide_form(self, form):
-        """Replaces form widgets with hidden inputs.
-            Parameters:
-                form (obj): A form instance.
-            Returns:
-                obj: The modified form instance.
-        """
-        for _, field in form.fields.items():
-            field.widget = HiddenInput()
-
-        return form
 
 class SuccessView(TemplateView):
     """View to display additional details on successful transaction."""
