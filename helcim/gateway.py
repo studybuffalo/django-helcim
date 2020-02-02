@@ -162,7 +162,7 @@ class BaseRequest():
         """Validates and returns appropriate user reference.
 
             Will confirm a user is available when associate_user is
-            True and then return that user as a refernece. If
+            True and then return that user as a reference. If
             associate_user is False, will return None.
         """
         if SETTINGS['associate_user']:
