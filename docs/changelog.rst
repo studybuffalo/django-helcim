@@ -6,13 +6,25 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.7.1 (2020-Feb-02)
+===================
+
+Feature Updates
+---------------
+
+* Switching the ``HELCIM_ASSOCIATE_USER`` setting to
+  ``HELCIM_ALLOW_ANONYMOUS``. This will allow clearer support for
+  anonymous transactions.
+* Adding a new sandbox site that shows how Django Helcim can be
+  integrated into a project from scratch.
+
 0.7.0 (2019-Dec-15)
 ===================
 
 Feature Updates
 ---------------
 
-* Removing official support for Django 2.1 (has reach end of life).
+* Removing official support for Django 2.1 (has reached end of life).
 * Removing Tox from testing. Too many conflicting issues and CI system
   can handle this better now.
 
