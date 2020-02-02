@@ -9,6 +9,7 @@ _templates/
 
 # Environment Files (to prevent accidental commit to repository)
 *.env
+!.*.env
 
 # Testing files and reports
 .coverage
