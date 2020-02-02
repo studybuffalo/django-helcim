@@ -54,7 +54,7 @@ TO_API_FIELDS = {
     'cc_cvv': Field('cardCVV', 's', 3, 4),
     'cc_expiry': Field('cardExpiry', 's', 4, 4),
     'cc_name': Field('cardHolderName', 's'),
-    'cc_number': Field('cardNumber', 's', 16, 16),
+    'cc_number': Field('cardNumber', 's', 13, 19),
     'cc_postal_code': Field('cardHolderPostalCode', 's'),
     'comments': Field('comments', 's'),
     'customer_code': Field('customerCode', 's'),
