@@ -92,31 +92,31 @@ class HelcimjsPaymentForm(forms.Form):
         label='Credit Card Number',
         max_length=19,
         required=False,
-        widget=TextInputCustomName(attrs={'id': 'cardNumber', 'name': ''})
+        widget=TextInputCustomName(attrs={'id': 'cardNumber', 'name': ''}),
     )
     cc_expiry_month = forms.ChoiceField(
         choices=month_choices,
         label='Month Expiry',
         required=False,
-        widget=forms.Select(attrs={'id': 'cardExpiryMonth'})
+        widget=forms.Select(attrs={'id': 'cardExpiryMonth'}),
     )
     cc_expiry_year = forms.ChoiceField(
         choices=year_choices,
         label='Year Expiry',
         required=False,
-        widget=forms.Select(attrs={'id': 'cardExpiryYear'})
+        widget=forms.Select(attrs={'id': 'cardExpiryYear'}),
     )
     cc_cvv = forms.CharField(
         label='CVV',
         max_length=4,
         required=False,
-        widget=TextInputCustomName(attrs={'id': 'cardCVV', 'name': ''})
+        widget=TextInputCustomName(attrs={'id': 'cardCVV', 'name': ''}),
     )
     cc_name = forms.CharField(
         label='Name on Card',
         max_length=256,
         required=False,
-        widget=forms.TextInput(attrs={'id': 'cardHolderName'})
+        widget=forms.TextInput(attrs={'id': 'cardHolderName'}),
     )
     card_token = forms.CharField(
         label='Card Token',
@@ -128,11 +128,11 @@ class HelcimjsPaymentForm(forms.Form):
         label='Customer Code',
         max_length=16,
         required=False,
-        widget=forms.HiddenInput(attrs={'id': 'customerCode'})
+        widget=forms.HiddenInput(attrs={'id': 'customerCode'}),
     )
-    amount = forms.DecimalField(
-        decimal_places=4,
+    amount = forms.CharField(
         initial='0.00',
         label='Amount',
-        min_value=0,
+        max_length=16,
+        widget=forms.TextInput(attrs={'id': 'amount'}),
     )
