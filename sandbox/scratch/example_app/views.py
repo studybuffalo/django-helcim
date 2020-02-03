@@ -10,7 +10,7 @@ from helcim.exceptions import ProcessingError, PaymentError
 from helcim.gateway import Purchase
 from helcim.models import HelcimTransaction, HelcimToken
 
-from .forms import PaymentForm
+from .forms import PaymentForm, HelcimjsPaymentForm
 
 
 class BasePaymentView(FormView):
@@ -58,8 +58,21 @@ class BasePaymentView(FormView):
             The 'process' POST argument is used to determine whether
             to render a confirmation page or process a payment.
         """
+        print(request.POST)
         # Determine POST action and direct to proper function
         process = request.POST.get('process', None)
+
+        # Need to add handling here to return back to processing page
+        # on Helcim.js errors
+        # Example Error on POST:
+        # <QueryDict: {
+        #   'csrfmiddlewaretoken': ['abc'],
+        #   'response': ['0'],
+        #   'responseMessage': ['Invalid Card Expiry - Card Has Expired'],
+        #   'xml': ['<message>\r\n\t<response>0</response>\r\n\t<responseMessage>Invalid Card Expiry - Card Has Expired</responseMessage>\r\n</message>'],
+        #   'cc_name': ['Myself'],
+        #   'amount': ['1']
+        # }>
 
         # Render the confirmation page
         if process:
@@ -140,6 +153,8 @@ class BasePaymentView(FormView):
 class PaymentView(BasePaymentView):
     """This view handles a basic API purchase call."""
     form_class = PaymentForm
+    template_details = 'example_app/payment_details.html'
+    template_confirmation = 'example_app/payment_confirmation.html'
 
     def process_payment(self, request, **kwargs):
         """Moves forward with payment & subscription processing."""
@@ -181,6 +196,70 @@ class PaymentView(BasePaymentView):
                 messages.error(request, error_message[1])
 
             # If transaction was generated, payment was successful
+            if transaction_success:
+                # NOTE : you generally wouldn't want to transmit these
+                # details as query parameters; this is just done to
+                # simplify this example
+                url = '{}?transaction={}&token={}'.format(
+                    self.get_success_url(),
+                    transaction.id,
+                    token.id
+                )
+                return HttpResponseRedirect(url)
+
+            # Payment unsuccessful, add message for confirmation page
+            messages.error(request, 'Error processing payment')
+
+        # Invalid form submission/payment - render payment details again
+        kwargs['error'] = True
+
+        return self.render_details(request, **kwargs)
+
+class HelcimjsPaymentView(BasePaymentView):
+    """This view handles an API purchase call with Helcim.js."""
+    form_class = HelcimjsPaymentForm
+    template_details = 'example_app/helcimjs_payment_details.html'
+    template_confirmation = 'example_app/helcimjs_payment_confirmation.html'
+
+    def process_payment(self, request, **kwargs):
+        """Moves forward with payment & subscription processing."""
+        # Validate payment details again incase anything changed
+        payment_form = self.form_class(request.POST)
+
+        if payment_form.is_valid():
+            # Format expiry for the Helcim API (MMYY)
+            cc_expiry = '{}{}'.format(
+                payment_form.cleaned_data['cc_expiry_month'],
+                payment_form.cleaned_data['cc_expiry_year'][:-2],
+            )
+
+            purchase = Purchase(
+                save_token=True,
+                amount=payment_form.cleaned_data['amount'],
+                django_user=self.request.user,
+                cc_name=payment_form.cleaned_data['cardholder_name'],
+                cc_number=payment_form.cleaned_data['card_number'],
+                cc_expiry=cc_expiry,
+                cc_cvv=payment_form.cleaned_data['card_cvv'],
+            )
+
+            transaction_success = False
+
+            try:
+                transaction, token = purchase.process()
+                transaction_success = bool(transaction)
+            except ValueError as error:
+                messages.error(request, str(error))
+            except ProcessingError as error:
+                # NOTE: these types of errors are usually server-side
+                # issues; you would not normally display them to a user
+                messages.error(request, str(error))
+            except PaymentError as error:
+                # Format error response
+                error_message = str(error).split('Helcim API request failed: ')
+
+                messages.error(request, error_message[1])
+
             if transaction_success:
                 # NOTE : you generally wouldn't want to transmit these
                 # details as query parameters; this is just done to

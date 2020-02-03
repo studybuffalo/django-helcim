@@ -134,7 +134,8 @@
       width: 30rem;
     }
 
-    button.submit {
+    button.submit,
+    input[type=button].submit {
       background-color: rgb(240, 240, 240);
       border: 1px solid rgb(100, 100, 100);
       border-radius: 4px;
@@ -144,7 +145,8 @@
       padding: 0.25rem 1rem;
     }
 
-      button.submit:hover {
+      button.submit:hover,
+      input[type=button].submit:hover {
         background-color: rgb(230, 230, 230);
         border-color: rgb(25, 25, 25);
       }
@@ -191,5 +193,8 @@
       </div>
     </section>
   </div>
+
+  {% block scripts %}{% endblock %}
+  {% block extra_scripts %}{% endblock %}
 </body>
 </html>
