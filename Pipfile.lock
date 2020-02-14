@@ -454,10 +454,10 @@
         },
         "phonenumbers": {
             "hashes": [
-                "sha256:a4a3016c39ca058a0c953eb58cbb8138d8c75472e018f6a2554255049e22679e",
-                "sha256:d73c4f552653d2d7aea7baf47e6b6995215d3e0f23934558e113005a814100e6"
+                "sha256:685e81ac131fea8dbd71b7769d2ac480c9fe9d5a45838e8546f5de9910670e8e",
+                "sha256:9ca4332425ae4f4d1e7925bbf98ef9446755b59a903ae6a63cf4fb19adcd168b"
             ],
-            "version": "==8.11.3"
+            "version": "==8.11.4"
         },
         "pillow": {
             "hashes": [
@@ -656,11 +656,11 @@
         },
         "sphinx": {
             "hashes": [
-                "sha256:298537cb3234578b2d954ff18c5608468229e116a9757af3b831c2b2b4819159",
-                "sha256:e6e766b74f85f37a5f3e0773a1e1be8db3fcb799deb58ca6d18b70b0b44542a5"
+                "sha256:5024a67f065fe60d9db2005580074d81f22a02dd8f00a5b1ec3d5f4d42bc88d8",
+                "sha256:f929b72e0cfe45fa581b8964d54457117863a6a6c9369ecc1a65b8827abd3bf2"
             ],
             "index": "pypi",
-            "version": "==2.3.1"
+            "version": "==2.4.1"
         },
         "sphinx-rtd-theme": {
             "hashes": [
