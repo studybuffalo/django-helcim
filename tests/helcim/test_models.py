@@ -1,6 +1,10 @@
 """Tests for the Helcim models module."""
 # pylint: disable=missing-docstring, invalid-name
+import re
+
 import pytest
+
+from django.utils import timezone
 
 from helcim import models
 
@@ -24,6 +28,18 @@ def test_helcim_transaction_str():
     )
 
     assert str(transaction) == '2018-01-01 01:02:03 - s'
+
+def test_helcim_transaction_str__with_timezone():
+    transaction = models.HelcimTransaction.objects.create(
+        transaction_success=True,
+        date_response=timezone.now(),
+        transaction_type='s',
+    )
+
+    assert re.match(
+        r'\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{6} - s',
+        str(transaction),
+    )
 
 def test_helcim_transaction_can_be_captured_valid():
     transaction = models.HelcimTransaction.objects.create(

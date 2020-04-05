@@ -161,7 +161,7 @@ class HelcimTransaction(models.Model):
 
     def __str__(self):
         string_parts = [
-            self.date_response,
+            str(self.date_response),
             self.transaction_type,
         ]
 

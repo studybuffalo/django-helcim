@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.7.1 (2020-Apr-05)
+===================
+
+Bug Fixes
+---------
+
+* Fixed issue with ``__str__`` of transaction model in Django admin
+  when timezones were used for ``datetimes``.
+
 0.7.0 (2019-Dec-15)
 ===================
 
