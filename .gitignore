@@ -1,4 +1,3 @@
-### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
@@ -9,6 +8,7 @@ _templates/
 
 # Environment Files (to prevent accidental commit to repository)
 *.env
+!.*.env
 
 # Testing files and reports
 .coverage
@@ -17,9 +17,9 @@ reports/*
 !reports/.gitkeep
 
 # Sandbox Files
-sandbox/db.sqlite3
-sandbox/media/*
-sandbox/static/*
+sandbox/**/db.sqlite3
+sandbox/**/media/*
+sandbox/**/static/*
 
 # Distribution files
 *.egg-info
