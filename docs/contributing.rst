@@ -100,7 +100,14 @@ environment (see above) to proceed.
 Deploying the site
 ==================
 
-First migrate the Django database::
+You will need to create your own copy of the ``config.env`` file. This
+file contains some basic ``django`` and ``django-helcim`` settings to
+get the sandbox to work. A template config file can be found at
+``sandbox/.config.env``. Copy and rename this file to ``config.env``
+and update the relevant settings as needed for your sandbox (e.g. your
+Helcim API details).
+
+You should then be able to run the Django migrations::
 
     $ pipenv run python sandbox/manage.py migrate
 
@@ -124,7 +131,7 @@ access it at http://127.0.0.1:8000/::
 
     $ pipenv run python sandbox/manage.py runserver
 
-If needed, you can create a superuser account with the standard manager
+If needed, you can create a superuser account with the standard management
 command::
 
     $ pipenv run python sandbox/manage.py createsuperuser
