@@ -1,11 +1,9 @@
 # pylint: disable=missing-docstring, invalid-name
-import sys
-import re
 import warnings
 import django
 
 
-__version__ = '0.7.1'
+__version__ = '0.7.2'
 
 # Provide DepreciationWarning for older Python versions
 # Have to use sys.version while supporting Python 3.5 to enable testing
