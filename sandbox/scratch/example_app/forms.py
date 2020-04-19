@@ -30,16 +30,17 @@ def get_expiry_choices():
 
     return month_choices, year_choices
 
-class TextInputCustomName(forms.TextInput):
-    """Custom input that lets you specify the widget's name attribute.
+class HiddenInputCustomName(forms.HiddenInput):
+    """Custom hidden input that lets you specify the widget's name attribute.
 
         This widget helps streamline communication with Helcim.js,
         which is expecting various camelCase names (as opposed to the
-        usual snake_case names used in python).
+        usual snake_case names used in python) and the fact that some
+        form elements shouldn't have names.
     """
 
     def get_context(self, name, value, attrs):
-        context = super(TextInputCustomName, self).get_context(
+        context = super(HiddenInputCustomName, self).get_context(
             name, value, attrs
         )
         context['widget']['name'] = context['widget']['attrs'].get('name', '')
@@ -52,7 +53,7 @@ class PaymentForm(forms.Form):
 
     cc_number = forms.CharField(
         label='Credit Card Number',
-        max_length=19,
+        max_length=16,
         min_length=13,
     )
     cc_name = forms.CharField(
@@ -90,51 +91,79 @@ class HelcimjsPaymentForm(forms.Form):
     """
     month_choices, year_choices = get_expiry_choices()
 
-    cc_number = forms.CharField(
+    # Fields for user data entry
+    django_cc_number = forms.CharField(
         label='Credit Card Number',
-        max_length=19,
+        max_length=16,
+        min_length=13,
         required=False,
-        widget=TextInputCustomName(attrs={'id': 'cardNumber', 'name': ''}),
     )
-    cc_expiry_month = forms.ChoiceField(
+    django_cc_expiry_month = forms.ChoiceField(
         choices=month_choices,
         label='Month Expiry',
         required=False,
-        widget=forms.Select(attrs={'id': 'cardExpiryMonth'}),
     )
-    cc_expiry_year = forms.ChoiceField(
+    django_cc_expiry_year = forms.ChoiceField(
         choices=year_choices,
         label='Year Expiry',
         required=False,
-        widget=forms.Select(attrs={'id': 'cardExpiryYear'}),
     )
-    cc_cvv = forms.CharField(
+    django_cc_cvv = forms.CharField(
         label='CVV',
         max_length=4,
+        min_length=3,
         required=False,
-        widget=TextInputCustomName(attrs={'id': 'cardCVV', 'name': ''}),
     )
-    cc_name = forms.CharField(
-        label='Name on Card',
+    django_cc_name = forms.CharField(
+        label='Cardholder Name',
         max_length=256,
         required=False,
-        widget=forms.TextInput(attrs={'id': 'cardHolderName'}),
     )
-    card_token = forms.CharField(
-        label='Card Token',
-        max_length=23,
-        required=False,
-        widget=forms.HiddenInput(attrs={'id': 'cardToken'})
-    )
-    customer_code = forms.CharField(
-        label='Customer Code',
-        max_length=16,
-        required=False,
-        widget=forms.HiddenInput(attrs={'id': 'customerCode'}),
-    )
-    amount = forms.CharField(
+    django_amount = forms.CharField(
         initial='0.00',
         label='Amount',
         max_length=16,
-        widget=forms.TextInput(attrs={'id': 'amount'}),
+        required=False,
+    )
+
+    # Fields for Helcim.js processing
+    helcim_cc_number = forms.CharField(
+        max_length=16,
+        min_length=13,
+        required=False,
+        widget=HiddenInputCustomName(
+            attrs={'id': 'cardNumber', 'name': ''}
+        ),
+    )
+    helcim_cc_expiry = forms.CharField(
+        max_length=4,
+        min_length=4,
+        required=False,
+        widget=HiddenInputCustomName(
+            attrs={'id': 'cardExpiry', 'name': ''}
+        ),
+    )
+    helcim_cc_cvv = forms.CharField(
+        max_length=4,
+        min_length=3,
+        required=False,
+        widget=HiddenInputCustomName(
+            attrs={'id': 'cardCVV', 'name': ''}
+        ),
+    )
+    helcim_cc_name = forms.CharField(
+        max_length=256,
+        required=False,
+        widget=HiddenInputCustomName(
+            attrs={'id': 'cardHolderName', 'name': ''}
+        ),
+    )
+    helcim_amount = forms.CharField(
+        initial='0.00',
+        label='Amount',
+        max_length=16,
+        required=False,
+        widget=HiddenInputCustomName(
+            attrs={'id': 'amount', 'name': ''}
+        ),
     )

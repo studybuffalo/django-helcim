@@ -104,6 +104,35 @@ FROM_API_FIELDS = {
     'type': Field('transaction_type', 's'),
 }
 
+FROM_HELCIM_JS_FIELDS = {
+    'amount': Field('amount', 'c'),
+    'approvalCode': Field('approval_code', 's'),
+    'avsResponse': Field('avs_response', 's'),
+    'bankAccountCorporate': Field('bank_corporate', 's'),
+    'bankAccountNumber': Field('bank_account_number', 's'),
+    'bankAccountToken': Field('bank_token', 's'),
+    'bankAccountType': Field('bank_type', 's'),
+    'bankFinancialNumber': Field('bank_financial_number', 's'),
+    'bankTransitNumber': Field('bank_transit_number', 's'),
+    'cardHolderName': Field('cc_name', 's'),
+    'cardNumber': Field('cc_number', 's'),
+    'cardToken': Field('token', 's'),
+    'cardType': Field('cc_type', 's'),
+    'currency': Field('currency', 's'),
+    'customerCode': Field('customer_code', 's'),
+    'cvvResponse': Field('cvv_response', 's'),
+    'date': Field('transaction_date', 'd'),
+    'noticeMessage': Field('notice_message', 's'),
+    'orderNumber': Field('order_number', 's'),
+    'response': Field('response', 'b'),
+    'responseMessage': Field('response_message', 's'),
+    'time': Field('transaction_time', 't'),
+    'transactionId': Field('transaction_id', 'i'),
+    'type': Field('transaction_type', 's'),
+    'xml': Field('response_xml', 's'),
+    'xmlHash': Field('response_xml_hash', 's'),
+}
+
 def validate_request_fields(details):
     """Validates and coerces request field data prior to submission.
 
@@ -235,7 +264,7 @@ def process_api_response(response, raw_request=None, raw_response=None):
         raw_response (str): Raw response (as string) returned by API.
 
     Returns:
-        dict: The validated and convereted API response.
+        dict: The validated and converted API response.
     """
     # Add the standard API response details
     processed = {
@@ -270,7 +299,7 @@ def process_api_response(response, raw_request=None, raw_response=None):
 
                 # Boolean Field
                 elif api_field.field_type == 'b':
-                    processed[new_name] = True if field_value == '1' else False
+                    processed[new_name] = field_value == '1'
 
                 # Date Field
                 elif api_field.field_type == 'd':
@@ -312,4 +341,78 @@ def process_api_response(response, raw_request=None, raw_response=None):
     processed['raw_request'] = create_raw_request(raw_request)
     processed['raw_response'] = raw_response
 
+    return processed
+
+def process_helcim_js_response(response):
+    """Processes the Helcim.js response into a Python dictionary.
+
+    Parameters:
+        response (dict): The Helicm.js POST response.
+
+    Returns:
+        dict: The validated and converted Helcim.js response.
+    """
+    processed = {}
+
+    # Convert response fields into Python fields
+    for field_name, field_value in response.items():
+        try:
+            api_field = FROM_HELCIM_JS_FIELDS[field_name]
+            new_name = api_field.field_name
+
+            # String Field
+            if api_field.field_type == 's':
+                processed[new_name] = (
+                    None if field_value is None else str(field_value)
+                )
+
+            # Decimal Field
+            elif api_field.field_type == 'c':
+                processed[new_name] = Decimal(field_value)
+
+            # Integer Field
+            elif api_field.field_type == 'i':
+                processed[new_name] = int(field_value)
+
+            # Boolean Field
+            elif api_field.field_type == 'b':
+                processed[new_name] = field_value == '1'
+
+            # Date Field
+            elif api_field.field_type == 'd':
+                processed[new_name] = datetime.strptime(
+                    field_value, '%Y-%m-%d'
+                ).date()
+
+            # Time Field
+            elif api_field.field_type == 't':
+                processed[new_name] = datetime.strptime(
+                    field_value, '%H:%M:%S'
+                ).time()
+
+            # Handle any invalid types (should never happen...)
+            else:
+                LOG.warning(
+                    'Field %s has invalid type: %s',
+                    api_field.field_name,
+                    api_field.field_type,
+                )
+                processed[field_name] = field_value
+        except KeyError:
+            LOG.warning(
+                'Response field not in FROM_HELCIM_JS_FIELDS: %s',
+                field_name
+            )
+            processed[field_name] = field_value
+
+        # If possible, create the F4L4 field
+        cc_number = processed.get('cc_number')
+
+        if cc_number:
+            processed['token_f4l4'] = '{}{}'.format(
+                cc_number[:4], cc_number[-4:]
+            )
+        else:
+            processed['token_f4l4'] = None
+    print(processed)
     return processed
