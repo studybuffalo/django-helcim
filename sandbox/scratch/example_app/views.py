@@ -7,28 +7,28 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 
 from helcim.exceptions import ProcessingError, PaymentError
-from helcim.gateway import Purchase
+from helcim.gateway import Purchase, HelcimJSResponse
 from helcim.models import HelcimTransaction, HelcimToken
 
 from .forms import PaymentForm, HelcimjsPaymentForm
 
 
-class BasePaymentView(FormView):
-    """This view handles payment detail collection and processing.
+class PaymentView(FormView):
+    """This view handles a basic API purchase call.
 
-        It is intended to be extended to allow the specific handling
-        of the payment form, which may change depending on the use
-        case.
-
-        Will allow user to enter payment details, review the entered
-        information on a confirmation page, then submit the payment.
+        This view is an example of how an application that requires
+        payment processing (e.g. a subscription service, an online
+        store) may function. The django-helcim specific details will
+        be found in the post and process_payment methods. The majority
+        of the remaining methods are meant to represent a generic
+        service that requires payment processing.
 
         The GET call will return a page for the user to enter the
         payment details.
 
-        THE POST calls use a ``process`` parameter to determine if
+        The POST calls use a ``process`` parameter to determine if
         a confirmation page needs to be displayed or if the payment
-        shoudl be processed. This is done because you cannot transfer
+        should be processed. This is done because you cannot transfer
         POST data securely through a redirection.
     """
     confirmation = False
@@ -39,7 +39,6 @@ class BasePaymentView(FormView):
 
     def get_template_names(self):
         """Returns the proper template name based on payment stage."""
-        print(self.confirmation)
         conf_templates = [self.template_confirmation]
         det_templates = [self.template_details]
 
@@ -56,22 +55,13 @@ class BasePaymentView(FormView):
     def post(self, request, *args, **kwargs):
         """Handles POST requests and ensure proper handling.
 
+            The 'back' POST argument is used to signal that the user
+            wants to return the payment details page.
+
             The 'process' POST argument is used to determine whether
             to render a confirmation page or process a payment.
         """
         # Determine POST action and direct to proper function
-
-        # Need to add handling here to return back to processing page
-        # on Helcim.js errors
-        # Example Error on POST:
-        # <QueryDict: {
-        #   'csrfmiddlewaretoken': ['abc'],
-        #   'response': ['0'],
-        #   'responseMessage': ['Invalid Card Expiry - Card Has Expired'],
-        #   'xml': ['<message>\r\n\t<response>0</response>\r\n\t<responseMessage>Invalid Card Expiry - Card Has Expired</responseMessage>\r\n</message>'],
-        #   'cc_name': ['Myself'],
-        #   'amount': ['1']
-        # }>
 
         # If "back" is present, return the payment details form again
         if request.POST.get('back', None):
@@ -79,10 +69,11 @@ class BasePaymentView(FormView):
             self.confirmation = False
             return self.render_details(request, **kwargs)
 
-        # Render the confirmation page
+        # Process the payment
         if request.POST.get('process', None):
             return self.process_payment(request)
 
+        # Render the confirmation page
         return self.render_confirmation(request)
 
     def render_details(self, request, **kwargs):
@@ -136,18 +127,6 @@ class BasePaymentView(FormView):
 
         return self.render_details(request, **kwargs)
 
-    def process_payment(self, request, **kwargs):
-        """Moves forward with payment & subscription processing.
-
-            This method needs to be extended to handle the unique
-            requirements of each application.
-
-            If forms are invalid will move back to payment details page
-            for user to correct errors. This is only expected to happen
-            if a user tampers with the hidden inputs.
-        """
-        raise NotImplementedError('This method must be overriden.')
-
     def hide_form(self, form):
         """Replaces form widgets with hidden inputs.
             Parameters:
@@ -159,12 +138,6 @@ class BasePaymentView(FormView):
             field.widget = HiddenInput()
 
         return form
-
-class PaymentView(BasePaymentView):
-    """This view handles a basic API purchase call."""
-    form_class = PaymentForm
-    template_details = 'example_app/payment_details.html'
-    template_confirmation = 'example_app/payment_confirmation.html'
 
     def process_payment(self, request, **kwargs):
         """Moves forward with payment & subscription processing."""
@@ -224,69 +197,70 @@ class PaymentView(BasePaymentView):
 
         return self.render_details(request, **kwargs)
 
-class HelcimjsPaymentView(BasePaymentView):
-    """This view handles an API purchase call with Helcim.js."""
+class HelcimjsPaymentView(FormView):
+    """This view handles an API purchase call with Helcim.js.
+
+        This view is an example of how an application that requires
+        payment processing (e.g. a subscription service, an online
+        store) may function. The django-helcim specific details will
+        be found in the post and process_payment methods. The majority
+        of the remaining methods are meant to represent a generic
+        service that requires payment processing.
+
+        When making a POST call, Helcim.js will intercept the request
+        and direct it to the Helcim API server directly. This prevents
+        any transmission of sensitive data to your servers and reduces
+        your PCI Compliance requirements. These views and templates for
+        this behaviour.
+
+        The GET call will return a page for the user to enter the
+        payment details.
+
+        When the user "submits" their payment, there is client-side
+        processing to generate the Confirmation view. This will enable
+        confirmation display and allow an actual POST to occur.
+        Helcim.js will intercept the request at this point. If the
+        request is valid, the user token and response details will be
+        saved; if it is invalid, the user will be directed back to the
+        payment details view to review and correct the noted error(s).
+    """
     form_class = HelcimjsPaymentForm
-    template_details = 'example_app/helcimjs_payment_details.html'
-    template_confirmation = 'example_app/helcimjs_payment_confirmation.html'
+    success_url = 'example:complete'
+    template_name = 'example_app/helcimjs_payment_details.html'
 
-    def process_payment(self, request, **kwargs):
-        """Moves forward with payment & subscription processing."""
-        # Validate payment details again incase anything changed
-        payment_form = self.form_class(request.POST)
+    def get_success_url(self, **kwargs): # pylint: disable=arguments-differ
+        """Returns the success URL."""
+        return reverse_lazy(self.success_url, kwargs=kwargs)
 
-        if payment_form.is_valid():
-            # Format expiry for the Helcim API (MMYY)
-            cc_expiry = '{}{}'.format(
-                payment_form.cleaned_data['cc_expiry_month'],
-                payment_form.cleaned_data['cc_expiry_year'][:-2],
+    def post(self, request, *args, **kwargs):
+        """Handles remaining processing after Helcim.js processing."""
+        response = HelcimJSResponse(
+            response=request.POST, save_token=True, django_user=request.user
+        )
+
+        if response.is_valid():
+            # NOTE: the type of transaction made by Helcim.js is determined by
+            # the Helcim.js configuration. You will need to decide on the
+            # proper "record" method to use for your situation.
+            transaction, token = response.record_purchase()
+
+            # NOTE: you generally wouldn't want to transmit these
+            # details as query parameters; this is just done to
+            # simplify this sandbox example
+            url = '{}?transaction={}&token={}'.format(
+                self.get_success_url(),
+                transaction.id,
+                token.id
             )
-
-            purchase = Purchase(
-                save_token=True,
-                amount=payment_form.cleaned_data['amount'],
-                django_user=self.request.user,
-                cc_name=payment_form.cleaned_data['cardholder_name'],
-                cc_number=payment_form.cleaned_data['card_number'],
-                cc_expiry=cc_expiry,
-                cc_cvv=payment_form.cleaned_data['card_cvv'],
-            )
-
-            transaction_success = False
-
-            try:
-                transaction, token = purchase.process()
-                transaction_success = bool(transaction)
-            except ValueError as error:
-                messages.error(request, str(error))
-            except ProcessingError as error:
-                # NOTE: these types of errors are usually server-side
-                # issues; you would not normally display them to a user
-                messages.error(request, str(error))
-            except PaymentError as error:
-                # Format error response
-                error_message = str(error).split('Helcim API request failed: ')
-
-                messages.error(request, error_message[1])
-
-            if transaction_success:
-                # NOTE : you generally wouldn't want to transmit these
-                # details as query parameters; this is just done to
-                # simplify this example
-                url = '{}?transaction={}&token={}'.format(
-                    self.get_success_url(),
-                    transaction.id,
-                    token.id
-                )
-                return HttpResponseRedirect(url)
-
-            # Payment unsuccessful, add message for confirmation page
-            messages.error(request, 'Error processing payment')
+            return HttpResponseRedirect(url)
 
         # Invalid form submission/payment - render payment details again
-        kwargs['error'] = True
+        # TODO: add some basic initial data to fthe form
+        form = self.get_form()
 
-        return self.render_details(request, **kwargs)
+        return self.form_invalid(form)
+
+        #return self.render_details(request, **kwargs)
 
 class SuccessView(TemplateView):
     """View to display additional details on successful transaction."""
