@@ -83,6 +83,30 @@
       font-weight: 100;
       margin: 1rem 0 0 0;
     }
+
+    .messages {
+      display: block;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+      .messages li {
+        border-left: 4px solid black;
+        margin: 0.25rem 0;
+        padding: 0.25rem 0 0.25rem 0.5rem;
+      }
+
+        .messages li.success {
+          border-left: 4px solid rgb(0, 77, 0);
+          color: rgb(0, 77, 0);
+        }
+
+        .messages li.warning, .messages li.error {
+          border-left: 4px solid rgb(179, 0, 0);
+          color: rgb(179, 0, 0);
+        }
+
     .field {
       display: block;
       padding: 0.25rem 0;
