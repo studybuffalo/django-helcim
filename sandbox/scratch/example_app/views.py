@@ -39,6 +39,7 @@ class BasePaymentView(FormView):
 
     def get_template_names(self):
         """Returns the proper template name based on payment stage."""
+        print(self.confirmation)
         conf_templates = [self.template_confirmation]
         det_templates = [self.template_details]
 
@@ -49,7 +50,7 @@ class BasePaymentView(FormView):
         return reverse_lazy(self.success_url, kwargs=kwargs)
 
     def get(self, request, *args, **kwargs):
-        """Returns 404 error as this method is not implemented."""
+        """Returns the initial payment processing form."""
         return self.render_details(request)
 
     def post(self, request, *args, **kwargs):
@@ -59,7 +60,6 @@ class BasePaymentView(FormView):
             to render a confirmation page or process a payment.
         """
         # Determine POST action and direct to proper function
-        process = request.POST.get('process', None)
 
         # Need to add handling here to return back to processing page
         # on Helcim.js errors
@@ -73,8 +73,14 @@ class BasePaymentView(FormView):
         #   'amount': ['1']
         # }>
 
+        # If "back" is present, return the payment details form again
+        if request.POST.get('back', None):
+            kwargs['back'] = True
+            self.confirmation = False
+            return self.render_details(request, **kwargs)
+
         # Render the confirmation page
-        if process:
+        if request.POST.get('process', None):
             return self.process_payment(request)
 
         return self.render_confirmation(request)
@@ -84,11 +90,16 @@ class BasePaymentView(FormView):
 
             If an error occurred during a POST, will render the
             payment form with any relevant errors.
+
+            If "back" is present, will navigate back to payment
+            details page.
         """
         context = self.get_context_data(**kwargs)
 
-        # If error is present, there is POST data to include in form
-        if 'error' in kwargs:
+        # If there is form data already present, use it for inital form data
+        # Error is added if there are processing errors during a POST
+        # "back" is added when user navigates back from confirmation view
+        if 'error' in kwargs or 'back' in kwargs:
             payment_form = self.form_class(request.POST)
         else:
             payment_form = self.form_class()
