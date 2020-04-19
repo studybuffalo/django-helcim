@@ -164,6 +164,7 @@ HELCIM_ENABLE_TRANSACTION_REFUND = ENV(
     'HELCIM_ENABLE_TRANSACTION_REFUND', default=True
 )
 HELCIM_ENABLE_TOKEN_VAULT = ENV('HELCIM_ENABLE_TOKEN_VAULT', default=True)
+HELCIM_REDACT_ALL = ENV('HELCIM_REDACT_ALL', default=True)
 
 # These are not django-helcim settings; they are used to test out
 # the Helcim.js workflows
