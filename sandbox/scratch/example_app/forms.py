@@ -22,8 +22,10 @@ def get_expiry_choices():
 
     # Assembles years for the next 50 years (the longest likely expiry)
     now = timezone.now()
+    year_start = now.year
+    year_end = year_start + 50
     year_choices = (
-        (year, str(year)[2:]) for year in range(now.year, now.year + 50)
+        (str(year)[2:], str(year)[2:]) for year in range(year_start, year_end)
     )
 
     return month_choices, year_choices

@@ -58,7 +58,6 @@ class BasePaymentView(FormView):
             The 'process' POST argument is used to determine whether
             to render a confirmation page or process a payment.
         """
-        print(request.POST)
         # Determine POST action and direct to proper function
         process = request.POST.get('process', None)
 
@@ -165,7 +164,7 @@ class PaymentView(BasePaymentView):
             # Format expiry for the Helcim API (MMYY)
             cc_expiry = '{}{}'.format(
                 payment_form.cleaned_data['cc_expiry_month'],
-                payment_form.cleaned_data['cc_expiry_year'][:-2],
+                payment_form.cleaned_data['cc_expiry_year'],
             )
 
             purchase = Purchase(
@@ -186,29 +185,28 @@ class PaymentView(BasePaymentView):
             except ValueError as error:
                 messages.error(request, str(error))
             except ProcessingError as error:
-                # NOTE: these types of errors are usually server-side
-                # issues; you would not normally display them to a user
+                # NOTE: ProcessingErrors are usually server-side errors;
+                # you would not normally display them to a user
                 messages.error(request, str(error))
             except PaymentError as error:
-                # Format error response
+                # Format error response; the Helcim API prepends
+                # "Helcim API request failed: " to the error. We strip that
+                # out here to give a better user facing error
                 error_message = str(error).split('Helcim API request failed: ')
 
                 messages.error(request, error_message[1])
 
             # If transaction was generated, payment was successful
             if transaction_success:
-                # NOTE : you generally wouldn't want to transmit these
+                # NOTE: you generally wouldn't want to transmit these
                 # details as query parameters; this is just done to
-                # simplify this example
+                # simplify this sandbox example
                 url = '{}?transaction={}&token={}'.format(
                     self.get_success_url(),
                     transaction.id,
                     token.id
                 )
                 return HttpResponseRedirect(url)
-
-            # Payment unsuccessful, add message for confirmation page
-            messages.error(request, 'Error processing payment')
 
         # Invalid form submission/payment - render payment details again
         kwargs['error'] = True
