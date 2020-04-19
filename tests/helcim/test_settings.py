@@ -3,7 +3,8 @@ from django.conf import settings
 from django.core import exceptions as django_exceptions
 from django.test import override_settings
 
-from helcim.gateway import determine_helcim_settings
+from helcim.settings import determine_helcim_settings
+
 
 @override_settings(
     HELCIM_ACCOUNT_ID=1, HELCIM_API_TOKEN=2, HELCIM_API_URL=3,
