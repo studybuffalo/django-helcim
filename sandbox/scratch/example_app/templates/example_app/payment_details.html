@@ -10,7 +10,7 @@
 
 {% block sub_title %}| Payment Details {% endblock %}
 
-{% block h1 %}Enter Payment and Order Details{% endblock %}
+{% block h1 %}Basic Payment &rsaquo; Enter Payment and Order Details{% endblock %}
 
 {% block content %}
   <form action="" method="post" class="payment-form">
@@ -49,6 +49,8 @@
       {{ form.amount.errors }}
     </div>
 
-    <button type="submit" class="submit">Submit</button>
+    <div class="form-buttons">
+      <button type="submit" class="submit">Submit</button>
+    </div>
   </form>
 {% endblock %}
