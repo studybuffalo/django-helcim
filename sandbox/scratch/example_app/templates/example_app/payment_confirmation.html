@@ -2,7 +2,7 @@
 
 {% block sub_title %}| Confirmation {% endblock %}
 
-{% block h1 %}Confirm Order and Payment Details{% endblock %}
+{% block h1 %}Basic Payment &rsaquo; Confirm Order and Payment Details{% endblock %}
 
 {% block content %}
   <div class="field">
@@ -20,7 +20,7 @@
   </div>
 
   <div class="field">
-    <span class="label">Expiry</span>
+    <span class="label">Expiry:</span>
     <span class="value">
       {{ form.cc_expiry_month.value }}/{{ form.cc_expiry_year.value }}
     </span>
@@ -54,9 +54,7 @@
       {% endfor %}
       <input type="hidden" name="back" value="true">
 
-      <div class="form-buttons">
-        <button type="submit" class="back">Back</button>
-      </div>
+      <button type="submit" class="back">Back</button>
     </form>
   </div>
 {% endblock %}
