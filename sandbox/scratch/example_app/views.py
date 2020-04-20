@@ -185,10 +185,11 @@ class PaymentView(FormView):
                 # NOTE: you generally wouldn't want to transmit these
                 # details as query parameters; this is just done to
                 # simplify this sandbox example
-                url = '{}?transaction={}&token={}'.format(
+                url = '{}?transaction_type={}&transaction={}&token={}'.format(
                     self.get_success_url(),
+                    'api',
                     transaction.id,
-                    token.id
+                    token.id,
                 )
                 return HttpResponseRedirect(url)
 
@@ -247,10 +248,11 @@ class HelcimjsPaymentView(FormView):
             # NOTE: you generally wouldn't want to transmit these
             # details as query parameters; this is just done to
             # simplify this sandbox example
-            url = '{}?transaction={}&token={}'.format(
+            url = '{}?transaction_type={}&transaction={}&token={}'.format(
                 self.get_success_url(),
+                'helcimjs',
                 transaction.id,
-                token.id
+                token.id,
             )
             return HttpResponseRedirect(url)
 
@@ -285,5 +287,9 @@ class SuccessView(TemplateView):
 
         context['transaction'] = transaction
         context['token'] = token
+
+        # Determine if this was an API or Helcim.js transaction
+        transaction_type = self.request.GET.get('transaction_type', None)
+        context['transaction_type'] = transaction_type
 
         return context

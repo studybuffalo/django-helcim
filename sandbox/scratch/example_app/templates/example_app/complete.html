@@ -193,6 +193,10 @@
   </table>
 
   <div style="margin: 4rem 0 2rem 0;">
+    {% if transaction_type == 'api' %}
     <a href="{% url 'example:payment_basic' %}" class="submit-another">Submit another transaction</a>
+    {% else %}
+      <a href="{% url 'example:payment_helcim_js' %}" class="submit-another">Submit another transaction</a>
+    {% endif %}
   </div>
 {% endblock %}
