@@ -122,9 +122,9 @@ FROM_HELCIM_JS_FIELDS = {
     'customerCode': Field('customer_code', 's'),
     'cvvResponse': Field('cvv_response', 's'),
     'date': Field('transaction_date', 'd'),
-    'noticeMessage': Field('notice_message', 's'),
+    'noticeMessage': Field('notice', 's'),
     'orderNumber': Field('order_number', 's'),
-    'response': Field('response', 'b'),
+    'response': Field('transaction_success', 'b'),
     'responseMessage': Field('response_message', 's'),
     'time': Field('transaction_time', 't'),
     'transactionId': Field('transaction_id', 'i'),
@@ -350,9 +350,7 @@ def process_helcim_js_response(response):
     Returns:
         dict: The validated and converted Helcim.js response.
     """
-    processed = {
-        'transaction_success': bool(int(response['response']) == 1)
-    }
+    processed = {}
 
     # Convert response fields into Python fields
     for field_name, field_value in response.items():
