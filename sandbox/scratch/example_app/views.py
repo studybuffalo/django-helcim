@@ -255,7 +255,7 @@ class HelcimjsPaymentView(FormView):
             return HttpResponseRedirect(url)
 
         # Invalid form submission/payment - render payment details again
-        # TODO: add some basic initial data to fthe form
+        # TODO: add some basic initial data to the form
         form = self.get_form()
 
         return self.form_invalid(form)
