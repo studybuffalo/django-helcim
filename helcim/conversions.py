@@ -268,9 +268,7 @@ def process_api_response(response, raw_request=None, raw_response=None):
     """
     # Add the standard API response details
     processed = {
-        'transaction_success': (
-            True if int(response['response']) == 1 else False
-        ),
+        'transaction_success': bool(int(response['response'])),
         'response_message': str(response['responseMessage']),
         'notice': str(response['notice']),
     }
@@ -352,7 +350,9 @@ def process_helcim_js_response(response):
     Returns:
         dict: The validated and converted Helcim.js response.
     """
-    processed = {}
+    processed = {
+        'transaction_success': bool(int(response['response']) == 1)
+    }
 
     # Convert response fields into Python fields
     for field_name, field_value in response.items():
