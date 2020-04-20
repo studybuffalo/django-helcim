@@ -1,4 +1,7 @@
 """Configuration file for pytest."""
+# pylint: disable=import-outside-toplevel
+import pytest
+
 import django
 from django.conf import settings
 
@@ -43,3 +46,9 @@ def pytest_configure():
 
     # Initiate Django
     django.setup()
+
+@pytest.fixture
+def user():
+    from . import factories
+
+    return factories.UserFactory()
