@@ -123,7 +123,6 @@ TEMPLATES = [
                 'django.template.context_processors.media',
                 'django.template.context_processors.static',
                 'django.contrib.messages.context_processors.messages',
-                'context_processors.helcim_processor',
             ],
         }
     }
@@ -157,6 +156,12 @@ HELCIM_API_URL = ENV('HELCIM_API_URL', default='')
 HELCIM_ACCOUNT_ID = ENV('HELCIM_ACCOUNT_ID', default='')
 HELCIM_API_TOKEN = ENV('HELCIM_API_TOKEN', default='')
 HELCIM_TERMINAL_ID = ENV('HELCIM_TERMINAL_ID', default='')
+HELCIM_JS_CONFIG = {
+    'purchase': {
+        'url': ENV('HELCIM_JS_PURCHASE_URL', default=''),
+        'token': ENV('HELCIM_JS_PURCHASE_TOKEN', default='1234567890'),
+    },
+}
 HELCIM_ENABLE_TRANSACTION_CAPTURE = ENV(
     'HELCIM_ENABLE_TRANSACTION_CAPTURE', default=True
 )
@@ -165,8 +170,3 @@ HELCIM_ENABLE_TRANSACTION_REFUND = ENV(
 )
 HELCIM_ENABLE_TOKEN_VAULT = ENV('HELCIM_ENABLE_TOKEN_VAULT', default=True)
 HELCIM_REDACT_ALL = ENV('HELCIM_REDACT_ALL', default=True)
-
-# These are not django-helcim settings; they are used to test out
-# the Helcim.js workflows
-HELCIM_HELCIMJS_URL = ENV('HELCIM_HELCIMJS_URL', default='')
-HELCIM_HELCIMJS_TOKEN = ENV('HELCIM_HELCIMJS_TOKEN', default='1234567890')

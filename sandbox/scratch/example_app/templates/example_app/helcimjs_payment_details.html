@@ -102,7 +102,7 @@
       <div id="helcimResults"></div>
 
       <!-- Hidden fields to allow Helcim.js to function -->
-      <input type="hidden" id="token" value="{{ helcimjs_token }}">
+      <input type="hidden" id="token" value="{{ helcim_js.purchase.token }}">
       <input type="hidden" id="test" value="1">
 
       <!-- Fields to use for Helcim.js submission -->
@@ -123,6 +123,6 @@
 {% endblock %}
 
 {% block extra_scripts %}
-  <script type="text/javascript" src="{{ helcimjs_url }}"></script>
+  <script type="text/javascript" src="{{ helcim_js.purchase.url }}"></script>
   <script type="text/javascript" src="{% static 'example_app/helcimjs_payment_details.js' %}"></script>
 {% endblock %}

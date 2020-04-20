@@ -374,3 +374,21 @@ class ResponseMixin():
 
         # If unable to save token, return None
         return None
+
+class HelcimJSMixin():
+    """Provides Helcim.js URL and token details in the view context.
+
+        This is a helper mixin that allows you to declare your Helcim.js
+        configuration details within your Django settings. They are then
+        injected into the view context to allow you to easily declare
+        them within a template.
+    """
+    def get_context_data(self, **kwargs):
+        """Overrides the view method to add Helcim.js details."""
+        # Retrieve existing context
+        context = super().get_context_data(**kwargs)
+
+        # Add the Helcim.js configuration details
+        context['helcim_js'] = SETTINGS['helcim_js']
+
+        return context

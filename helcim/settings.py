@@ -2,6 +2,18 @@
 from django.conf import settings as django_settings
 from django.core import exceptions as django_exceptions
 
+def _validate_helcim_js_settings(helcim_js):
+    """Confirms that declared Helcim.js are in proper format."""
+    if isinstance(helcim_js, dict) is False:
+        raise django_exceptions.ImproperlyConfigured(
+            'HELCIM_JS setting must be a dictionary.'
+        )
+
+    for _, value in helcim_js.items():
+        if 'url' not in value or 'token' not in value:
+            raise django_exceptions.ImproperlyConfigured(
+                'HELCIM_JS values must include both a "url" and "token" key.'
+            )
 
 def determine_helcim_settings():
     """Collects all possible django-helcim settings for easy use.
@@ -35,6 +47,11 @@ def determine_helcim_settings():
     )
     terminal_id = getattr(django_settings, 'HELCIM_TERMINAL_ID', '')
     api_test = getattr(django_settings, 'HELCIM_API_TEST', None)
+
+    # HELCIM.JS SETTINGS
+    # -------------------------------------------------------------------------
+    helcim_js = getattr(django_settings, 'HELCIM_JS_CONFIG', {})
+    _validate_helcim_js_settings(helcim_js)
 
     # REDACTION SETTINGS
     # -------------------------------------------------------------------------
@@ -89,6 +106,7 @@ def determine_helcim_settings():
         'api_token': api_token,
         'terminal_id': terminal_id,
         'api_test': api_test,
+        'helcim_js': helcim_js,
         'redact_all': redact_all,
         'redact_cc_name': redact_cc_name,
         'redact_cc_number': redact_cc_number,

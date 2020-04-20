@@ -8,6 +8,7 @@ from django.views.generic.edit import FormView
 
 from helcim.exceptions import ProcessingError, PaymentError
 from helcim.gateway import Purchase, HelcimJSResponse
+from helcim.mixins import HelcimJSMixin
 from helcim.models import HelcimTransaction, HelcimToken
 
 from .forms import PaymentForm, HelcimjsPaymentForm
@@ -198,7 +199,7 @@ class PaymentView(FormView):
 
         return self.render_details(request, **kwargs)
 
-class HelcimjsPaymentView(FormView):
+class HelcimjsPaymentView(HelcimJSMixin, FormView):
     """This view handles an API purchase call with Helcim.js.
 
         This view is an example of how an application that requires
