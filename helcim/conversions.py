@@ -414,5 +414,5 @@ def process_helcim_js_response(response):
             )
         else:
             processed['token_f4l4'] = None
-    print(processed)
+
     return processed
