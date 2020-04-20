@@ -89,6 +89,7 @@ FROM_API_FIELDS = {
     'availability': Field('availability', 'b'),
     'approvalCode': Field('approval_code', 's'),
     'avsResponse': Field('avs_response', 's'),
+    'cardExpiry': Field('cc_expiry', 's'),
     'cardHolderName': Field('cc_name', 's'),
     'cardNumber': Field('cc_number', 's'),
     'cardToken': Field('token', 's'),
@@ -114,6 +115,7 @@ FROM_HELCIM_JS_FIELDS = {
     'bankAccountType': Field('bank_type', 's'),
     'bankFinancialNumber': Field('bank_financial_number', 's'),
     'bankTransitNumber': Field('bank_transit_number', 's'),
+    'cardExpiry': Field('cc_expiry', 's'),
     'cardHolderName': Field('cc_name', 's'),
     'cardNumber': Field('cc_number', 's'),
     'cardToken': Field('token', 's'),
@@ -129,7 +131,7 @@ FROM_HELCIM_JS_FIELDS = {
     'time': Field('transaction_time', 't'),
     'transactionId': Field('transaction_id', 'i'),
     'type': Field('transaction_type', 's'),
-    'xml': Field('response_xml', 's'),
+    'xml': Field('raw_response', 's'),
     'xmlHash': Field('response_xml_hash', 's'),
 }
 

@@ -519,8 +519,7 @@ class HelcimJSResponse(mixins.ResponseMixin, object):
             self.raw_response
         )
 
-        # Can return response value to notify of errors
-        return self.response['response']
+        return self.response['transaction_success']
 
     def record_purchase(self):
         """Saves validated purchase response to database.
