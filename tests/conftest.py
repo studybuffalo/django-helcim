@@ -49,6 +49,7 @@ def pytest_configure():
 
 @pytest.fixture
 def user():
+    """Fixture to generate a Django user."""
     from . import factories
 
     return factories.UserFactory()
