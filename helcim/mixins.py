@@ -15,76 +15,8 @@ from helcim.models import HelcimToken, HelcimTransaction
 
 class TransactionMixin():
     """Methods to support creating a HelcimTransaction instance."""
-    def _determine_user_reference(self):
-        """Validates and returns appropriate user reference.
-
-            Determines if an absent or anonymous user is permitted.
-            Returns an exception if they are provided and not allowed.
-        """
-        # Handles anonymous/no user situations
-        if SETTINGS['allow_anonymous']:
-            if self.django_user is None or self.django_user.is_anonymous:
-                return None
-        else:
-            if self.django_user is None or self.django_user.is_anonymous:
-                raise helcim_exceptions.ProcessingError(
-                    'Required Django user reference not provided.'
-                )
-
-        # Otherwise can just return the provided user model
-        return self.django_user
-
-    def _redact_api_data(self):
-        """Redacts API data and updates redacted_response attribute."""
-        if 'raw_request' in self.redacted_response:
-            self.redacted_response['raw_request'] = re.sub(
-                r'(accountId=.*?)(&|$)',
-                r'accountId=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-            self.redacted_response['raw_request'] = re.sub(
-                r'(apiToken=.*?)(&|$)',
-                r'apiToken=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-            self.redacted_response['raw_request'] = re.sub(
-                r'(terminalId=.*?)(&|$)',
-                r'terminalId=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-        else:
-            self.redacted_response['raw_request'] = None
-
-    def _redact_field(self, api_name, python_name):
-        """Redacts all information for the provided field.
-
-            Method directly updates the redacted_response attribute.
-
-            Parameters:
-                api_name (str): The field name used by the Helcim API.
-                python_name (str): The field name used by this
-                    application.
-        """
-        # Redacts the raw_request data (if present)
-        if self.redacted_response.get('raw_request', None):
-            self.redacted_response['raw_request'] = re.sub(
-                r'({}=.*?)(&|$)'.format(api_name),
-                r'{}=REDACTED\g<2>'.format(api_name),
-                self.redacted_response['raw_request']
-            )
-
-        # Redacts the raw_response data (if present)
-        if self.redacted_response.get('raw_response', None):
-            self.redacted_response['raw_response'] = re.sub(
-                r'<{0}>.*</{0}>'.format(api_name),
-                r'<{0}>REDACTED</{0}>'.format(api_name),
-                self.redacted_response['raw_response']
-            )
-
-        if python_name in self.redacted_response:
-            self.redacted_response[python_name] = None
-
-    def _identify_redact_fields(self):
+    @classmethod
+    def _identify_redact_fields(cls):
         """Identifies which fields (if any) should be redacted.
 
             Configured using flags in the Django settings file.
@@ -171,6 +103,93 @@ class TransactionMixin():
 
         return redact_fields
 
+    @classmethod
+    def convert_expiry_to_date(cls, expiry):
+        """Converts a 4 digit expiry to a datetime object.
+
+            Parameters:
+                expiry (str): the four digit representation of the
+                    credit card expiry
+
+            Returns:
+                obj: the expiry as a datetime object.
+        """
+
+        year = 2000 + int(expiry[2:])
+        month = int(expiry[:2])
+        day = monthrange(year, month)[1]
+
+        return datetime(year, month, day, tzinfo=pytz.timezone('UTC')).date()
+
+    def _determine_user_reference(self):
+        """Validates and returns appropriate user reference.
+
+            Determines if an absent or anonymous user is permitted.
+            Returns an exception if they are provided and not allowed.
+        """
+        # Handles anonymous/no user situations
+        if SETTINGS['allow_anonymous']:
+            if self.django_user is None or self.django_user.is_anonymous:
+                return None
+        else:
+            if self.django_user is None or self.django_user.is_anonymous:
+                raise helcim_exceptions.ProcessingError(
+                    'Required Django user reference not provided.'
+                )
+
+        # Otherwise can just return the provided user model
+        return self.django_user
+
+    def _redact_api_data(self):
+        """Redacts API data and updates redacted_response attribute."""
+        if 'raw_request' in self.redacted_response:
+            self.redacted_response['raw_request'] = re.sub(
+                r'(accountId=.*?)(&|$)',
+                r'accountId=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+            self.redacted_response['raw_request'] = re.sub(
+                r'(apiToken=.*?)(&|$)',
+                r'apiToken=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+            self.redacted_response['raw_request'] = re.sub(
+                r'(terminalId=.*?)(&|$)',
+                r'terminalId=REDACTED\g<2>',
+                self.redacted_response['raw_request']
+            )
+        else:
+            self.redacted_response['raw_request'] = None
+
+    def _redact_field(self, api_name, python_name):
+        """Redacts all information for the provided field.
+
+            Method directly updates the redacted_response attribute.
+
+            Parameters:
+                api_name (str): The field name used by the Helcim API.
+                python_name (str): The field name used by this
+                    application.
+        """
+        # Redacts the raw_request data (if present)
+        if self.redacted_response.get('raw_request', None):
+            self.redacted_response['raw_request'] = re.sub(
+                r'({}=.*?)(&|$)'.format(api_name),
+                r'{}=REDACTED\g<2>'.format(api_name),
+                self.redacted_response['raw_request']
+            )
+
+        # Redacts the raw_response data (if present)
+        if self.redacted_response.get('raw_response', None):
+            self.redacted_response['raw_response'] = re.sub(
+                r'<{0}>.*</{0}>'.format(api_name),
+                r'<{0}>REDACTED</{0}>'.format(api_name),
+                self.redacted_response['raw_response']
+            )
+
+        if python_name in self.redacted_response:
+            self.redacted_response[python_name] = None
+
     def redact_data(self):
         """Removes sensitive and identifiable data.
 
@@ -198,23 +217,6 @@ class TransactionMixin():
 
         if fields['expiry']['redact']:
             self.response['cc_expiry'] = None
-
-    def convert_expiry_to_date(self, expiry):
-        """Converts a 4 digit expiry to a datetime object.
-
-            Parameters:
-                expiry (str): the four digit representation of the
-                    credit card expiry
-
-            Returns:
-                obj: the expiry as a datetime object.
-        """
-
-        year = 2000 + int(expiry[2:])
-        month = int(expiry[:2])
-        day = monthrange(year, month)[1]
-
-        return datetime(year, month, day, tzinfo=pytz.timezone('UTC')).date()
 
     def create_model_arguments(self, transaction_type):
         """Creates dictionary for use as transaction model arguments.
@@ -305,7 +307,8 @@ class TransactionMixin():
 
 class TokenMixin():
     """Methods to support creating a HelcimToken instance."""
-    def _determine_save_token_status(self, user_decision):
+    @classmethod
+    def _determine_save_token_status(cls, user_decision):
         """Determines if Helcim card token should be saved.
 
             Parameters:
