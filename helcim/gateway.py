@@ -14,7 +14,7 @@ from helcim import (
 from helcim.settings import SETTINGS
 
 
-class BaseRequest(mixins.TransactionMixin, object):
+class BaseRequest(mixins.ResponseMixin, object):
     """Base class to handle validation and submission to Helcim API.
 
     Parameters:
@@ -275,7 +275,7 @@ class BaseRequest(mixins.TransactionMixin, object):
         """Validates Helcim API request fields and coerces values."""
         self.cleaned = conversions.validate_request_fields(self.details)
 
-class BaseCardTransaction(mixins.TokenMixin, BaseRequest):
+class BaseCardTransaction(BaseRequest):
     """Base class for transactions involving credit card details."""
     def __init__(self, save_token=False, **kwargs):
         """Extends BaseRequest to include save_token and django_user.
@@ -483,7 +483,7 @@ class Capture(BaseRequest):
 
         return capture
 
-class HelcimJSResponse(mixins.TransactionMixin, mixins.TokenMixin, object):
+class HelcimJSResponse(mixins.ResponseMixin, object):
     """Class to handle Helcim.js Responses.
 
         This is a helper class that takes a Helcim.js response,

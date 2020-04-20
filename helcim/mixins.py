@@ -13,8 +13,12 @@ from helcim.settings import SETTINGS
 from helcim.models import HelcimToken, HelcimTransaction
 
 
-class TransactionMixin():
-    """Methods to support creating a HelcimTransaction instance."""
+class ResponseMixin():
+    """Methods to support handling a Helcim repsonse.
+
+        Handles some data manipulations to prepare for saving to a
+        model instance and applies relevant redactions to data.
+     """
     @classmethod
     def _identify_redact_fields(cls):
         """Identifies which fields (if any) should be redacted.
@@ -104,7 +108,7 @@ class TransactionMixin():
         return redact_fields
 
     @classmethod
-    def convert_expiry_to_date(cls, expiry):
+    def _convert_expiry_to_date(cls, expiry):
         """Converts a 4 digit expiry to a datetime object.
 
             Parameters:
@@ -120,6 +124,26 @@ class TransactionMixin():
         day = monthrange(year, month)[1]
 
         return datetime(year, month, day, tzinfo=pytz.timezone('UTC')).date()
+
+    @classmethod
+    def _determine_save_token_status(cls, user_decision):
+        """Determines if Helcim card token should be saved.
+
+            Parameters:
+                user_decision (bool): Whether the user has requested to
+                    save this token or not.
+
+            Returns:
+                bool: Whether a token should be saved.
+        """
+        # Check if vault is enabled in settings
+        vault_enabled = SETTINGS['enable_token_vault']
+
+        # If yes, check if user requested save
+        if vault_enabled:
+            return user_decision
+
+        return False
 
     def _determine_user_reference(self):
         """Validates and returns appropriate user reference.
@@ -248,7 +272,7 @@ class TransactionMixin():
 
         # Format the credit card expiry date (if present)
         if response.get('cc_expiry', None):
-            cc_expiry = self.convert_expiry_to_date(
+            cc_expiry = self._convert_expiry_to_date(
                 response['cc_expiry']
             )
         else:
@@ -305,28 +329,6 @@ class TransactionMixin():
 
         return transaction_instance
 
-class TokenMixin():
-    """Methods to support creating a HelcimToken instance."""
-    @classmethod
-    def _determine_save_token_status(cls, user_decision):
-        """Determines if Helcim card token should be saved.
-
-            Parameters:
-                user_decision (bool): Whether the user has requested to
-                    save this token or not.
-
-            Returns:
-                bool: Whether a token should be saved.
-        """
-        # Check if vault is enabled in settings
-        vault_enabled = SETTINGS['enable_token_vault']
-
-        # If yes, check if user requested save
-        if vault_enabled:
-            return user_decision
-
-        return False
-
     def save_token_to_vault(self):
         """Saves Helcim card token.
 
@@ -343,7 +345,7 @@ class TokenMixin():
         cc_name = self.response.get('cc_name', None)
         raw_expiry = self.response.get('cc_expiry', None)
         cc_expiry = (
-            self.convert_expiry_to_date(raw_expiry) if raw_expiry else None
+            self._convert_expiry_to_date(raw_expiry) if raw_expiry else None
         )
 
         # Ensure there is a customer code (can't use token without one)
