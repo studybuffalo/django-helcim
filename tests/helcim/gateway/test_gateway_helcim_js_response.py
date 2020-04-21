@@ -74,3 +74,60 @@ def test__is_valid__invalid():
     assert response.is_valid() is False
     assert response.validated is True
     assert response.valid is False
+
+@patch.dict('helcim.mixins.SETTINGS', {'redact_all': True, })
+def test__is_valid__redactions_applied():
+    """Confirm that all redactions are applied during validation.
+
+        Don't need to worry about API details or raw_request, because
+        these details will not be part of a Helcim.js response.
+    """
+    raw_request = {
+        'response': '1',
+        'cardHolderName': 'TEST NAME',
+        'cardNumber': '1111 **** **** 9999',
+        'cardExpiry': '0150',
+        'cardType': 'Mastercard',
+        'cardToken': '123456789abcdefghijk',
+        'xml': (
+            '<message>'
+            '<response>1</response>'
+            '<cardHolderName>TEST NAME</cardHolderName>'
+            '<cardNumber>1111 **** **** 9999</cardNumber>'
+            '<cardExpiry>0820</cardExpiry><expiryDate>REDACTED</expiry>'
+            '<cardToken>123456789abcdefghijk</cardToken>'
+            '<cardF4L4>REDACTED</cardF4L4>'
+            '<cardType>Mastercard</cardType>'
+            '</message>'
+        ),
+    }
+    response = HelcimJSResponse(raw_request)
+
+    assert response.is_valid()
+
+    raw_response = response.redacted_response['raw_response']
+
+    redacted_cc_name = '<cardHolderName>REDACTED</cardHolderName>'
+    assert redacted_cc_name in raw_response
+    assert response.redacted_response['cc_name'] is None
+
+    redacted_cc_number = '<cardNumber>REDACTED</cardNumber>'
+    assert redacted_cc_number in raw_response
+    assert response.redacted_response['cc_number'] is None
+
+    redacted_cc_expiry = (
+        '<cardExpiry>REDACTED</cardExpiry><expiryDate>REDACTED</expiry>'
+    )
+    assert redacted_cc_expiry in raw_response
+    assert response.redacted_response['cc_expiry'] is None
+
+    redacted_cc_type = '<cardType>REDACTED</cardType>'
+    assert redacted_cc_type in raw_response
+    assert response.redacted_response['cc_type'] is None
+
+    redacted_token = (
+        '<cardToken>REDACTED</cardToken><cardF4L4>REDACTED</cardF4L4>'
+    )
+    assert redacted_token in raw_response
+    assert response.redacted_response['token'] is None
+    assert response.redacted_response['token_f4l4'] is None
