@@ -515,12 +515,18 @@ class HelcimJSResponse(mixins.ResponseMixin):
     def is_valid(self):
         """Validates format is correct and notifies of any errors.
 
+            Will also generate the redacted response at this point.
+
             Returns:
                 boolean: True if valid without errors, otherwise false.
         """
+        # Save the converted response
         self.response = conversions.process_helcim_js_response(
             self.raw_response
         )
+
+        # Apply any redactions as needed
+        self.redact_data()
 
         # Updates instance to note that validation was run and record result
         self.validated = True
