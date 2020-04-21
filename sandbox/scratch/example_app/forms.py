@@ -119,11 +119,11 @@ class HelcimjsPaymentForm(forms.Form):
         max_length=256,
         required=False,
     )
-    django_amount = forms.CharField(
+    django_amount = forms.DecimalField(
+        decimal_places=4,
         initial='0.00',
         label='Amount',
-        max_length=16,
-        required=False,
+        min_value=0,
     )
 
     # Fields for Helcim.js processing
