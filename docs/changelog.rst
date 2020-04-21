@@ -28,6 +28,9 @@ Feature Updates
     include the ``HELCIM_JS_CONFIG`` details, allowing streamlined
     declaration of configuration details in Django templates.
 
+* ``django-helcim`` will no longer require specifying Helcim API
+  details in the settings, as either the API or Helcim.js workflow
+  can be used with the package.
 * Adding a new sandbox site that shows how Django Helcim can be
   integrated into a project from scratch. This site demonstrates
   both the Helcim API workflow and the Helcim.js workflow.

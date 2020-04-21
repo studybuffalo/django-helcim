@@ -25,32 +25,21 @@ def determine_helcim_settings():
         Returns:
             dict: Summary of all possible django-helcim settings.
     """
-    # API SETTINGS
+    # API AND HELCIM.JS SETTINGS
     # -------------------------------------------------------------------------
-    # Required settings
-    try:
-        account_id = getattr(django_settings, 'HELCIM_ACCOUNT_ID')
-    except AttributeError:
-        raise django_exceptions.ImproperlyConfigured(
-            'You must define a HELCIM_ACCOUNT_ID setting'
-        )
-
-    try:
-        api_token = getattr(django_settings, 'HELCIM_API_TOKEN')
-    except AttributeError:
-        raise django_exceptions.ImproperlyConfigured(
-            'You must define a HELCIM_API_TOKEN setting'
-        )
-
-    # Other settings
+    # API Settings
+    # TODO: rework these setting names to be clearly API-specific
+    # HELCIM_ACCOUNT_ID to become HELCIM_API_ACCOUNT_ID
+    # HELCIM_TERMINAL_ID TO BECOME HELCIM_API_TERMINAL_ID
+    account_id = getattr(django_settings, 'HELCIM_ACCOUNT_ID', '')
+    api_token = getattr(django_settings, 'HELCIM_API_TOKEN', '')
     api_url = getattr(
         django_settings, 'HELCIM_API_URL', 'https://secure.myhelcim.com/api/'
     )
     terminal_id = getattr(django_settings, 'HELCIM_TERMINAL_ID', '')
-    api_test = getattr(django_settings, 'HELCIM_API_TEST', None)
+    api_test = getattr(django_settings, 'HELCIM_API_TEST', False)
 
-    # HELCIM.JS SETTINGS
-    # -------------------------------------------------------------------------
+    # Helcim.js Settings
     helcim_js = getattr(django_settings, 'HELCIM_JS_CONFIG', {})
     _validate_helcim_js_settings(helcim_js)
 
