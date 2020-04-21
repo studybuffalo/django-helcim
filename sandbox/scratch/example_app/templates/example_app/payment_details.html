@@ -1,0 +1,56 @@
+{% extends 'example_app/base.html' %}
+
+{% block extra_styles %}
+  <style>
+    .payment-form {
+      max-width: 20rem;
+    }
+  </style>
+{% endblock %}
+
+{% block sub_title %}| Payment Details {% endblock %}
+
+{% block h1 %}Basic Payment &rsaquo; Enter Payment and Order Details{% endblock %}
+
+{% block content %}
+  <form action="" method="post" class="payment-form">
+    {% csrf_token %}
+
+    <div class="field">
+      {{ form.cc_number.label_tag }}
+      {{ form.cc_number }}
+      {{ form.cc_number.errors }}
+    </div>
+
+    <div class="field">
+      {{ form.cc_name.label_tag }}
+      {{ form.cc_name }}
+      {{ form.cc_name.errors }}
+    </div>
+
+    <div class="field small-input">
+      {{ form.cc_cvv.label_tag }}
+      {{ form.cc_cvv }}
+      {{ form.cc_cvv.errors }}
+    </div>
+
+    <div class="field">
+      <label for="{{ form.cc_expiry_month.id_for_label }}">
+        Expiry
+      </label>
+      {{ form.cc_expiry_month }} {{ form.cc_expiry_year }}
+      {{ form.cc_expiry_month.errors }}
+      {{ form.cc_expiry_year.errors }}
+    </div>
+
+    <div class="field small-input">
+      {{ form.amount.label_tag }}
+      {{ form.amount }}
+      {{ form.amount.errors }}
+    </div>
+
+    <div class="form-buttons">
+      <button type="submit" class="submit">Submit</button>
+    </div>
+  </form>
+{% endblock %}

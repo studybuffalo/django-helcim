@@ -1,0 +1,128 @@
+{% extends 'example_app/base.html' %}
+{% load static %}
+
+{% block extra_styles %}
+  <style>
+    #header-payment.hide {
+      display: none;
+    }
+
+    #header-confirmation.hide {
+      display: none;
+    }
+
+    #payment-form {
+      max-width: 20rem;
+    }
+
+      #payment-form.hide {
+        display: none;
+      }
+
+    #confirmation-details {
+      max-width: 20rem;
+    }
+
+      #confirmation-details.hide {
+        display: none;
+      }
+  </style>
+{% endblock %}
+
+{% block sub_title %}| Payment Details {% endblock %}
+
+{% block h1 %}
+  <span id="header-payment">Helcim.js &rsaquo; Enter Payment and Order Details</span>
+  <span id="header-confirmation" class="hide">Helcim.js &rsaquo; Confirm Order and Payment Details</span>
+{% endblock %}
+
+{% block content %}
+  <div id="payment-form">
+    <div class="field">
+      {{ form.django_cc_number.label_tag }}
+      {{ form.django_cc_number }}
+      <span id="django-cc-number-errors">{{ form.django_cc_number.errors }}</span>
+    </div>
+
+    <div class="field">
+      {{ form.django_cc_name.label_tag }}
+      {{ form.django_cc_name }}
+      <span id="django-cc-name-errors">{{ form.django_cc_name.errors }}</span>
+    </div>
+
+    <div class="field small-input">
+      {{ form.django_cc_cvv.label_tag }}
+      {{ form.django_cc_cvv }}
+      <span id="django-cc-cvv-errors">{{ form.django_cc_cvv.errors }}</span>
+    </div>
+
+    <div class="field">
+      <label for="{{ form.django_cc_expiry_month.id_for_label }}">
+        Expiry
+      </label>
+      {{ form.django_cc_expiry_month }} {{ form.django_cc_expiry_year }}
+      {{ form.django_cc_expiry_month.errors }}
+      <span id="django-cc-expiry-errors">{{ form.django_cc_expiry_year.errors }}</span>
+    </div>
+
+    <div class="field small-input">
+      {{ form.django_amount.label_tag }}
+      {{ form.django_amount }}
+      <span id="django-amount-errors">{{ form.django_amount.errors }}</span>
+    </div>
+
+    <div class="form-buttons">
+      <button id="proceed-to-confirmation" class="submit">Submit</button>
+    </div>
+  </div>
+
+  <div id="confirmation-details" class="hide">
+    <div class="field">
+      <span class="label">Credit Card Number:</span>
+      <span id="confirmation-cc-number" class="value"></span>
+    </div>
+
+    <div class="field">
+      <span class="label">Cardholder Name:</span>
+      <span id="confirmation-cc-name" class="value"></span>
+    </div>
+
+    <div class="field">
+      <span class="label">Expiry:</span>
+      <span  id="confirmation-cc-expiry" class="value"></span>
+    </div>
+
+    <div class="field">
+      <span class="label">Amount:</span>
+      <span id="confirmation-amount" class="value"></span>
+    </div>
+
+    <form action="" method="post" name="helcimForm" id="helcimForm" class="payment-form">
+      <!-- This div is used to display results from Helcim.js (e.g. errors) -->
+      <div id="helcimResults"></div>
+
+      <!-- Hidden fields to allow Helcim.js to function -->
+      <input type="hidden" id="token" value="{{ helcim_js.purchase.token }}">
+      <input type="hidden" id="test" value="1">
+
+      <!-- Fields to use for Helcim.js submission -->
+      {{ form.helcim_cc_number }}
+      {{ form.helcim_cc_expiry }}
+      {{ form.helcim_cc_cvv }}
+      {{ form.helcim_cc_name }}
+      {{ form.helcim_amount }}
+
+      {% csrf_token %}
+
+      <div class="form-buttons">
+        <input type="button" id="buttonProcess" class="submit" value="Submit" onclick="javascript:helcimProcess();">
+        <button type="button" id="back-to-details" class="back">Back</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+  <script type="text/javascript" src="{{ helcim_js.purchase.url }}"></script>
+  <script type="text/javascript" src="{% static 'example_app/helcimjs_payment_details.js' %}"></script>
+{% endblock %}

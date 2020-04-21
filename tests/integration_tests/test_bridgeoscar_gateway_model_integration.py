@@ -271,7 +271,7 @@ def test_retrieve_saved_tokens_with_nothing(django_user_model):
         'redact_cc_expiry': False,
         'redact_cc_type': False,
         'enable_token_vault': True,
-        'associate_user': False,
+        'allow_anonymous': True,
     }
 )
 def test_purchase_bridge_valid_no_redaction():
@@ -315,7 +315,7 @@ def test_purchase_bridge_valid_no_redaction():
     {
         'redact_all': True,
         'enable_token_vault': True,
-        'associate_user': False,
+        'allow_anonymous': True,
     }
 )
 def test_purchase_bridge_valid_redact_sensitive_cc_data():

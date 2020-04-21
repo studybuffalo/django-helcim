@@ -188,7 +188,7 @@ def test_base_card_bridge_formats_details_without_billing_address():
 @patch(
     'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
 )
-@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'associate_user': True})
+@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'allow_anonymous': False})
 def test_base_card_bridge_provided_token_details_and_django_user():
     transaction = bridge_oscar.BaseCardTransactionBridge(
         '1', token_id='2', django_user='3'
@@ -199,7 +199,7 @@ def test_base_card_bridge_provided_token_details_and_django_user():
 @patch(
     'helcim.bridge_oscar.retrieve_token_details', mock_retrieve_token_details
 )
-@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'associate_user': False})
+@patch.dict('helcim.bridge_oscar.gateway.SETTINGS', {'allow_anonymous': True})
 def test_base_card_bridge_provided_token_details_and_customer_code():
     transaction = bridge_oscar.BaseCardTransactionBridge(
         '1', token_id='2', customer_code='3'

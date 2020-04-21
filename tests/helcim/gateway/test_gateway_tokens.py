@@ -108,7 +108,7 @@ def test_retrieve_token_details_invalid():
     'helcim.gateway.models.HelcimToken.objects.filter',
     MockHelcimTokenFilter
 )
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': True})
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': False})
 def test_retrieve_saved_tokens_by_django_user():
     """Tests that tokens can be retrieved for a Django user."""
     tokens = gateway.retrieve_saved_tokens(django_user='1')
@@ -120,7 +120,7 @@ def test_retrieve_saved_tokens_by_django_user():
     'helcim.gateway.models.HelcimToken.objects.filter',
     MockHelcimTokenFilter
 )
-@patch.dict('helcim.gateway.SETTINGS', {'associate_user': False})
+@patch.dict('helcim.gateway.SETTINGS', {'allow_anonymous': True})
 def test_retrieve_saved_tokens_by_customer_code():
     """Tests that tokens can be retrieved for a customer code."""
     tokens = gateway.retrieve_saved_tokens(customer_code='1')

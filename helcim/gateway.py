@@ -3,23 +3,18 @@
 These functions provide an agonstic interface with the Helcim Commerce
 API and should work in any application.
 """
-from calendar import monthrange
-import copy
-from datetime import datetime
-import re
-
-import pytz
 import requests
 import xmltodict
 
-from django.conf import settings as django_settings
-from django.core import exceptions as django_exceptions
 from django.db import IntegrityError
 
-from helcim import conversions, exceptions as helcim_exceptions, models
+from helcim import (
+    conversions, exceptions as helcim_exceptions, mixins, models
+)
+from helcim.settings import SETTINGS
 
 
-class BaseRequest():
+class BaseRequest(mixins.ResponseMixin):
     """Base class to handle validation and submission to Helcim API.
 
     Parameters:
@@ -108,73 +103,6 @@ class BaseRequest():
         self.redacted_response = {}
         self.django_user = django_user
 
-    def _redact_api_data(self):
-        """Redacts API data and updates redacted_response attribute."""
-        if 'raw_request' in self.redacted_response:
-            self.redacted_response['raw_request'] = re.sub(
-                r'(accountId=.*?)(&|$)',
-                r'accountId=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-            self.redacted_response['raw_request'] = re.sub(
-                r'(apiToken=.*?)(&|$)',
-                r'apiToken=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-            self.redacted_response['raw_request'] = re.sub(
-                r'(terminalId=.*?)(&|$)',
-                r'terminalId=REDACTED\g<2>',
-                self.redacted_response['raw_request']
-            )
-        else:
-            self.redacted_response['raw_request'] = None
-
-    def _redact_field(self, api_name, python_name):
-        """Redacts all information for the provided field.
-
-            Method directly updates the redacted_response attribute.
-
-            Parameters:
-                api_name (str): The field name used by the Helcim API.
-                python_name (str): The field name used by this
-                    application.
-        """
-        # Redacts the raw_request data (if present)
-        if self.redacted_response.get('raw_request', None):
-            self.redacted_response['raw_request'] = re.sub(
-                r'({}=.*?)(&|$)'.format(api_name),
-                r'{}=REDACTED\g<2>'.format(api_name),
-                self.redacted_response['raw_request']
-            )
-
-        # Redacts the raw_response data (if present)
-        if self.redacted_response.get('raw_response', None):
-            self.redacted_response['raw_response'] = re.sub(
-                r'<{0}>.*</{0}>'.format(api_name),
-                r'<{0}>REDACTED</{0}>'.format(api_name),
-                self.redacted_response['raw_response']
-            )
-
-        if python_name in self.redacted_response:
-            self.redacted_response[python_name] = None
-
-    def _associate_user_reference(self):
-        """Validates and returns appropriate user reference.
-
-            Will confirm a user is available when associate_user is
-            True and then return that user as a refernece. If
-            associate_user is False, will return None.
-        """
-        if SETTINGS['associate_user']:
-            if self.django_user is None:
-                raise helcim_exceptions.ProcessingError(
-                    'Required Django user reference not provided.'
-                )
-
-            return self.django_user
-
-        return None
-
     def set_api_details(self, details):
         """Sets the API details for this transaction.
 
@@ -232,34 +160,6 @@ class BaseRequest():
         if 'test' not in self.cleaned and SETTINGS['api_test']:
             self.cleaned['test'] = SETTINGS['api_test']
 
-    def redact_data(self):
-        """Removes sensitive and identifiable data.
-
-            By default will redact API fields and populate
-            redacted_response attribute. Depending on Django settings,
-            may also redact other fields in the formated and raw
-            response.
-        """
-        # Copy the response data to the redacted file for updating
-        self.redacted_response = copy.deepcopy(self.response)
-
-        # Remove any API content
-        self._redact_api_data()
-
-        # Identify and redact any other specified fields
-        fields = identify_redact_fields()
-
-        for _, redact_field in fields.items():
-            if redact_field['redact']:
-                for field in redact_field['fields']:
-                    self._redact_field(field['api'], field['python'])
-
-        if fields['name']['redact']:
-            self.response['cc_name'] = None
-
-        if fields['expiry']['redact']:
-            self.response['cc_expiry'] = None
-
     def process_error_response(self, response_message):
         """Returns error response with proper exception type.
 
@@ -291,87 +191,6 @@ class BaseRequest():
             raise helcim_exceptions.VerificationError(exception_message)
 
         raise helcim_exceptions.HelcimError(exception_message)
-
-    def convert_expiry_to_date(self, expiry):
-        """Converts a 4 digit expiry to a datetime object.
-
-            Parameters:
-                expiry (str): the four digit representation of the
-                    credit card expiry
-
-            Returns:
-                obj: the expiry as a datetime object.
-        """
-
-        year = 2000 + int(expiry[2:])
-        month = int(expiry[:2])
-        day = monthrange(year, month)[1]
-
-        return datetime(year, month, day, tzinfo=pytz.timezone('UTC')).date()
-
-    def create_model_arguments(self, transaction_type):
-        """Creates dictionary for use as transaction model arguments.
-
-            Takes the redacted_response data and creates a dictionary
-            that can be used as the keyword argumetns for the
-            HelcimTransaction model.
-
-            Parameters:
-                transaction_type (str): Transaction type for this
-                    transaction.
-
-            Returns:
-                dict: dictionary of the HelcimTransaction arguments.
-        """
-        response = self.redacted_response
-
-        # Format the transaction_date
-        if all([
-                response.get('transaction_date'),
-                response.get('transaction_time')
-        ]):
-            date_response = datetime.combine(
-                response.get('transaction_date'),
-                response.get('transaction_time')
-            )
-        else:
-            date_response = None
-
-        # Format the credit card expiry date (if present)
-        if response.get('cc_expiry', None):
-            cc_expiry = self.convert_expiry_to_date(
-                response['cc_expiry']
-            )
-        else:
-            cc_expiry = None
-
-        # Return proper user reference
-        django_user = self._associate_user_reference()
-
-        return {
-            'raw_request': response.get('raw_request'),
-            'raw_response': response.get('raw_response'),
-            'transaction_success': response.get('transaction_success'),
-            'response_message': response.get('response_message'),
-            'notice': response.get('notice'),
-            'date_response': date_response,
-            'transaction_type': transaction_type,
-            'transaction_id': response.get('transaction_id'),
-            'amount': response.get('amount'),
-            'currency': response.get('currency'),
-            'cc_name': response.get('cc_name'),
-            'cc_number': response.get('cc_number'),
-            'cc_expiry': cc_expiry,
-            'cc_type': response.get('cc_type'),
-            'token': response.get('token'),
-            'token_f4l4': response.get('token_f4l4'),
-            'avs_response': response.get('avs_response'),
-            'cvv_response': response.get('cvv_response'),
-            'approval_code': response.get('approval_code'),
-            'order_number': response.get('order_number'),
-            'customer_code': response.get('customer_code'),
-            'django_user': django_user,
-        }
 
     def post(self, post_data=None):
         """Makes POST to Helcim API and updates response attribute.
@@ -432,7 +251,7 @@ class BaseRequest():
                     to database.
         """
         # Redacts data if not already done
-        if not self.redacted_response:
+        if not bool(self.redacted_response):
             self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
@@ -467,25 +286,6 @@ class BaseCardTransaction(BaseRequest):
         """
         super(BaseCardTransaction, self).__init__(**kwargs)
         self.save_token = self._determine_save_token_status(save_token)
-
-    def _determine_save_token_status(self, user_decision):
-        """Determines if Helcim card token should be saved.
-
-            Parameters:
-                user_decision (bool): Whether the user has requested to
-                    save this token or not.
-
-            Returns:
-                bool: Whether a token should be saved.
-        """
-        # Check if vault is enabled in settings
-        vault_enabled = SETTINGS['enable_token_vault']
-
-        # If yes, check if user requested save
-        if vault_enabled:
-            return user_decision
-
-        return False
 
     def determine_card_details(self):
         """Confirms valid payment details and updates self.cleaned.
@@ -557,47 +357,6 @@ class BaseCardTransaction(BaseRequest):
         for field in payment_fields:
             self.cleaned.pop(field, None)
 
-    def save_token_to_vault(self):
-        """Saves Helcim card token.
-
-            Returns:
-                obj: The HelcimToken model instance, or ``None`` (if
-                    model not created).
-        """
-        token = self.response.get('token', None)
-        token_f4l4 = self.response.get('token_f4l4', None)
-        cc_name = self.response.get('cc_name', None)
-        raw_expiry = self.response.get('cc_expiry', None)
-        cc_expiry = (
-            self.convert_expiry_to_date(raw_expiry) if raw_expiry else None
-        )
-
-        # Ensure there is a customer code (can't use token without one)
-        try:
-            customer_code = self.response['customer_code']
-        except KeyError:
-            raise helcim_exceptions.ProcessingError(
-                'Unable to save token - customer code not provided'
-            )
-
-        # Retreive proper user reference
-        django_user = self._associate_user_reference()
-
-        if token and token_f4l4:
-            token_instance, _ = models.HelcimToken.objects.get_or_create(
-                token=token,
-                token_f4l4=token_f4l4,
-                cc_name=cc_name,
-                cc_expiry=cc_expiry,
-                cc_type=self.response.get('cc_type', None),
-                customer_code=customer_code,
-                django_user=django_user,
-            )
-
-            return token_instance
-
-        return None
-
 class Purchase(BaseCardTransaction):
     """Makes a purchase request to Helcim Commerce API."""
     def process(self):
@@ -621,11 +380,7 @@ class Purchase(BaseCardTransaction):
         self.post(purchase_data)
 
         purchase = self.save_transaction('s')
-
-        if self.save_token:
-            token = self.save_token_to_vault()
-        else:
-            token = None
+        token = self.save_token_to_vault()
 
         return purchase, token
 
@@ -645,12 +400,9 @@ class Preauthorize(BaseCardTransaction):
             }
         )
         self.post(preauth_data)
-        preauth = self.save_transaction('p')
 
-        if self.save_token:
-            token = self.save_token_to_vault()
-        else:
-            token = None
+        preauth = self.save_transaction('p')
+        token = self.save_token_to_vault()
 
         return preauth, token
 
@@ -670,13 +422,9 @@ class Refund(BaseCardTransaction):
             }
         )
         self.post(refund_data)
+
         refund = self.save_transaction('r')
-
-        if self.save_token:
-            token = self.save_token_to_vault()
-        else:
-            token = None
-
+        token = self.save_token_to_vault()
 
         return refund, token
 
@@ -696,13 +444,9 @@ class Verification(BaseCardTransaction):
             }
         )
         self.post(verification_data)
+
         verification = self.save_transaction('v')
-
-        if self.save_token:
-            token = self.save_token_to_vault()
-        else:
-            token = None
-
+        token = self.save_token_to_vault()
 
         return verification, token
 
@@ -739,194 +483,114 @@ class Capture(BaseRequest):
 
         return capture
 
-def identify_redact_fields():
-    """Identifies which fields (if any) should be redacted.
+class HelcimJSResponse(mixins.ResponseMixin):
+    """Class to handle Helcim.js Responses.
 
-        Configured using flags in the Django settings file.
+        This is a helper class that takes a Helcim.js response,
+        handles any errors, converts the response into Python types
+        and applies any redactions.
 
-        Returns:
-            dict: A dictionary of fields to redact with corresponding
-                API field and variable names.
+        Handling is more limited since all requests to the API are
+        handled directly by Helcim.js. It is important to note that
+        responses from Helcim.js are similar, but not identical to the
+        basic Helcim API.
+
+        Parameters:
+            response (obj): the Helcim.js response POST data.
+            save_token (bool): whether to save this to the
+                ``django-helcim`` token vault.
+            django_user (obj): a django user instance to use with
+                ``django-helcim`` model instances.
     """
-    redact_fields = {
-        'name': {
-            'redact': None,
-            'settings': 'redact_cc_name',
-            'fields': [
-                {'api': 'cardHolderName', 'python': 'cc_name'},
-            ]
-        },
-        'number': {
-            'redact': None,
-            'settings': 'redact_cc_number',
-            'fields': [
-                {'api': 'cardNumber', 'python': 'cc_number'},
-            ]
-        },
-        'expiry': {
-            'redact': None,
-            'settings': 'redact_cc_expiry',
-            'fields': [
-                {'api': 'cardExpiry', 'python': 'cc_expiry'},
-                {'api': 'expiryDate', 'python': 'cc_expiry'},
-            ]
-        },
-        'cvv': {
-            'redact': None,
-            'settings': 'redact_cc_cvv',
-            'fields': [
-                {'api': 'cardCVV', 'python': 'cc_cvv'},
-            ]
-        },
-        'type': {
-            'redact': None,
-            'settings': 'redact_cc_type',
-            'fields': [
-                {'api': 'cardType', 'python': 'cc_type'},
-            ]
-        },
-        'token': {
-            'redact': None,
-            'settings': 'redact_token',
-            'fields': [
-                {'api': 'cardToken', 'python': 'token'},
-                {'api': 'cardF4L4', 'python': 'token_f4l4'},
-            ]
-        },
-        'mag': {
-            'redact': None,
-            'settings': 'redact_cc_magnetic',
-            'fields': [
-                {'api': 'cardMag', 'python': 'mag'},
-            ]
-        },
-        'mag_enc': {
-            'redact': None,
-            'settings': 'redact_cc_magnetic_encrypted',
-            'fields': [
-                {'api': 'cardMagEnc', 'python': 'mag_enc'},
-                {'api': 'serialNumber', 'python': 'mang_enc_serial_number'},
-            ]
-        },
-    }
+    def __init__(self, response, save_token=False, django_user=None):
+        self.raw_response = response
+        self.response = {}
+        self.redacted_response = {}
+        self.save_token = self._determine_save_token_status(save_token)
+        self.django_user = django_user
+        self.validated = False
+        self.valid = False
 
-    # HELCIM_REDACT_ALL overrides all other settings
-    if SETTINGS['redact_all'] is not None:
-        if SETTINGS['redact_all'] is True:
-            for key in redact_fields:
-                redact_fields[key]['redact'] = True
-        else:
-            for key in redact_fields:
-                redact_fields[key]['redact'] = False
 
-    # Otherwise, assess each field individually
-    else:
-        for key, field in redact_fields.items():
-            redact_fields[key]['redact'] = SETTINGS[field['settings']]
+    def is_valid(self):
+        """Validates format is correct and notifies of any errors.
 
-    return redact_fields
+            Will also generate the redacted response at this point.
 
-def determine_helcim_settings():
-    """Collects all possible django-helcim settings for easy use.
-
-        Performs basic validation of required settings and assigns
-        defaults where applicable.
-
-        Returns:
-            dict: Summary of all possible django-helcim settings.
-    """
-    # API SETTINGS
-    # -------------------------------------------------------------------------
-    # Required settings
-    try:
-        account_id = getattr(django_settings, 'HELCIM_ACCOUNT_ID')
-    except AttributeError:
-        raise django_exceptions.ImproperlyConfigured(
-            'You must define a HELCIM_ACCOUNT_ID setting'
+            Returns:
+                boolean: True if valid without errors, otherwise false.
+        """
+        # Save the converted response
+        self.response = conversions.process_helcim_js_response(
+            self.raw_response
         )
 
-    try:
-        api_token = getattr(django_settings, 'HELCIM_API_TOKEN')
-    except AttributeError:
-        raise django_exceptions.ImproperlyConfigured(
-            'You must define a HELCIM_API_TOKEN setting'
-        )
+        # Apply any redactions as needed
+        self.redact_data()
 
-    # Other settings
-    api_url = getattr(
-        django_settings, 'HELCIM_API_URL', 'https://secure.myhelcim.com/api/'
-    )
-    terminal_id = getattr(django_settings, 'HELCIM_TERMINAL_ID', '')
-    api_test = getattr(django_settings, 'HELCIM_API_TEST', None)
+        # Updates instance to note that validation was run and record result
+        self.validated = True
+        self.valid = self.response['transaction_success']
 
-    # REDACTION SETTINGS
-    # -------------------------------------------------------------------------
-    redact_all = getattr(django_settings, 'HELCIM_REDACT_ALL', None)
-    redact_cc_name = getattr(django_settings, 'HELCIM_REDACT_CC_NAME', True)
-    redact_cc_number = getattr(
-        django_settings, 'HELCIM_REDACT_CC_NUMBER', True
-    )
-    redact_cc_expiry = getattr(
-        django_settings, 'HELCIM_REDACT_CC_EXPIRY', True
-    )
-    redact_cc_cvv = getattr(django_settings, 'HELCIM_REDACT_CC_CVV', True)
-    redact_cc_type = getattr(django_settings, 'HELCIM_REDACT_CC_TYPE', True)
-    redact_cc_magnetic = getattr(
-        django_settings, 'HELCIM_REDACT_CC_MAGNETIC', True
-    )
-    redact_cc_magnetic_encrypted = getattr(
-        django_settings, 'HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED', True
-    )
-    redact_token = getattr(django_settings, 'HELCIM_REDACT_TOKEN', False)
+        return self.valid
 
-    # TRANSACTION FUNCTIONALITY SETTINGS
-    # -------------------------------------------------------------------------
-    enable_transaction_capture = getattr(
-        django_settings, 'HELCIM_ENABLE_TRANSACTION_CAPTURE', False
-    )
-    enable_transaction_refund = getattr(
-        django_settings, 'HELCIM_ENABLE_TRANSACTION_REFUND', False
-    )
+    def _record_response(self, transaction_type):
+        """Handles saving transaction and token for various response types.
 
-    # TOKEN VAULT SETTINGS
-    # -------------------------------------------------------------------------
-    enable_token_vault = getattr(
-        django_settings, 'HELCIM_ENABLE_TOKEN_VAULT', False
-    )
+            Will run last checks to ensure data is valid before saving to
+            database.
 
-    # ADMIN SETTINGS
-    # -------------------------------------------------------------------------
-    enable_admin = getattr(
-        django_settings, 'HELCIM_ENABLE_ADMIN', False
-    )
+            Parameters:
+                transaction_type (str): the transaction_type to save the
+                    transaction as: purchase/sale (``s``), preauthorization
+                    (``p``), or verification (``v``).
 
-    # OTHER SETTINGS
-    # -------------------------------------------------------------------------
-    associate_user = getattr(
-        django_settings, 'HELCIM_ASSOCIATE_USER', True
-    )
+            Returns:
+                tuple: tuple of HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
+        """
+        if self.validated is False:
+            raise helcim_exceptions.HelcimError(
+                'Must validate data with the .is_valid() method '
+                ' before recording purchase.'
+            )
 
-    return {
-        'api_url': api_url,
-        'account_id': account_id,
-        'api_token': api_token,
-        'terminal_id': terminal_id,
-        'api_test': api_test,
-        'redact_all': redact_all,
-        'redact_cc_name': redact_cc_name,
-        'redact_cc_number': redact_cc_number,
-        'redact_cc_expiry': redact_cc_expiry,
-        'redact_cc_cvv': redact_cc_cvv,
-        'redact_cc_type': redact_cc_type,
-        'redact_cc_magnetic': redact_cc_magnetic,
-        'redact_cc_magnetic_encrypted': redact_cc_magnetic_encrypted,
-        'redact_token': redact_token,
-        'enable_transaction_capture': enable_transaction_capture,
-        'enable_transaction_refund': enable_transaction_refund,
-        'enable_token_vault': enable_token_vault,
-        'enable_admin': enable_admin,
-        'associate_user': associate_user,
-    }
+        if self.valid is False:
+            raise helcim_exceptions.HelcimError(
+                'Response data was invalid - cannot record purchase data.'
+            )
+
+        transaction_instance = self.save_transaction(transaction_type)
+        token_instance = self.save_token_to_vault()
+
+        return transaction_instance, token_instance
+
+    def record_purchase(self):
+        """Saves validated purchase response to database.
+
+            Returns:
+                tuple: tuple of HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
+        """
+        return self._record_response('s')
+
+    def record_preauthorization(self):
+        """Saves validated preauthorization response to database.
+
+            Returns:
+                tuple of the HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
+        """
+        return self._record_response('p')
+
+    def record_verification(self):
+        """Saves validated verification response to database.
+
+            Returns:
+                tuple of the HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
+        """
+        return self._record_response('v')
 
 def retrieve_token_details(token_id, django_user=None, customer_code=None):
     """Takes a HelcimToken ID and maps details to dictionary."""
@@ -972,5 +636,3 @@ def retrieve_saved_tokens(django_user=None, customer_code=None):
         return models.HelcimToken.objects.filter(customer_code=customer_code)
 
     return models.HelcimToken.objects.none()
-
-SETTINGS = determine_helcim_settings()

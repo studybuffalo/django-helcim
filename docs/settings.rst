@@ -66,6 +66,31 @@ or not. When set to `True` all transactions will have ``test=true`` added
 to the POST data. This prevents the Helcim Commerce API from attempting
 to process the transaction.
 
+``HELCIM_JS_CONFIG``
+====================
+
+**Required:** ``False``
+
+**Default (dictionary):** ``{}``
+
+A dictionary that allows you to declare your Helcim.js configuration details
+within your Django settings. This dictionary is validated and made available
+in your view context via the ``HelcimJSMixin`` mixin. The dictionary requires
+the following format:
+
+.. code-block:: python
+
+   {
+     'custom_identifier': {
+       'url': 'url-to-your-helcim-js-script',
+       'token' 'your-helcim-js-token',
+     }
+   }
+
+Once configured, you can add the ``HelcimJSMixin`` to the required views and
+access the details in your templates through this syntax:
+``helcim_js.custom_identifier.url`` and ``helcim_js.custom_identifier.token``.
+
 -----------------------------
 Private data storage settings
 -----------------------------

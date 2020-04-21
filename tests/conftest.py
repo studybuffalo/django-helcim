@@ -1,4 +1,7 @@
 """Configuration file for pytest."""
+# pylint: disable=import-outside-toplevel
+import pytest
+
 import django
 from django.conf import settings
 
@@ -36,10 +39,17 @@ def pytest_configure():
         'HELCIM_ACCOUNT_ID': '1234567890',
         'HELCIM_API_TOKEN': 'abcdefghijklmno1234567890',
         'HELCIM_ENABLE_TOKEN_VAULT': True,
-        'HELCIM_ASSOCIATE_USER': False,
+        'HELCIM_ALLOW_ANONYMOUS': True,
     }
 
     settings.configure(**django_settings)
 
     # Initiate Django
     django.setup()
+
+@pytest.fixture
+def user():
+    """Fixture to generate a Django user."""
+    from . import factories
+
+    return factories.UserFactory()

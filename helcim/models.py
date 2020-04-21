@@ -53,6 +53,7 @@ class HelcimTransaction(models.Model):
         ('p', 'pre-authorization'),
         ('c', 'capture'),
         ('r', 'refund'),
+        ('v', 'verify'),
     )
     transaction_type = models.CharField(
         choices=TRANSACTION_TYPES,

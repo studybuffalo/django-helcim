@@ -54,7 +54,7 @@ TO_API_FIELDS = {
     'cc_cvv': Field('cardCVV', 's', 3, 4),
     'cc_expiry': Field('cardExpiry', 's', 4, 4),
     'cc_name': Field('cardHolderName', 's'),
-    'cc_number': Field('cardNumber', 's', 16, 16),
+    'cc_number': Field('cardNumber', 's', 13, 19),
     'cc_postal_code': Field('cardHolderPostalCode', 's'),
     'comments': Field('comments', 's'),
     'customer_code': Field('customerCode', 's'),
@@ -89,6 +89,7 @@ FROM_API_FIELDS = {
     'availability': Field('availability', 'b'),
     'approvalCode': Field('approval_code', 's'),
     'avsResponse': Field('avs_response', 's'),
+    'cardExpiry': Field('cc_expiry', 's'),
     'cardHolderName': Field('cc_name', 's'),
     'cardNumber': Field('cc_number', 's'),
     'cardToken': Field('token', 's'),
@@ -102,6 +103,36 @@ FROM_API_FIELDS = {
     'time': Field('transaction_time', 't'),
     'transactionId': Field('transaction_id', 'i'),
     'type': Field('transaction_type', 's'),
+}
+
+FROM_HELCIM_JS_FIELDS = {
+    'amount': Field('amount', 'c'),
+    'approvalCode': Field('approval_code', 's'),
+    'avsResponse': Field('avs_response', 's'),
+    'bankAccountCorporate': Field('bank_corporate', 's'),
+    'bankAccountNumber': Field('bank_account_number', 's'),
+    'bankAccountToken': Field('bank_token', 's'),
+    'bankAccountType': Field('bank_type', 's'),
+    'bankFinancialNumber': Field('bank_financial_number', 's'),
+    'bankTransitNumber': Field('bank_transit_number', 's'),
+    'cardExpiry': Field('cc_expiry', 's'),
+    'cardHolderName': Field('cc_name', 's'),
+    'cardNumber': Field('cc_number', 's'),
+    'cardToken': Field('token', 's'),
+    'cardType': Field('cc_type', 's'),
+    'currency': Field('currency', 's'),
+    'customerCode': Field('customer_code', 's'),
+    'cvvResponse': Field('cvv_response', 's'),
+    'date': Field('transaction_date', 'd'),
+    'noticeMessage': Field('notice', 's'),
+    'orderNumber': Field('order_number', 's'),
+    'response': Field('transaction_success', 'b'),
+    'responseMessage': Field('response_message', 's'),
+    'time': Field('transaction_time', 't'),
+    'transactionId': Field('transaction_id', 'i'),
+    'type': Field('transaction_type', 's'),
+    'xml': Field('raw_response', 's'),
+    'xmlHash': Field('response_xml_hash', 's'),
 }
 
 def validate_request_fields(details):
@@ -207,6 +238,86 @@ def process_request_fields(api, cleaned, additional=None):
 
     return request_data
 
+def convert_helcim_response_fields(fields, field_dictionary):
+    """Converts provided Helcim response to Python data types.
+
+        Handles both API responses and Helcim.js response.
+
+        Parameters:
+            fields (dict): Helcim response fields.
+            field_dictionary (dict): dictionary of field references to
+                use for data type conversion.
+
+        Returns:
+            dictionary: converted fields as Python data types.
+    """
+    converted = {}
+
+    for field_name, field_value in fields.items():
+        try:
+            api_field = field_dictionary[field_name]
+            new_name = api_field.field_name
+
+            # String Field
+            if api_field.field_type == 's':
+                converted[new_name] = (
+                    None if field_value is None else str(field_value)
+                )
+
+            # Decimal Field
+            elif api_field.field_type == 'c':
+                converted[new_name] = Decimal(field_value)
+
+            # Integer Field
+            elif api_field.field_type == 'i':
+                converted[new_name] = int(field_value)
+
+            # Boolean Field
+            elif api_field.field_type == 'b':
+                converted[new_name] = field_value == '1'
+
+            # Date Field
+            elif api_field.field_type == 'd':
+                converted[new_name] = datetime.strptime(
+                    field_value, '%Y-%m-%d'
+                ).date()
+
+            # Time Field
+            elif api_field.field_type == 't':
+                converted[new_name] = datetime.strptime(
+                    field_value, '%H:%M:%S'
+                ).time()
+
+            # Handle any invalid types (should never happen...)
+            else:
+                LOG.warning(
+                    'Field %s has invalid type: %s',
+                    api_field.field_name,
+                    api_field.field_type,
+                )
+                converted[field_name] = field_value
+        except KeyError:
+            LOG.warning(
+                'Response field not in FROM_API_FIELDS: %s', field_name
+            )
+            converted[field_name] = field_value
+
+    return converted
+
+def create_f4l4(cc_number):
+    """Creates the token_f4l4 value if a CC number is provided.
+
+        Parameters
+            cc_number (str): The Helcim response CC number.
+
+        Returns:
+            string: the token F4L4 value.
+    """
+    if cc_number:
+        return '{}{}'.format(cc_number[:4], cc_number[-4:])
+
+    return None
+
 def create_raw_request(data):
     """Converts the raw request into a POST string.
 
@@ -235,81 +346,51 @@ def process_api_response(response, raw_request=None, raw_response=None):
         raw_response (str): Raw response (as string) returned by API.
 
     Returns:
-        dict: The validated and convereted API response.
+        dict: The validated and converted API response.
     """
     # Add the standard API response details
     processed = {
-        'transaction_success': (
-            True if int(response['response']) == 1 else False
-        ),
+        'transaction_success': bool(int(response['response'])),
         'response_message': str(response['responseMessage']),
         'notice': str(response['notice']),
     }
 
     # Add and coerece any fields returned in the transaction field
     if 'transaction' in response:
-        for field_name, field_value in response['transaction'].items():
+        # Convert transaction fields to Python dictionary
+        converted_fields = convert_helcim_response_fields(
+            response['transaction'], FROM_API_FIELDS
+        )
 
-            try:
-                api_field = FROM_API_FIELDS[field_name]
-                new_name = api_field.field_name
-
-                # String Field
-                if api_field.field_type == 's':
-                    processed[new_name] = (
-                        None if field_value is None else str(field_value)
-                    )
-
-                # Decimal Field
-                elif api_field.field_type == 'c':
-                    processed[new_name] = Decimal(field_value)
-
-                # Integer Field
-                elif api_field.field_type == 'i':
-                    processed[new_name] = int(field_value)
-
-                # Boolean Field
-                elif api_field.field_type == 'b':
-                    processed[new_name] = True if field_value == '1' else False
-
-                # Date Field
-                elif api_field.field_type == 'd':
-                    processed[new_name] = datetime.strptime(
-                        field_value, '%Y-%m-%d'
-                    ).date()
-
-                # Time Field
-                elif api_field.field_type == 't':
-                    processed[new_name] = datetime.strptime(
-                        field_value, '%H:%M:%S'
-                    ).time()
-
-                # Handle any invalid types (should never happen...)
-                else:
-                    LOG.warning(
-                        'Field %s has invalid type: %s',
-                        api_field.field_name,
-                        api_field.field_type,
-                    )
-                    processed[field_name] = field_value
-            except KeyError:
-                LOG.warning(
-                    'Response field not in FROM_API_FIELDS: %s', field_name
-                )
-                processed[field_name] = field_value
+        # Merge converted fields into processed dictionary
+        processed = {**processed, **converted_fields}
 
         # If possible, create the F4L4 field
-        cc_number = processed.get('cc_number')
-
-        if cc_number:
-            processed['token_f4l4'] = '{}{}'.format(
-                cc_number[:4], cc_number[-4:]
-            )
-        else:
-            processed['token_f4l4'] = None
+        processed['token_f4l4'] = create_f4l4(processed.get('cc_number', None))
 
     # Add additional audit information
     processed['raw_request'] = create_raw_request(raw_request)
     processed['raw_response'] = raw_response
+
+    return processed
+
+def process_helcim_js_response(response):
+    """Processes the Helcim.js response into a Python dictionary.
+
+    Parameters:
+        response (dict): The Helicm.js POST response.
+
+    Returns:
+        dict: The validated and converted Helcim.js response.
+    """
+    # Convert response fields into Python dicitionary
+    converted_fields = convert_helcim_response_fields(
+        response, FROM_HELCIM_JS_FIELDS
+    )
+
+    # If possible, create the F4L4 field
+    token_f4l4 = create_f4l4(converted_fields.get('cc_number', None))
+
+    processed = {**converted_fields, 'token_f4l4': token_f4l4}
 
     return processed

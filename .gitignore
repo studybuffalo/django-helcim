@@ -20,6 +20,7 @@ reports/*
 sandbox/**/db.sqlite3
 sandbox/**/media/*
 sandbox/**/static/*
+!sandbox/scratch/example_app/static/example_app/
 
 # Distribution files
 *.egg-info

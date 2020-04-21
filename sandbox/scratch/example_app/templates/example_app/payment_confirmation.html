@@ -1,0 +1,60 @@
+{% extends 'example_app/base.html' %}
+
+{% block sub_title %}| Confirmation {% endblock %}
+
+{% block h1 %}Basic Payment &rsaquo; Confirm Order and Payment Details{% endblock %}
+
+{% block content %}
+  <div class="field">
+    <span class="label">{{ form.cc_number.label }}</span>
+    <span class="value">
+      {{ form.cc_number.value|slice:":4" }}
+      **** ****
+      {{ form.cc_number.value|slice:"-4:" }}
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="label">{{ form.cc_name.label }}</span>
+    <span class="value">{{ form.cc_name.value }}</span>
+  </div>
+
+  <div class="field">
+    <span class="label">Expiry:</span>
+    <span class="value">
+      {{ form.cc_expiry_month.value }}/{{ form.cc_expiry_year.value }}
+    </span>
+  </div>
+
+  <div class="field">
+    <span class="label">{{ form.amount.label }}</span>
+    <span class="value">${{ form.amount.value|floatformat:2 }}</span>
+  </div>
+
+
+  <div class="form-buttons">
+    <form action="" method="post">
+      {% csrf_token %}
+
+      <!-- Hidden inputs containing values from the payment details form -->
+      {% for field in form %}
+        {{ field }}
+      {% endfor %}
+      <input type="hidden" name="process" value="true">
+
+      <button type="submit" class="submit">Submit</button>
+    </form>
+
+    <form action="" method="post">
+      {% csrf_token %}
+
+      <!-- Hidden inputs containing values from the payment details form -->
+      {% for field in form %}
+        {{ field }}
+      {% endfor %}
+      <input type="hidden" name="back" value="true">
+
+      <button type="submit" class="back">Back</button>
+    </form>
+  </div>
+{% endblock %}

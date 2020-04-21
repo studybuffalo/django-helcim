@@ -1,0 +1,202 @@
+{% extends 'example_app/base.html' %}
+
+{% block sub_title %}| Payment Complete {% endblock %}
+
+{% block extra_styles %}
+  <style>
+    .instance-details,
+    .instance-details tr,
+    .instance-details th,
+    .instance-details td {
+      border-collapse: collapse;
+    }
+    .instance-details th, .instance-details td {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    .instance-details tbody td {
+      font-family: "Courier New", Courier, monospace;
+      vertical-align: top;
+    }
+
+    .instance-details tbody td:first-child {
+      font-weight: 700;
+    }
+    .instance-details tbody tr:nth-child(even) td {
+      background-color: rgb(240, 240, 240);
+    }
+  </style>
+{% endblock %}
+
+{% block h1 %}Transaction Successfully Completed{% endblock %}
+
+{% block content %}
+  <h2>Transaction Instance Details</h2>
+  <table class="instance-details">
+    <thead>
+      <tr>
+        <th>Model Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>id</td>
+        <td>{{ transaction.id }}</td>
+      </tr>
+      <tr>
+        <td>raw_request</td>
+        <td>{{ transaction.raw_request }}</td>
+      </tr>
+      <tr>
+        <td>raw_response</td>
+        <td>{{ transaction.raw_response }}</td>
+      </tr>
+      <tr>
+        <td>transaction_success</td>
+        <td>{{ transaction.transaction_success }}</td>
+      </tr>
+      <tr>
+        <td>response_message</td>
+        <td>{{ transaction.response_message }}</td>
+      </tr>
+      <tr>
+        <td>notice</td>
+        <td>{{ transaction.notice }}</td>
+      </tr>
+      <tr>
+        <td>date_response</td>
+        <td>{{ transaction.date_response }}</td>
+      </tr>
+      <tr>
+        <td>date_created</td>
+        <td>{{ transaction.date_created }}</td>
+      </tr>
+      <tr>
+        <td>transaction_type</td>
+        <td>
+          {{ transaction.transaction_type }}
+          - {{ transaction.get_transaction_type_display }}
+        </td>
+      </tr>
+      <tr>
+        <td>transaction_id</td>
+        <td>{{ transaction.transaction_id }}</td>
+      </tr>
+      <tr>
+        <td>amount</td>
+        <td>{{ transaction.amount }}</td>
+      </tr>
+      <tr>
+        <td>currency</td>
+        <td>{{ transaction.currency }}</td>
+      </tr>
+      <tr>
+        <td>cc_name</td>
+        <td>{{ transaction.cc_name }}</td>
+      </tr>
+      <tr>
+        <td>cc_number</td>
+        <td>{{ transaction.cc_number }}</td>
+      </tr>
+      <tr>
+        <td>cc_expiry</td>
+        <td>{{ transaction.cc_expiry }}</td>
+      </tr>
+      <tr>
+        <td>cc_type</td>
+        <td>{{ transaction.cc_type }}</td>
+      </tr>
+      <tr>
+        <td>token</td>
+        <td>{{ transaction.token }}</td>
+      </tr>
+      <tr>
+        <td>token_f4l4</td>
+        <td>{{ transaction.token_f4l4 }}</td>
+      </tr>
+      <tr>
+        <td>avs_response</td>
+        <td>{{ transaction.avs_response }}</td>
+      </tr>
+      <tr>
+        <td>cvv_response</td>
+        <td>{{ transaction.cvv_response }}</td>
+      </tr>
+      <tr>
+        <td>approval_code</td>
+        <td>{{ transaction.approval_code }}</td>
+      </tr>
+      <tr>
+        <td>order_number</td>
+        <td>{{ transaction.order_number }}</td>
+      </tr>
+      <tr>
+        <td>customer_code</td>
+        <td>{{ transaction.customer_code }}</td>
+      </tr>
+      <tr>
+        <td>django_user</td>
+        <td>{{ transaction.django_user }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>Token Instance Details</h2>
+
+  <table class="instance-details">
+    <thead>
+      <tr>
+        <th>Model Field</th>
+        <th>Value</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>id</td>
+        <td>{{ token.id }}</td>
+      </tr>
+      <tr>
+        <td>token</td>
+        <td>{{ token.token }}</td>
+      </tr>
+      <tr>
+        <td>token_f4l4</td>
+        <td>{{ token.token_f4l4 }}</td>
+      </tr>
+      <tr>
+        <td>cc_name</td>
+        <td>{{ token.cc_name }}</td>
+      </tr>
+      <tr>
+        <td>cc_expiry</td>
+        <td>{{ token.cc_expiry }}</td>
+      </tr>
+      <tr>
+        <td>cc_type</td>
+        <td>{{ token.cc_type }}</td>
+      </tr>
+      <tr>
+        <td>date_added</td>
+        <td>{{ token.date_added }}</td>
+      </tr>
+      <tr>
+        <td>customer_code</td>
+        <td>{{ token.customer_code }}</td>
+      </tr>
+      <tr>
+        <td>django_user</td>
+        <td>{{ token.django_user }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin: 4rem 0 2rem 0;">
+    {% if transaction_type == 'api' %}
+    <a href="{% url 'example:payment_basic' %}" class="submit-another">Submit another transaction</a>
+    {% else %}
+      <a href="{% url 'example:payment_helcim_js' %}" class="submit-another">Submit another transaction</a>
+    {% endif %}
+  </div>
+{% endblock %}
