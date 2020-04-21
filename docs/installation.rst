@@ -1,6 +1,15 @@
+.. _getting-started:
+
 ===============
 Getting started
 ===============
+
+.. note::
+
+    These instructions make a distinction between making direct
+    calls to the Helcim Commerce API versus using Helcim.js.
+    Within this documentation, "Helcim API" refers to direct calls,
+    where as "Helcim.js" will refere to calls via Helcim.js.
 
 ------------------------------------------------
 Install django-helcim and its dependencies
@@ -40,18 +49,40 @@ Edit your Django settings
 -------------------------
 
 Once ``django-helcim`` has been installed, you will need to update
-your Django settings. At a bare minimum you will need to specify the
-following settings: `HELCIM_API_URL`, `HELCIM_ACCOUNT_ID`,
-`HELCIM_API_TOKEN`, and `HELCIM_TERMINAL_ID`. For example::
+your Django settings. You will need to specify the required settings
+depending on the workflow you are using.
 
-    HELCIM_API_URL = https://secure.myhelcim.com/api/
-    HELCIM_ACCOUNT_ID = 123456
-    HELCIM_API_TOKEN = 123456789abcdefg
-    HELCIM_TERMINAL_ID = 123456
+For the Helcim API, you will need to specify the following settings
+(at a minimum): ``HELCIM_API_URL``, ``HELCIM_ACCOUNT_ID``,
+``HELCIM_API_TOKEN``, and ``HELCIM_TERMINAL_ID``.
 
-This package defaults where possible to the most restrictive settings
-possible, given the secure nature of financial data. You will need to
-manually enable functionality as your application requires. You can see
-a summary of all settings in the `Settings page`_.
+For Helcim.js, you will need to specify the ``HELCIM_JS_CONFIG``
+setting (at a minimum).
 
-.. _Settings page: https://django-helcim.readthedocs.io/en/latest/settings.html
+There are several other settings available to configure
+``django-helcim``. In most cases, defaults are applied automatically
+when a setting is not specified. Where possible, the package defaults
+to the most restrictive value possible (given the security requirements
+of financial data). A full list of settings you can configure is
+available on the :ref:`Settings page <settings>`.
+
+----------
+Next Steps
+----------
+
+Once ``django-helcim`` is installed, you will need to integrate it into
+your payment workflow. This process will vary significantly between
+applications, but this application provides some standard objects and
+methods to streamline the process.
+
+Working examples of integrations can be found in
+`GitHub repo sandbox directory`_. You will find two working Django
+applications. The ``oscar`` sandbox is a working example of integration
+with Django Oscar. The ``scratch`` sandbox shows a minimal example of
+integration with a generic service requiring payment processing and
+demonstrates both the Helcim API and Helcim.js workflows.
+
+See the :ref:`Sandbox page <sandbox>` for additional details on setting up
+and configuring the sandbox sites.
+
+.. _GitHub repo sandbox directory: https://github.com/studybuffalo/django-helcim/tree/master/sandbox
