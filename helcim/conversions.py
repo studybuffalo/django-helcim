@@ -238,6 +238,86 @@ def process_request_fields(api, cleaned, additional=None):
 
     return request_data
 
+def convert_helcim_response_fields(fields, field_dictionary):
+    """Converts provided Helcim response to Python data types.
+
+        Handles both API responses and Helcim.js response.
+
+        Parameters:
+            fields (dict): Helcim response fields.
+            field_dictionary (dict): dictionary of field references to
+                use for data type conversion.
+
+        Returns:
+            dictionary: converted fields as Python data types.
+    """
+    converted = {}
+
+    for field_name, field_value in fields.items():
+        try:
+            api_field = field_dictionary[field_name]
+            new_name = api_field.field_name
+
+            # String Field
+            if api_field.field_type == 's':
+                converted[new_name] = (
+                    None if field_value is None else str(field_value)
+                )
+
+            # Decimal Field
+            elif api_field.field_type == 'c':
+                converted[new_name] = Decimal(field_value)
+
+            # Integer Field
+            elif api_field.field_type == 'i':
+                converted[new_name] = int(field_value)
+
+            # Boolean Field
+            elif api_field.field_type == 'b':
+                converted[new_name] = field_value == '1'
+
+            # Date Field
+            elif api_field.field_type == 'd':
+                converted[new_name] = datetime.strptime(
+                    field_value, '%Y-%m-%d'
+                ).date()
+
+            # Time Field
+            elif api_field.field_type == 't':
+                converted[new_name] = datetime.strptime(
+                    field_value, '%H:%M:%S'
+                ).time()
+
+            # Handle any invalid types (should never happen...)
+            else:
+                LOG.warning(
+                    'Field %s has invalid type: %s',
+                    api_field.field_name,
+                    api_field.field_type,
+                )
+                converted[field_name] = field_value
+        except KeyError:
+            LOG.warning(
+                'Response field not in FROM_API_FIELDS: %s', field_name
+            )
+            converted[field_name] = field_value
+
+    return converted
+
+def create_f4l4(cc_number):
+    """Creates the token_f4l4 value if a CC number is provided.
+
+        Parameters
+            cc_number (str): The Helcim response CC number.
+
+        Returns:
+            string: the token F4L4 value.
+    """
+    if cc_number:
+        return '{}{}'.format(cc_number[:4], cc_number[-4:])
+
+    return None
+
 def create_raw_request(data):
     """Converts the raw request into a POST string.
 
@@ -277,65 +357,16 @@ def process_api_response(response, raw_request=None, raw_response=None):
 
     # Add and coerece any fields returned in the transaction field
     if 'transaction' in response:
-        for field_name, field_value in response['transaction'].items():
+        # Convert transaction fields to Python dictionary
+        converted_fields = convert_helcim_response_fields(
+            response['transaction'], FROM_API_FIELDS
+        )
 
-            try:
-                api_field = FROM_API_FIELDS[field_name]
-                new_name = api_field.field_name
-
-                # String Field
-                if api_field.field_type == 's':
-                    processed[new_name] = (
-                        None if field_value is None else str(field_value)
-                    )
-
-                # Decimal Field
-                elif api_field.field_type == 'c':
-                    processed[new_name] = Decimal(field_value)
-
-                # Integer Field
-                elif api_field.field_type == 'i':
-                    processed[new_name] = int(field_value)
-
-                # Boolean Field
-                elif api_field.field_type == 'b':
-                    processed[new_name] = field_value == '1'
-
-                # Date Field
-                elif api_field.field_type == 'd':
-                    processed[new_name] = datetime.strptime(
-                        field_value, '%Y-%m-%d'
-                    ).date()
-
-                # Time Field
-                elif api_field.field_type == 't':
-                    processed[new_name] = datetime.strptime(
-                        field_value, '%H:%M:%S'
-                    ).time()
-
-                # Handle any invalid types (should never happen...)
-                else:
-                    LOG.warning(
-                        'Field %s has invalid type: %s',
-                        api_field.field_name,
-                        api_field.field_type,
-                    )
-                    processed[field_name] = field_value
-            except KeyError:
-                LOG.warning(
-                    'Response field not in FROM_API_FIELDS: %s', field_name
-                )
-                processed[field_name] = field_value
+        # Merge converted fields into processed dictionary
+        processed = {**processed, **converted_fields}
 
         # If possible, create the F4L4 field
-        cc_number = processed.get('cc_number')
-
-        if cc_number:
-            processed['token_f4l4'] = '{}{}'.format(
-                cc_number[:4], cc_number[-4:]
-            )
-        else:
-            processed['token_f4l4'] = None
+        processed['token_f4l4'] = create_f4l4(processed.get('cc_number', None))
 
     # Add additional audit information
     processed['raw_request'] = create_raw_request(raw_request)
@@ -352,67 +383,14 @@ def process_helcim_js_response(response):
     Returns:
         dict: The validated and converted Helcim.js response.
     """
-    processed = {}
+    # Convert response fields into Python dicitionary
+    converted_fields = convert_helcim_response_fields(
+        response, FROM_HELCIM_JS_FIELDS
+    )
 
-    # Convert response fields into Python fields
-    for field_name, field_value in response.items():
-        try:
-            api_field = FROM_HELCIM_JS_FIELDS[field_name]
-            new_name = api_field.field_name
+    # If possible, create the F4L4 field
+    token_f4l4 = create_f4l4(converted_fields.get('cc_number', None))
 
-            # String Field
-            if api_field.field_type == 's':
-                processed[new_name] = (
-                    None if field_value is None else str(field_value)
-                )
-
-            # Decimal Field
-            elif api_field.field_type == 'c':
-                processed[new_name] = Decimal(field_value)
-
-            # Integer Field
-            elif api_field.field_type == 'i':
-                processed[new_name] = int(field_value)
-
-            # Boolean Field
-            elif api_field.field_type == 'b':
-                processed[new_name] = field_value == '1'
-
-            # Date Field
-            elif api_field.field_type == 'd':
-                processed[new_name] = datetime.strptime(
-                    field_value, '%Y-%m-%d'
-                ).date()
-
-            # Time Field
-            elif api_field.field_type == 't':
-                processed[new_name] = datetime.strptime(
-                    field_value, '%H:%M:%S'
-                ).time()
-
-            # Handle any invalid types (should never happen...)
-            else:
-                LOG.warning(
-                    'Field %s has invalid type: %s',
-                    api_field.field_name,
-                    api_field.field_type,
-                )
-                processed[field_name] = field_value
-        except KeyError:
-            LOG.warning(
-                'Response field not in FROM_HELCIM_JS_FIELDS: %s',
-                field_name
-            )
-            processed[field_name] = field_value
-
-        # If possible, create the F4L4 field
-        cc_number = processed.get('cc_number')
-
-        if cc_number:
-            processed['token_f4l4'] = '{}{}'.format(
-                cc_number[:4], cc_number[-4:]
-            )
-        else:
-            processed['token_f4l4'] = None
+    processed = {**converted_fields, 'token_f4l4': token_f4l4}
 
     return processed
