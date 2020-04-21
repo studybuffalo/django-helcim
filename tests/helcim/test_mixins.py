@@ -31,6 +31,7 @@ class MockView():
         return context
 
 class MockMixinView(HelcimJSMixin, MockView):
+    """Mocked view with mixin."""
     pass
 
 class ResponseMixinModel(ResponseMixin):
