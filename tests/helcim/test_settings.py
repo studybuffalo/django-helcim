@@ -8,39 +8,40 @@ from helcim.settings import determine_helcim_settings
 
 @override_settings(
     HELCIM_ACCOUNT_ID=1, HELCIM_API_TOKEN=2, HELCIM_API_URL=3,
-    HELCIM_TERMINAL_ID=4, HELCIM_API_TEST=5, HELCIM_REDACT_ALL=6,
-    HELCIM_REDACT_CC_NAME=7, HELCIM_REDACT_CC_NUMBER=8,
-    HELCIM_REDACT_CC_EXPIRY=9, HELCIM_REDACT_CC_CVV=10,
-    HELCIM_REDACT_CC_TYPE=11, HELCIM_REDACT_CC_MAGNETIC=12,
-    HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=13, HELCIM_REDACT_TOKEN=14,
-    HELCIM_ENABLE_TRANSACTION_CAPTURE=15, HELCIM_ENABLE_TRANSACTION_REFUND=16,
-    HELCIM_ENABLE_TOKEN_VAULT=17, HELCIM_ALLOW_ANONYMOUS=18,
-    HELCIM_ENABLE_ADMIN=19,
+    HELCIM_TERMINAL_ID=4, HELCIM_API_TEST=5, HELCIM_JS_CONFIG={},
+    HELCIM_REDACT_ALL=7, HELCIM_REDACT_CC_NAME=8, HELCIM_REDACT_CC_NUMBER=9,
+    HELCIM_REDACT_CC_EXPIRY=10, HELCIM_REDACT_CC_CVV=11,
+    HELCIM_REDACT_CC_TYPE=12, HELCIM_REDACT_CC_MAGNETIC=13,
+    HELCIM_REDACT_CC_MAGNETIC_ENCRYPTED=14, HELCIM_REDACT_TOKEN=15,
+    HELCIM_ENABLE_TRANSACTION_CAPTURE=16, HELCIM_ENABLE_TRANSACTION_REFUND=17,
+    HELCIM_ENABLE_TOKEN_VAULT=18, HELCIM_ALLOW_ANONYMOUS=19,
+    HELCIM_ENABLE_ADMIN=20,
 )
 def test_determine_helcim_settings_all_settings_provided():
     """Tests that dictionary contains all expected values."""
     helcim_settings = determine_helcim_settings()
 
-    assert len(helcim_settings) == 19
+    assert len(helcim_settings) == 20
     assert helcim_settings['account_id'] == 1
     assert helcim_settings['api_token'] == 2
     assert helcim_settings['api_url'] == 3
     assert helcim_settings['terminal_id'] == 4
     assert helcim_settings['api_test'] == 5
-    assert helcim_settings['redact_all'] == 6
-    assert helcim_settings['redact_cc_name'] == 7
-    assert helcim_settings['redact_cc_number'] == 8
-    assert helcim_settings['redact_cc_expiry'] == 9
-    assert helcim_settings['redact_cc_cvv'] == 10
-    assert helcim_settings['redact_cc_type'] == 11
-    assert helcim_settings['redact_cc_magnetic'] == 12
-    assert helcim_settings['redact_cc_magnetic_encrypted'] == 13
-    assert helcim_settings['redact_token'] == 14
-    assert helcim_settings['enable_transaction_capture'] == 15
-    assert helcim_settings['enable_transaction_refund'] == 16
-    assert helcim_settings['enable_token_vault'] == 17
-    assert helcim_settings['allow_anonymous'] == 18
-    assert helcim_settings['enable_admin'] == 19
+    assert helcim_settings['helcim_js'] == {}
+    assert helcim_settings['redact_all'] == 7
+    assert helcim_settings['redact_cc_name'] == 8
+    assert helcim_settings['redact_cc_number'] == 9
+    assert helcim_settings['redact_cc_expiry'] == 10
+    assert helcim_settings['redact_cc_cvv'] == 11
+    assert helcim_settings['redact_cc_type'] == 12
+    assert helcim_settings['redact_cc_magnetic'] == 13
+    assert helcim_settings['redact_cc_magnetic_encrypted'] == 14
+    assert helcim_settings['redact_token'] == 15
+    assert helcim_settings['enable_transaction_capture'] == 16
+    assert helcim_settings['enable_transaction_refund'] == 17
+    assert helcim_settings['enable_token_vault'] == 18
+    assert helcim_settings['allow_anonymous'] == 19
+    assert helcim_settings['enable_admin'] == 20
 
 @override_settings()
 def test_determine_helcim_settings_missing_account_id():
@@ -90,10 +91,11 @@ def test_determine_helcim_settings_defaults():
 
     helcim_settings = determine_helcim_settings()
 
-    assert len(helcim_settings) == 19
+    assert len(helcim_settings) == 20
     assert helcim_settings['api_url'] == 'https://secure.myhelcim.com/api/'
     assert helcim_settings['terminal_id'] == ''
     assert helcim_settings['api_test'] is None
+    assert helcim_settings['helcim_js'] == {}
     assert helcim_settings['redact_all'] is None
     assert helcim_settings['redact_cc_name'] is True
     assert helcim_settings['redact_cc_number'] is True
