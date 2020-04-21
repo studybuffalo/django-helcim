@@ -5,15 +5,16 @@ from django.core import exceptions as django_exceptions
 def _validate_helcim_js_settings(helcim_js):
     """Confirms that declared Helcim.js are in proper format."""
     if isinstance(helcim_js, dict) is False:
-        raise django_exceptions.ImproperlyConfigured(
-            'HELCIM_JS setting must be a dictionary.'
-        )
+        message = 'HELCIM_JS_CONFIG setting must be a dictionary.'
+        raise django_exceptions.ImproperlyConfigured(message)
 
     for _, value in helcim_js.items():
         if 'url' not in value or 'token' not in value:
-            raise django_exceptions.ImproperlyConfigured(
-                'HELCIM_JS values must include both a "url" and "token" key.'
+            message = (
+                'HELCIM_JS_CONFIG values must include both a '
+                '"url" and "token" key.'
             )
+            raise django_exceptions.ImproperlyConfigured(message)
 
 def determine_helcim_settings():
     """Collects all possible django-helcim settings for easy use.
