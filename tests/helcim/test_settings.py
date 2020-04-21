@@ -3,8 +3,40 @@ from django.conf import settings
 from django.core import exceptions as django_exceptions
 from django.test import override_settings
 
-from helcim.settings import determine_helcim_settings
+from helcim.settings import (
+    determine_helcim_settings, _validate_helcim_js_settings
+)
 
+
+def test__validate_helcim_js_settings__valid():
+    """Confirms no errors when settings are properly set."""
+    try:
+        _validate_helcim_js_settings({'example': {'url': 'a', 'token': 'b'}})
+    except django_exceptions.ImproperlyConfigured:
+        assert False
+    else:
+        assert True
+
+def test__validate_helcim_js_settings__invalid_type():
+    """Confirms error when HELCIM_JS_CONFIG is not a dictionary."""
+    try:
+        _validate_helcim_js_settings('invalid')
+    except django_exceptions.ImproperlyConfigured as error:
+        assert str(error) == 'HELCIM_JS_CONFIG setting must be a dictionary.'
+    else:
+        assert False
+
+def test__validate_helcim_js_settings__missing_keys():
+    """Confirms error when HELCIM_JS_CONFIG dictionary is missing keys."""
+    try:
+        _validate_helcim_js_settings({'example': {'missing': 'keys'}})
+    except django_exceptions.ImproperlyConfigured as error:
+        assert str(error) == (
+            'HELCIM_JS_CONFIG values must include both a '
+            '"url" and "token" key.'
+        )
+    else:
+        assert False
 
 @override_settings(
     HELCIM_ACCOUNT_ID=1, HELCIM_API_TOKEN=2, HELCIM_API_URL=3,
@@ -17,7 +49,7 @@ from helcim.settings import determine_helcim_settings
     HELCIM_ENABLE_TOKEN_VAULT=18, HELCIM_ALLOW_ANONYMOUS=19,
     HELCIM_ENABLE_ADMIN=20,
 )
-def test_determine_helcim_settings_all_settings_provided():
+def test__determine_helcim_settings__all_settings_provided():
     """Tests that dictionary contains all expected values."""
     helcim_settings = determine_helcim_settings()
 
@@ -44,7 +76,7 @@ def test_determine_helcim_settings_all_settings_provided():
     assert helcim_settings['enable_admin'] == 20
 
 @override_settings()
-def test_determine_helcim_settings_missing_account_id():
+def test__determine_helcim_settings__missing_account_id():
     """Tests that error is generated with account ID is missing."""
     del settings.HELCIM_ACCOUNT_ID
 
@@ -56,7 +88,7 @@ def test_determine_helcim_settings_missing_account_id():
         assert False
 
 @override_settings()
-def test_determine_helcim_settings_missing_api_token():
+def test__determine_helcim_settings__missing_api_token():
     """Tests that error is generated with API token is missing."""
     del settings.HELCIM_API_TOKEN
 
@@ -68,7 +100,7 @@ def test_determine_helcim_settings_missing_api_token():
         assert False
 
 @override_settings()
-def test_determine_helcim_settings_defaults():
+def test__determine_helcim_settings__defaults():
     """Tests that defaults is provided for expected settings."""
     # Clear any settings already provided
     del settings.HELCIM_API_URL
