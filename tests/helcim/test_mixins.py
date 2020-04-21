@@ -9,7 +9,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError
 
 from helcim import exceptions as helcim_exceptions
-from helcim.mixins import ResponseMixin
+from helcim.mixins import ResponseMixin, HelcimJSMixin
 
 
 pytestmark = pytest.mark.django_db # pylint: disable=invalid-name
@@ -18,6 +18,20 @@ class MockDjangoModel():
     """Mock of basic Django model."""
     def __init__(self, **kwargs):
         self.data = kwargs
+
+class MockView():
+    """Mocked Django view for mixin testing."""
+    def __init__(self):
+        pass
+
+    def get_context_data(self, **kwargs):
+        """Mimics normal method for testing."""
+        context = {**kwargs}
+
+        return context
+
+class MockMixinView(HelcimJSMixin, MockView):
+    pass
 
 class ResponseMixinModel(ResponseMixin):
     """Generic object to inherit TransactionMixin methods.
@@ -897,3 +911,13 @@ def test__response__save_token__with_customer_code():
     assert token_instance.data['token'] == 'abcdefghijklmnopqrstuvw'
     assert token_instance.data['token_f4l4'] == '11119999'
     assert token_instance.data['customer_code'] == 'CST1000'
+
+@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': 'abc'})
+def test__helcim_js_mixin__adds_context():
+    """Confirms that expected context is added with mixin."""
+    django_view = MockMixinView()
+
+    context = django_view.get_context_data()
+
+    assert 'helcim_js' in context
+    assert context['helcim_js'] == 'abc'
