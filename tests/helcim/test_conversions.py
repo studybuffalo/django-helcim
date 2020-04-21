@@ -35,31 +35,7 @@ MOCK_TO_FIELDS_INVALID = {
     'invalid': conversions.Field('value', 't'),
 }
 
-MOCK_FROM_FIELDS_DECIMAL = {
-    'amount': conversions.Field('amount', 'c'),
-}
-
-MOCK_FROM_FIELDS_STRING = {
-    'cardNumber': conversions.Field('cc_number', 's'),
-}
-
-MOCK_FROM_FIELDS_INTEGER = {
-    'transactionId': conversions.Field('transaction_id', 'i'),
-}
-
-MOCK_FROM_FIELDS_BOOLEAN = {
-    'availability': conversions.Field('availability', 'b'),
-}
-
-MOCK_FROM_FIELDS_DATE = {
-    'date': conversions.Field('transaction_date', 'd'),
-}
-
-MOCK_FROM_FIELDS_TIME = {
-    'time': conversions.Field('transaction_time', 't')
-}
-
-MOCK_FROM_FIELDS_ALL = {
+MOCK_FROM_FIELDS = {
     'amount': conversions.Field('amount', 'c'),
     'cardNumber': conversions.Field('cc_number', 's'),
     'transactionId': conversions.Field('transaction_id', 'i'),
@@ -339,6 +315,117 @@ def test__process_request_fields__invalid_api():
     else:
         assert False
 
+def test__process_api_response__string_field():
+    """Confirms handling of an API string response field."""
+    fields = {'cardNumber': '1111********9999'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['cc_number'] == '1111********9999'
+    assert isinstance(response['cc_number'], str)
+
+def test__convert_helcim_response_string__field_none():
+    """Tests that string field can handle a None response."""
+    fields = {'cardNumber': None}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['cc_number'] is None
+
+def test_process_api_response__decimal_field():
+    """Confirms handling of an API decimal response field."""
+    fields = {'amount': '50.01'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['amount'] == Decimal('50.01')
+    assert isinstance(response['amount'], Decimal)
+
+def test__convert_helcim_response__integer_field():
+    """Confirms handling of an API integer response field."""
+    fields = {'transactionId': '101'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['transaction_id'] == 101
+    assert isinstance(response['transaction_id'], int)
+
+def test__convert_helcim_response__boolean_field():
+    """Confirms handling of an API boolean response field."""
+    fields = {'availability': '1'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['availability'] is True
+    assert isinstance(response['availability'], bool)
+
+def test__convert_helcim_response__date_field():
+    """Confirms handling of an API date response field."""
+    fields = {'date': '2018-01-01'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['transaction_date'] == date(2018, 1, 1)
+    assert isinstance(response['transaction_date'], date)
+
+def test__convert_helcim_response__time_field():
+    """Confirms handling of an API time response field."""
+    fields = {'time': '08:30:15'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['transaction_time'] == time(8, 30, 15)
+    assert isinstance(response['transaction_time'], time)
+
+def test_process_api_response_missing_field():
+    """Confirms handling of an API response field not accounted for."""
+    fields = {'fake_field': 'fake.'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert response['fake_field'] == 'fake.'
+    assert isinstance(response['fake_field'], str)
+
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_INVALID)
+def test__convert_helcim_response__invalid_type():
+    """Confirms handling of an invalid type for a response field."""
+    fields = {'invalid': 'field'}
+
+    response = conversions.convert_helcim_response_fields(
+        fields, MOCK_FROM_FIELDS
+    )
+
+    assert 'invalid' in response
+    assert response['invalid'] == 'field'
+
+def test__create_f4l4():
+    """Confirms the F4L4 is returned when cc_number provided."""
+    token_f4l4 = conversions.create_f4l4('1111********9999')
+
+    assert token_f4l4 == '11119999'
+
+def test__create_f4l4__no_cc():
+    """Confirms the F4L4 creation can handle a missing CC number."""
+    token_f4l4 = conversions.create_f4l4(None)
+
+    assert token_f4l4 is None
+
 def test__create_raw_response__with_data():
     """Confirms handling when data is provided."""
     response_data = {
@@ -360,7 +447,7 @@ def test__create_raw_response__without_data():
 
     assert request_string is None
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS)
 def test__process_api_response__valid():
     """Tests handling of a valid API response."""
     api_response = {
@@ -393,185 +480,7 @@ def test__process_api_response__valid():
     assert response['cc_number'] == '1111********9999'
     assert response['token_f4l4'] == '11119999'
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_STRING)
-def test__process_api_response__string_field():
-    """Confirms handling of an API string response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'cardNumber': '1111********9999',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['cc_number'] == '1111********9999'
-    assert isinstance(response['cc_number'], str)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_STRING)
-def test__process_api_response_string__field_none():
-    """Tests that string field can handle a None response."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'cardNumber': None,
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['cc_number'] is None
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_DECIMAL)
-def test_process_api_response__decimal_field():
-    """Confirms handling of an API decimal response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'amount': '50.01',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['amount'] == Decimal('50.01')
-    assert isinstance(response['amount'], Decimal)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_INTEGER)
-def test__process_api_response__integer_field():
-    """Confirms handling of an API integer response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'transactionId': '101',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['transaction_id'] == 101
-    assert isinstance(response['transaction_id'], int)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_BOOLEAN)
-def test__process_api_response__boolean_field():
-    """Confirms handling of an API boolean response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'availability': '1',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['availability'] is True
-    assert isinstance(response['availability'], bool)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_DATE)
-def test__process_api_response__date_field():
-    """Confirms handling of an API date response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'date': '2018-01-01',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['transaction_date'] == date(2018, 1, 1)
-    assert isinstance(response['transaction_date'], date)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_TIME)
-def test__process_api_response__time_field():
-    """Confirms handling of an API time response field."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'time': '08:30:15',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['transaction_time'] == time(8, 30, 15)
-    assert isinstance(response['transaction_time'], time)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
-def test_process_api_response_missing_field():
-    """Confirms handling of an API response field not accounted for."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-        'notice': '',
-        'transaction': {
-            'fake_field': 'fake.',
-        }
-    }
-
-    response = conversions.process_api_response(api_response)
-
-    assert response['fake_field'] == 'fake.'
-    assert isinstance(response['fake_field'], str)
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
-def test__process_api_response__missing_required_field():
-    """Confirms handling when a required field is missing."""
-    api_response = {
-        'response': 1,
-        'responseMessage': 'Transaction successful.',
-    }
-
-    try:
-        conversions.process_api_response(api_response)
-    except KeyError as error:
-        assert str(error) == "'notice'"
-    else:
-        assert False
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
-def test__process_api_response__create_f4l4():
-    """Confirms the F4L4 details are assembled as expected."""
-    api_response = {
-        'response': 1,
-        'responseMessage': '',
-        'notice': '',
-        'transaction': {
-            'cardNumber': '1111********9999',
-        }
-    }
-    response = conversions.process_api_response(api_response)
-
-    assert response['token_f4l4'] == '11119999'
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
-def test__process_api_response__create_f4l4_with_no_cc():
-    """Confirms the F4L4 creation can handle a missing CC number."""
-    api_response = {
-        'response': 1,
-        'responseMessage': '',
-        'notice': '',
-        'transaction': {},
-    }
-    response = conversions.process_api_response(api_response)
-
-    assert response['token_f4l4'] is None
-
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_ALL)
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS)
 def test__process_api_response__missing_transaction():
     """Confirms handling of an API response when transaction field missing."""
     api_response = {
@@ -589,48 +498,32 @@ def test__process_api_response__missing_transaction():
     assert 'response_message' in response
     assert 'transaction_success' in response
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_INVALID)
-def test__process_api_response__invalid_type():
-    """Confirms handling of an invalid type for a response field."""
+def test__process_api_response__missing_required_field():
+    """Confirms handling when a required field is missing."""
     api_response = {
         'response': 1,
-        'responseMessage': '',
-        'notice': '',
-        'transaction': {
-            'invalid': 'field',
-        }
+        'responseMessage': 'Transaction successful.',
     }
-    response = conversions.process_api_response(api_response)
 
-    assert 'invalid' in response
-    assert response['invalid'] == 'field'
+    try:
+        conversions.process_api_response(api_response)
+    except KeyError as error:
+        assert str(error) == "'notice'"
+    else:
+        assert False
 
+@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS)
 def test__process_helcim_js__expected_output():
     """Confirms output from function."""
+    api_response = {
+        'amount': '100.00',
+        'cardNumber': '1111********9999',
+    }
 
-def test__process_helcim_js__string_field():
-    """Confirms handling of string field."""
+    response = conversions.process_helcim_js_response(api_response)
 
-def test__process_helcim_js__decimal_field():
-    """Confirms handling of decimal field."""
-
-def test__process_helcim_js__integer_field():
-    """Confirms handling of integer field."""
-
-def test__process_helcim_js__boolean_field():
-    """Confirms handling of boolean field."""
-
-def test__process_helcim_js__date_field():
-    """Confirms handling of date field."""
-
-def test__process_helcim_js__time_field():
-    """Confirms handling of time field."""
-
-def test__process_helcim_js__invalid_type():
-    """Confirms handling of an invalid field type."""
-
-def test__process_helcim_js__missing_field():
-    """Confirms handling of a field not in dictionary."""
-
-def test__process_helcim_js__f4l4():
-    """Confirms handling when creating the F4L4 value."""
+    # Length of response should be 3 (cardNumber will trigger F4L4 creation)
+    assert len(response) == 3
+    assert 'amount' in response
+    assert 'cc_number' in response
+    assert 'token_f4l4' in response
