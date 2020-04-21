@@ -12,8 +12,8 @@ def test_python_35_depreciation_warning(recwarn):
 
     assert len(recwarn) == 1
 
-    django_111_warning = recwarn.pop(DeprecationWarning)
-    assert issubclass(django_111_warning.category, DeprecationWarning)
+    python_35_warning = recwarn.pop(DeprecationWarning)
+    assert issubclass(python_35_warning.category, DeprecationWarning)
 
     warning_text = (
         'django-helcim will stop supporting Python 3.5 '
@@ -21,7 +21,7 @@ def test_python_35_depreciation_warning(recwarn):
         'Ensure you have updated your Python version by then.'
     )
 
-    assert str(django_111_warning.message) == warning_text
+    assert str(python_35_warning.message) == warning_text
 
 @patch('helcim.sys.version', '3.6.0')
 @patch('helcim.django.__version__', '3.0.0')
@@ -29,8 +29,9 @@ def test_other_python_versions_depreciation_warning(recwarn):
     """Tests that warning doesn't fire for other Python versions."""
     reload(helcim)
 
-    assert len(recwarn) is 0
+    assert len(recwarn) == 0
 
+@patch('helcim.sys.version', '3.6.0')
 @patch('helcim.django.__version__', '1.11.0')
 def test_django_111_depreciation_warning(recwarn):
     """Tests that the depreciation warning fires for Django 1.11."""
@@ -49,9 +50,10 @@ def test_django_111_depreciation_warning(recwarn):
 
     assert str(django_111_warning.message) == warning_text
 
+@patch('helcim.sys.version', '3.6.0')
 @patch('helcim.django.__version__', '2.0.0')
 def test_other_django_versions_depreciation_warning(recwarn):
     """Tests that warning doesn't fire for other Django versions."""
     reload(helcim)
 
-    assert len(recwarn) is 0
+    assert len(recwarn) == 0
