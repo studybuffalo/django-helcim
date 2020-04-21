@@ -124,6 +124,7 @@ class HelcimjsPaymentForm(forms.Form):
         initial='0.00',
         label='Amount',
         min_value=0,
+        required=False,
     )
 
     # Fields for Helcim.js processing
