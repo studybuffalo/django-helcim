@@ -251,7 +251,7 @@ class BaseRequest(mixins.ResponseMixin, object):
                     to database.
         """
         # Redacts data if not already done
-        if not self.redacted_response:
+        if not bool(self.redacted_response):
             self.redact_data()
 
         model_dictionary = self.create_model_arguments(transaction_type)
