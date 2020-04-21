@@ -14,7 +14,7 @@ from helcim import (
 from helcim.settings import SETTINGS
 
 
-class BaseRequest(mixins.ResponseMixin, object):
+class BaseRequest(mixins.ResponseMixin):
     """Base class to handle validation and submission to Helcim API.
 
     Parameters:
@@ -483,7 +483,7 @@ class Capture(BaseRequest):
 
         return capture
 
-class HelcimJSResponse(mixins.ResponseMixin, object):
+class HelcimJSResponse(mixins.ResponseMixin):
     """Class to handle Helcim.js Responses.
 
         This is a helper class that takes a Helcim.js response,
