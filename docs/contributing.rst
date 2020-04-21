@@ -1,3 +1,5 @@
+.. _contributing:
+
 ============
 Contributing
 ============
@@ -80,69 +82,14 @@ To check test coverage, you can use the following::
 You may specify the output of the coverage report by changing the
 ``--cov-report`` option to ``html`` or ``xml``.
 
----------------
-Sandbox Website
----------------
+-------
+Sandbox
+-------
 
-The Sandbox website is a barebones Django Oscar store that demonstrates
-how to use Django Helcim with Django Oscar and provides a way to test
-any of your changes. You will need to setup your development
-environment (see above) to proceed.
-
-.. attention::
-
-    These instructions assume you have already setup a pipenv virtual
-    environment with ``django-helcim`` installed. See `Getting started`_
-    if you need additional instructions.
-
-    .. _Getting started: https://django-helcim.readthedocs.io/en/latest/installation.html#install-django-helcim-and-its-dependencies
-
-Deploying the site
-==================
-
-You will need to create your own copy of the ``config.env`` file. This
-file contains some basic ``django`` and ``django-helcim`` settings to
-get the sandbox to work. A template config file can be found at
-``sandbox/.config.env``. Copy and rename this file to ``config.env``
-and update the relevant settings as needed for your sandbox (e.g. your
-Helcim API details).
-
-You should then be able to run the Django migrations::
-
-    $ pipenv run python sandbox/manage.py migrate
-
-Next you will need to load country data (see the `Django Oscar page for
-more details`_)::
-
-    $ pipenv run python sandbox/manage.py oscar_populate_countries
-
-.. _Django Oscar page for more details: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html#initial-data
-
-Next, import a basic catalogue of store items to test with::
-
-    $ pipenv run python sandbox/manage.py oscar_import_catalogue sandbox/fixtures/catalogue.csv
-
-Finally, collect all the static files for the site::
-
-    $ pipenv run python sandbox/manage.py collectstatic
-
-You can now start your site through the standard Django commands and
-access it at http://127.0.0.1:8000/::
-
-    $ pipenv run python sandbox/manage.py runserver
-
-If needed, you can create a superuser account with the standard management
-command::
-
-    $ pipenv run python sandbox/manage.py createsuperuser
-
-You can create regular user accounts by running the sandbox sever and
-creating it with the web form: http://127.0.0.1:8000/accounts/login/.
-
-.. tip::
-
-    If you need to restart your site from scratch, delete the
-    ``db.sqlite3`` file and complete the above steps again.
+You may find it easier to do testing within the sandbox enviroments.
+See the :ref:`Sandbox page <sandbox>` for additional details on setting up
+and configuring the sandbox sites if you haven't already done so as part
+of the ``django-helcim`` installation.
 
 ----------------------
 Updating documentation
