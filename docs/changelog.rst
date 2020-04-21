@@ -6,7 +6,7 @@ Changelog
 Version 0 (Beta)
 ----------------
 
-0.7.2 (2020-Apr-##)
+0.8.0 (2020-Apr-21)
 ===================
 
 Feature Updates
@@ -15,8 +15,31 @@ Feature Updates
 * Switching the ``HELCIM_ASSOCIATE_USER`` setting to
   ``HELCIM_ALLOW_ANONYMOUS``. This will allow clearer support for
   anonymous transactions.
+* Adding support for Helcim.js.
+
+  * Provides new ``gateway`` class which can be used to manage
+    Helcim.js responses, perform data conversion into Python data
+    types, complete validations, complete redactions, and save details
+    to the ``HelcimTransaction`` and ``HelcimToken`` models.
+  * Updates allowable settings to allow declaration of a
+    ``HELCIM_JS_CONFIG`` setting. This setting will allow declaration
+    of Helcim.js configuration details within the Django settings.
+  * Provides new mixin for Django Views. Updates view context to
+    include the ``HELCIM_JS_CONFIG`` details, allowing streamlined
+    declaration of configuration details in Django templates.
+
 * Adding a new sandbox site that shows how Django Helcim can be
-  integrated into a project from scratch.
+  integrated into a project from scratch. This site demonstrates
+  both the Helcim API workflow and the Helcim.js workflow.
+* Docs updated with new details on integrating ``django-helcim`` with
+  a Django project.
+
+Bug Fixes
+---------
+
+* Add verify/verification (``v``) as an allowable transaction type for
+  the ``HelcimTransaction`` model. Other calls in package were
+  expecting this type.
 
 0.7.1 (2020-Apr-05)
 ===================
