@@ -557,9 +557,10 @@ class HelcimJSResponse(mixins.ResponseMixin, object):
             Returns:
                 object: the HelcimToken instance.
         """
+        transaction_instance = self.save_transaction('v')
         token_instance = self.save_token_to_vault()
 
-        return token_instance
+        return transaction_instance, token_instance
 
 def retrieve_token_details(token_id, django_user=None, customer_code=None):
     """Takes a HelcimToken ID and maps details to dictionary."""
