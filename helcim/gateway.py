@@ -504,8 +504,8 @@ class HelcimJSResponse(mixins.ResponseMixin):
     """
     def __init__(self, response, save_token=False, django_user=None):
         self.raw_response = response
-        self.response = None
-        self.redacted_response = None
+        self.response = {}
+        self.redacted_response = {}
         self.save_token = self._determine_save_token_status(save_token)
         self.django_user = django_user
         self.validated = False
