@@ -76,36 +76,15 @@ def test__determine_helcim_settings__all_settings_provided():
     assert helcim_settings['enable_admin'] == 20
 
 @override_settings()
-def test__determine_helcim_settings__missing_account_id():
-    """Tests that error is generated with account ID is missing."""
-    del settings.HELCIM_ACCOUNT_ID
-
-    try:
-        determine_helcim_settings()
-    except django_exceptions.ImproperlyConfigured as error:
-        assert str(error) == 'You must define a HELCIM_ACCOUNT_ID setting'
-    else:
-        assert False
-
-@override_settings()
-def test__determine_helcim_settings__missing_api_token():
-    """Tests that error is generated with API token is missing."""
-    del settings.HELCIM_API_TOKEN
-
-    try:
-        determine_helcim_settings()
-    except django_exceptions.ImproperlyConfigured as error:
-        assert str(error) == 'You must define a HELCIM_API_TOKEN setting'
-    else:
-        assert False
-
-@override_settings()
 def test__determine_helcim_settings__defaults():
     """Tests that defaults is provided for expected settings."""
     # Clear any settings already provided
+    del settings.HELCIM_ACCOUNT_ID
+    del settings.HELCIM_API_TOKEN
     del settings.HELCIM_API_URL
     del settings.HELCIM_TERMINAL_ID
     del settings.HELCIM_API_TEST
+    del settings.HELICM_JS_CONFIG
     del settings.HELCIM_REDACT_ALL
     del settings.HELCIM_REDACT_CC_NAME
     del settings.HELCIM_REDACT_CC_NUMBER
@@ -124,9 +103,11 @@ def test__determine_helcim_settings__defaults():
     helcim_settings = determine_helcim_settings()
 
     assert len(helcim_settings) == 20
+    assert helcim_settings['account_id'] == ''
+    assert helcim_settings['api_token'] == ''
     assert helcim_settings['api_url'] == 'https://secure.myhelcim.com/api/'
     assert helcim_settings['terminal_id'] == ''
-    assert helcim_settings['api_test'] is None
+    assert helcim_settings['api_test'] is False
     assert helcim_settings['helcim_js'] == {}
     assert helcim_settings['redact_all'] is None
     assert helcim_settings['redact_cc_name'] is True
