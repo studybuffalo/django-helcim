@@ -508,6 +508,9 @@ class HelcimJSResponse(mixins.ResponseMixin, object):
         self.redacted_response = None
         self.save_token = self._determine_save_token_status(save_token)
         self.django_user = django_user
+        self.validated = False
+        self.valid = False
+
 
     def is_valid(self):
         """Validates format is correct and notifies of any errors.
@@ -519,48 +522,69 @@ class HelcimJSResponse(mixins.ResponseMixin, object):
             self.raw_response
         )
 
-        return self.response['transaction_success']
+        # Updates instance to note that validation was run and record result
+        self.validated = True
+        self.valid = self.response['transaction_success']
 
-    def record_purchase(self):
-        """Saves validated purchase response to database.
+        return self.valid
 
-            Will apply redaction settings prior to saving to database.
+    def _record_response(self, transaction_type):
+        """Handles saving transaction and token for various response types.
+
+            Will run last checks to ensure data is valid before saving to
+            database.
+
+            Parameters:
+                transaction_type (str): the transaction_type to save the
+                    transaction as: purchase/sale (``s``), preauthorization
+                    (``p``), or verification (``v``).
 
             Returns:
                 tuple: tuple of HelcimTransaction and HelcimToken instances.
                     HelcimToken will be None if token is not saved.
         """
-        transaction_instance = self.save_transaction('s')
+        if self.validated is False:
+            raise helcim_exceptions.HelcimError(
+                'Must validate data with the .is_valid() method '
+                ' before recording purchase.'
+            )
+
+        if self.valid is False:
+            raise helcim_exceptions.HelcimError(
+                'Response data was invalid - cannot record purchase data.'
+            )
+
+        transaction_instance = self.save_transaction(transaction_type)
         token_instance = self.save_token_to_vault()
 
         return transaction_instance, token_instance
 
+    def record_purchase(self):
+        """Saves validated purchase response to database.
+
+            Returns:
+                tuple: tuple of HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
+        """
+        return self._record_response('s')
+
     def record_preauthorization(self):
         """Saves validated preauthorization response to database.
-
-            Will apply redaction settings prior to saving to database.
 
             Returns:
                 tuple of the HelcimTransaction and HelcimToken instances.
                     HelcimToken will be None if token is not saved.
         """
-        transaction_instance = self.save_transaction('s')
-        token_instance = self.save_token_to_vault()
-
-        return transaction_instance, token_instance
+        return self._record_response('p')
 
     def record_verification(self):
         """Saves validated verification response to database.
 
-            Will apply redaction settings prior to saving to database.
-
             Returns:
-                object: the HelcimToken instance.
+                tuple of the HelcimTransaction and HelcimToken instances.
+                    HelcimToken will be None if token is not saved.
         """
-        transaction_instance = self.save_transaction('v')
-        token_instance = self.save_token_to_vault()
-
-        return transaction_instance, token_instance
+        return self._record_response('v')
 
 def retrieve_token_details(token_id, django_user=None, customer_code=None):
     """Takes a HelcimToken ID and maps details to dictionary."""
