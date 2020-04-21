@@ -1,4 +1,5 @@
 """Integration tests between Gateway and Model modules."""
+# pylint: disable=protected-access
 from datetime import datetime
 from unittest.mock import patch
 
@@ -158,6 +159,46 @@ def test__base_card_transaction__save_token__duplicate_without_associate():
 
     assert count == models.HelcimToken.objects.all().count()
     assert first_instance == second_instance
+
+@patch.dict(
+    'helcim.gateway.SETTINGS',
+    {'enable_token_vault': True, 'allow_anonymous': True},
+)
+def test__helcim_js_response__record_response():
+    """Confirms expected models created with _record_response."""
+    # Get initial model counts
+    trans_count = models.HelcimTransaction.objects.all().count()
+    token_count = models.HelcimToken.objects.all().count()
+
+    # Generate response
+    raw_response = {
+        'response': '1',
+        'responseMessage': 'APPROVED',
+        'noticeMessage': 'New Card Stored',
+        'cardNumber': '1111 **** **** 9999',
+        'cardExpiry': '0150',
+        'cardToken': '1234567890abcdefghijkl',
+        'customerCode': 'CST1000',
+        'date': '2020-01-01',
+        'time': '01:02:03',
+    }
+    response = gateway.HelcimJSResponse(raw_response, save_token=True)
+
+    # Validate data to prepare for recording
+    assert response.is_valid()
+
+    # Record purchase
+    transaction, token = response._record_response('s')
+
+    # Confirm model instance counts increased
+    assert models.HelcimTransaction.objects.all().count() == trans_count + 1
+    assert models.HelcimToken.objects.all().count() == token_count + 1
+
+    # Confirm some expected details
+    transaction.customer_code = 'CST1000'
+    transaction.transacton_type = 's'
+    token.customer_code = 'CST1000'
+    token.token = '1234567890abcdefghijkl'
 
 @patch.dict(
     'helcim.gateway.SETTINGS',
