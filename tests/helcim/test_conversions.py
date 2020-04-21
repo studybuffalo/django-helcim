@@ -402,13 +402,12 @@ def test_process_api_response_missing_field():
     assert response['fake_field'] == 'fake.'
     assert isinstance(response['fake_field'], str)
 
-@patch('helcim.conversions.FROM_API_FIELDS', MOCK_FROM_FIELDS_INVALID)
 def test__convert_helcim_response__invalid_type():
     """Confirms handling of an invalid type for a response field."""
     fields = {'invalid': 'field'}
 
     response = conversions.convert_helcim_response_fields(
-        fields, MOCK_FROM_FIELDS
+        fields, MOCK_FROM_FIELDS_INVALID
     )
 
     assert 'invalid' in response
