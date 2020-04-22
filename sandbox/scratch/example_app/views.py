@@ -199,7 +199,7 @@ class PaymentView(FormView):
 
         return self.render_details(request, **kwargs)
 
-class HelcimjsPaymentView(HelcimJSMixin, FormView):
+class HelcimJSPaymentView(HelcimJSMixin, FormView):
     """This view handles an API purchase call with Helcim.js.
 
         This view is an example of how an application that requires
@@ -262,8 +262,6 @@ class HelcimjsPaymentView(HelcimJSMixin, FormView):
         form = self.get_form()
 
         return self.form_invalid(form)
-
-        #return self.render_details(request, **kwargs)
 
 class SuccessView(TemplateView):
     """View to display additional details on successful transaction."""
