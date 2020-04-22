@@ -15,9 +15,9 @@ Getting Started
 Install django-helcim and its Dependencies
 ------------------------------------------------
 
-Install ``django-helcim`` (which will install both Django as a
-dependency). It is strongly recommended you use a virtual environment
-for your projects. For example, you can do this easily with Pipenv_::
+Install ``django-helcim`` from PyPI. It is strongly recommended you use
+a virtual environment for your projects. For example, you can do this
+easily with Pipenv_::
 
     $ pipenv install django-helcim
 
