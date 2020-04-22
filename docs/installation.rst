@@ -1,7 +1,7 @@
 .. _getting-started:
 
 ===============
-Getting started
+Getting Started
 ===============
 
 .. note::
@@ -12,7 +12,7 @@ Getting started
     where as "Helcim.js" will refere to calls via Helcim.js.
 
 ------------------------------------------------
-Install django-helcim and its dependencies
+Install django-helcim and its Dependencies
 ------------------------------------------------
 
 Install ``django-helcim`` (which will install both Django as a
@@ -38,14 +38,16 @@ to install this package as well::
 
     .. _setup instructions for Django Oscar: https://django-oscar.readthedocs.io/en/latest/internals/getting_started.html
 
-Django Helcim also supplies some credit card logos to display with
-saved credit cards. To make use of these you will need to run
-``collectstatic``::
+Make sure to add ``django-helcim`` to your ``INSTALLED_APPS``::
 
-    $ pipenv run python manage.py collectstatic
+    INSTALLED_APPS = [
+       ...
+       'helcim',
+       ...
+    ]
 
 -------------------------
-Edit your Django settings
+Edit your Django Settings
 -------------------------
 
 Once ``django-helcim`` has been installed, you will need to update
@@ -65,6 +67,33 @@ when a setting is not specified. Where possible, the package defaults
 to the most restrictive value possible (given the security requirements
 of financial data). A full list of settings you can configure is
 available on the :ref:`Settings page <settings>`.
+
+--------
+Add URLs
+--------
+
+There are a couple views you can use to review and manage various
+aspects of the ``django-helcim`` models. You can enable these by
+updating the :ref:`required settings <settings>` and adding the
+package URLs:
+
+.. code-block:: python
+
+    from django.urls import path
+
+    urlpatterns = [
+        path('helcim', include('helcim.urls')),
+    ]
+
+-------------
+Final Details
+-------------
+
+Django Helcim also supplies some credit card logos to display with
+saved credit cards. To make use of these you will need to run
+``collectstatic``::
+
+    $ pipenv run python manage.py collectstatic
 
 ----------
 Next Steps
