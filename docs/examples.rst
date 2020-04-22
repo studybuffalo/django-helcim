@@ -13,7 +13,7 @@ these can be can be found on the :ref:`Sandbox page <sandbox>`.
 
 You can also find explicit details of supported functionality and
 allowable options for all the ``django-helcim`` functions and classes
-on the :ref:`package documentation pages <helcim>`.
+on the :ref:`package documentation pages <helcim package>`.
 
 .. note::
 
