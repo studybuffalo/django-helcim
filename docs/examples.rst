@@ -198,10 +198,10 @@ variable.
     </form>
 
 Once you have made Helcim.js call, you will receive the response for
-handling. You will need to handle both possible errors from the call
-(e.g. expired credit card) and success calls. ``django-helcim``
-provides a helper class to manage these responses and create the
-relevant ``django-helcim`` model instances.
+handling. You will need to handle both error responses (e.g. expired
+credit card) and success calls. ``django-helcim`` provides a helper
+class to manage these responses and create the relevant
+``django-helcim`` model instances.
 
 .. code-block:: python
 

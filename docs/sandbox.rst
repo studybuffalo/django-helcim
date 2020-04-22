@@ -1,8 +1,8 @@
 .. _sandbox:
 
-===============
-Sandbox Website
-===============
+================
+Sandbox Websites
+================
 
 The sandbox websites provide working examples of how to integrate
 ``django-helcim`` into a project. There are two sandboxes to
