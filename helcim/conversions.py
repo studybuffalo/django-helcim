@@ -314,7 +314,8 @@ def create_f4l4(cc_number):
             string: the token F4L4 value.
     """
     if cc_number:
-        return '{}{}'.format(cc_number[:4], cc_number[-4:])
+        stripped_cc = cc_number.strip()
+        return '{}{}'.format(stripped_cc[:4], stripped_cc[-4:])
 
     return None
 
