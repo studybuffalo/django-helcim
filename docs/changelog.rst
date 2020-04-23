@@ -6,6 +6,17 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.9.0 (2020-Apr-23)
+===================
+
+Feature Updates
+---------------
+
+* Adding new settings key under the ``HELCIM_JS_CONFIG`` setting.
+  Can now include ``test: True`` for each Helcim.js configuration.
+  When enabled, you can use ``helcim_js.identifier.test_input`` to
+  enable or disable test mode within the Django template.
+
 0.8.1 (2020-Apr-23)
 ===================
 

@@ -391,4 +391,16 @@ class HelcimJSMixin():
         # Add the Helcim.js configuration details
         context['helcim_js'] = SETTINGS['helcim_js']
 
+        # Add a helper "test" input to allow declaration of test status
+        # This input flags a transaction as a test and allows testing
+        # in environments without SSL enabled (e.g. the Django
+        # development server)
+        for config in context['helcim_js']:
+            if context['helcim_js'][config].get('test', False):
+                test_input = '<input id="test" type="hidden" value="1">'
+            else:
+                test_input = ''
+
+            context['helcim_js'][config]['test_input'] = test_input
+
         return context

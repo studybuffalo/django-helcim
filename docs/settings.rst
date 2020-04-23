@@ -83,15 +83,43 @@ the following format:
 .. code-block:: python
 
    {
-     'custom_identifier': {
+     'identifier': {
        'url': 'url-to-your-helcim-js-script',
        'token' 'your-helcim-js-token',
+       'test': True,
      }
    }
 
 Once configured, you can add the ``HelcimJSMixin`` to the required views and
-access the details in your templates through this syntax:
-``helcim_js.custom_identifier.url`` and ``helcim_js.custom_identifier.token``.
+access the details in your templates. Below is summary of the keys and mixin
+funtionality:
+
++----------------+-----------------------+------------------------------------+
+| Settings Key   | Description           | Mixin Usage                        |
++================+=======================+====================================+
+| ``identifier`` | An identifier used in | ``helcim_js.identifier``           |
+|                | templates to          |                                    |
+|                | reference these       |                                    |
+|                | configuration         |                                    |
+|                | details.              |                                    |
++----------------+-----------------------+------------------------------------+
+| ``url``        | URL to the Helcim.js  | ``helcim_js.identifier.url``       |
+|                | file. Can be an empty |                                    |
+|                | string if you will    |                                    |
+|                | serve the JS file     |                                    |
+|                | yourself.             |                                    |
++----------------+-----------------------+------------------------------------+
+| ``token``      | The Helcim.js token   | ``helcim_js.identifier.token``     |
++----------------+-----------------------+------------------------------------+
+| ``test``       | Optional value; add   | ``helcim_js.identifier.test_input` |
+|                | key with a ``truthy`` |                                    |
+|                | value to enable. If   |                                    |
+|                | enabled, will output  |                                    |
+|                | the HTML input to     |                                    |
+|                | trigger the Helcim.js |                                    |
+|                | test mode. Otherwise  |                                    |
+|                | will be empty string. |                                    |
++----------------+-----------------------+------------------------------------+
 
 -----------------------------
 Private data storage settings
