@@ -913,7 +913,7 @@ def test__response__save_token__with_customer_code():
     assert token_instance.data['token_f4l4'] == '11119999'
     assert token_instance.data['customer_code'] == 'CST1000'
 
-@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': 'abc'})
+@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {'url': 'abc'}}})
 def test__helcim_js_mixin__adds_context():
     """Confirms that expected context is added with mixin."""
     django_view = MockMixinView()
@@ -921,4 +921,36 @@ def test__helcim_js_mixin__adds_context():
     context = django_view.get_context_data()
 
     assert 'helcim_js' in context
-    assert context['helcim_js'] == 'abc'
+    assert context['helcim_js'] == {'id': {'url': 'abc', 'test_input': ''}}
+
+@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {'test': True}}})
+def test__helcim_js_mixin__adds_test_input__with_test_key():
+    """Confirms an HTML test input is added when test key specified."""
+    django_view = MockMixinView()
+
+    context = django_view.get_context_data()
+
+    assert 'test_input' in context['helcim_js']['id']
+    assert context['helcim_js']['id']['test_input'] == (
+        '<input id="test" type="hidden" value="1">'
+    )
+
+@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {}}})
+def test__helcim_js_mixin__doesadds_test_input__without_test_key():
+    """Confirms empty string returned when test key not specified."""
+    django_view = MockMixinView()
+
+    context = django_view.get_context_data()
+
+    assert 'test_input' in context['helcim_js']['id']
+    assert context['helcim_js']['id']['test_input'] == ''
+
+@patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {'test': False}}})
+def test__helcim_js_mixin__doesadds_test_input__with_falsy_key():
+    """Confirms empty string returned when test key is a falsy value."""
+    django_view = MockMixinView()
+
+    context = django_view.get_context_data()
+
+    assert 'test_input' in context['helcim_js']['id']
+    assert context['helcim_js']['id']['test_input'] == ''
