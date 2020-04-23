@@ -6,6 +6,16 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.8.1 (2020-Apr-23)
+===================
+
+Bug Fixes
+---------
+
+* Fixing bug with the Helcim token "First 4 Last 4" characters saving;
+  Helcim.js response may include whitespace in credit card number,
+  so this needs to be stripped out.
+
 0.8.0 (2020-Apr-21)
 ===================
 

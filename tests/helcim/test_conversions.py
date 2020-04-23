@@ -419,6 +419,12 @@ def test__create_f4l4():
 
     assert token_f4l4 == '11119999'
 
+def test__create_f4l4__with_whitespace():
+    """Confirms the F4L4 is returned when cc_number provided."""
+    token_f4l4 = conversions.create_f4l4(' 1111********9999 ')
+
+    assert token_f4l4 == '11119999'
+
 def test__create_f4l4__no_cc():
     """Confirms the F4L4 creation can handle a missing CC number."""
     token_f4l4 = conversions.create_f4l4(None)
