@@ -7,6 +7,7 @@ import re
 import pytz
 
 from django.db import IntegrityError
+from django.utils.safestring import mark_safe
 
 from helcim import exceptions as helcim_exceptions
 from helcim.settings import SETTINGS
@@ -397,7 +398,9 @@ class HelcimJSMixin():
         # development server)
         for config in context['helcim_js']:
             if context['helcim_js'][config].get('test', False):
-                test_input = '<input id="test" type="hidden" value="1">'
+                test_input = mark_safe(
+                    '<input id="test" type="hidden" value="1">'
+                )
             else:
                 test_input = ''
 

@@ -7,6 +7,7 @@ import pytest
 
 from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError
+from django.utils.safestring import SafeString
 
 from helcim import exceptions as helcim_exceptions
 from helcim.mixins import ResponseMixin, HelcimJSMixin
@@ -931,12 +932,13 @@ def test__helcim_js_mixin__adds_test_input__with_test_key():
     context = django_view.get_context_data()
 
     assert 'test_input' in context['helcim_js']['id']
-    assert context['helcim_js']['id']['test_input'] == (
+    assert context['helcim_js']['id']['test_input'] == str(
         '<input id="test" type="hidden" value="1">'
     )
+    assert isinstance(context['helcim_js']['id']['test_input'], SafeString)
 
 @patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {}}})
-def test__helcim_js_mixin__doesadds_test_input__without_test_key():
+def test__helcim_js_mixin__adds_test_input__without_test_key():
     """Confirms empty string returned when test key not specified."""
     django_view = MockMixinView()
 
@@ -946,7 +948,7 @@ def test__helcim_js_mixin__doesadds_test_input__without_test_key():
     assert context['helcim_js']['id']['test_input'] == ''
 
 @patch.dict('helcim.mixins.SETTINGS', {'helcim_js': {'id': {'test': False}}})
-def test__helcim_js_mixin__doesadds_test_input__with_falsy_key():
+def test__helcim_js_mixin__adds_test_input__with_falsy_key():
     """Confirms empty string returned when test key is a falsy value."""
     django_view = MockMixinView()
 
