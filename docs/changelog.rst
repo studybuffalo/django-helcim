@@ -6,6 +6,15 @@ Changelog
 Version 0 (Beta)
 ----------------
 
+0.9.1 (2020-Apr-25)
+===================
+
+Bug Fixes
+---------
+
+* Marking the ``helcim_js.identifier.test_input`` as a Django ``SafeString``,
+  to allow usage without manual escpaing in templates.
+
 0.9.0 (2020-Apr-23)
 ===================
 
