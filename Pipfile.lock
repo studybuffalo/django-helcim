@@ -360,10 +360,10 @@
         },
         "keyring": {
             "hashes": [
-                "sha256:197fd5903901030ef7b82fe247f43cfed2c157a28e7747d1cfcf4bc5e699dd03",
-                "sha256:8179b1cdcdcbc221456b5b74e6b7cfa06f8dd9f239eb81892166d9223d82c5ba"
+                "sha256:3401234209015144a5d75701e71cb47239e552b0882313e9f51e8976f9e27843",
+                "sha256:c53e0e5ccde3ad34284a40ce7976b5b3a3d6de70344c3f8ee44364cc340976ec"
             ],
-            "version": "==21.2.0"
+            "version": "==21.2.1"
         },
         "lazy-object-proxy": {
             "hashes": [
@@ -655,11 +655,11 @@
         },
         "sphinx": {
             "hashes": [
-                "sha256:3145d87d0962366d4c5264c39094eae3f5788d01d4b1a12294051bfe4271d91b",
-                "sha256:d7c6e72c6aa229caf96af82f60a0d286a1521d42496c226fe37f5a75dcfe2941"
+                "sha256:62edfd92d955b868d6c124c0942eba966d54b5f3dcb4ded39e65f74abac3f572",
+                "sha256:f5505d74cf9592f3b997380f9bdb2d2d0320ed74dd69691e3ee0644b956b8d83"
             ],
             "index": "pypi",
-            "version": "==3.0.2"
+            "version": "==3.0.3"
         },
         "sphinx-rtd-theme": {
             "hashes": [
