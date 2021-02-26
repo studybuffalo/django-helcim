@@ -11,7 +11,7 @@ xmltodict = "*"  # https://github.com/martinblech/xmltodict
 [dev-packages]
 # Django (for testing)
 # ------------------------------------------------------------------------------
-django-oscar = ">=2.0,<2.1"  # https://github.com/django-oscar/django-oscar
+django-oscar = ">=2.0,<3.1"  # https://github.com/django-oscar/django-oscar
 django-environ = "*"  # https://github.com/joke2k/django-environ
 django-debug-toolbar = "*"  # https://github.com/jazzband/django-debug-toolbar
 #pycountry = "*"  # https://pypi.org/project/pycountry/
